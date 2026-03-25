@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>결제하기 - All-In-Shop</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/page.css">
+    <link rel="stylesheet" href="../css/chatbot.css">
+    <link rel="stylesheet" href="../css/pages/checkout.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <h1 class="logo"><a href="index.html">All-In-Shop</a></h1>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="index.html">쇼핑하기</a></li>
+                    <li><a href="login.html">로그인</a></li>
+                    <li><a href="signup.html">회원가입</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container checkout-main">
+    <div class="checkout-grid">
+        <!-- 주문 결제 제목 -->
+        <h2 class="checkout-title">주문 결제</h2>
+
+        <!-- 배송 정보 -->
+        <div class="checkout-box">
+            <h3 class="checkout-subtitle">배송 정보</h3>
+            <form class="checkout-form">
+                <input type="text" placeholder="이름" class="input-field">
+                <input type="text" placeholder="연락처" class="input-field">
+                <div class="postcode-wrapper">
+                    <input type="text" id="postcode" placeholder="우편번호" readonly class="input-field readonly">
+                    <button type="button" class="btn btn-outline" onclick="execDaumPostcode()">주소 찾기</button>
+                </div>
+                <input type="text" id="address" placeholder="기본 주소" readonly class="input-field readonly">
+                <input type="text" id="detailAddress" placeholder="상세 주소" class="input-field">
+            </form>
+        </div>
+        
+        <!-- 결제 수단 -->
+        <div class="checkout-box">
+            <h3 class="checkout-subtitle">결제 수단</h3>
+            <div id="pay-methods" class="pay-methods">
+                <button type="button" class="btn btn-outline" onclick="selectPayMethod(this, 'card')">신용카드</button>
+                <button type="button" class="btn btn-outline" onclick="selectPayMethod(this, 'vbank')">무통장 입금</button>
+                <button type="button" class="btn btn-outline" onclick="selectPayMethod(this, 'phone')">휴대폰 결제</button>
+            </div>
+            <div class="checkout-total">
+                <span class="total-label">총 결제 금액</span>
+                <span id="checkout-total-price" class="total-price">₩0</span>
+            </div>
+            <button id="payButton" type="button" class="btn btn-primary" onclick="requestPay()">결제하기</button>
+        </div>
+    </div>
+</main>
+
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>&copy; 2026 All-In-Shop. All rights reserved.</p>
+        </div>
+    </footer>
+
+
+    <!-- 카카오(다음) 우편번호 API -->
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
+   <!-- 포트원(아임포트) 결제 API -->
+<script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+<script src="../js/checkout.js"></script>
+
+
+</body>
+</html>

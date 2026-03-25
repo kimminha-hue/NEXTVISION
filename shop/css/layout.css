@@ -1,0 +1,54 @@
+/* Layout */
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+/* Header */
+.site-header {
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--border-color);
+    background: rgba(11, 12, 16, 0.85);
+    backdrop-filter: blur(12px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.site-header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Main Grid */
+.product-catalog {
+    padding: 0 0 6rem;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Footer */
+.site-footer {
+    margin-top: auto;
+    padding: 3rem 0;
+    text-align: center;
+    border-top: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    background: var(--surface-color);
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6rem 1rem;
+}

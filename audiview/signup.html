@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AUDIVIEW 회원가입</title>
+<link rel="stylesheet" href="css/login.css">
+</head>
+
+<body>
+
+<a href="#signup-main" class="skip-link">본문 바로가기</a>
+
+<main id="signup-main" class="login-main">
+
+<div class="login-container">
+
+<section class="login-box" role="region" aria-labelledby="signup-title">
+
+<a href="index.html" class="logo" aria-label="AUDIVIEW 메인으로 이동">
+<span class="logo-audi">AUDI</span><span class="logo-view">VIEW</span>
+</a>
+
+<h1 id="signup-title">회원가입</h1>
+<!-- 음성 안내 -->
+<div class="form-group">
+<button type="button" class="voice-guide"
+onclick="readGuide()"
+aria-label="회원가입 입력 안내 듣기">
+🔊 입력 안내 듣기
+</button>
+</div>
+
+<div id="error-msg" class="error-msg" aria-live="assertive"></div>
+
+<form id="signupForm">
+
+<!-- 이름 -->
+<div class="form-group">
+<label for="name">이름</label>
+<input 
+id="name"
+type="text"
+placeholder="이름 입력"
+required>
+</div>
+
+<!-- 이메일 -->
+<div class="form-group">
+<label for="email">이메일</label>
+<input 
+id="email"
+type="email"
+placeholder="example@email.com"
+aria-describedby="email-desc"
+required>
+
+</div>
+
+<!-- 비밀번호 -->
+<div class="form-group">
+<label for="password">비밀번호</label>
+
+<div class="password-wrap">
+<input 
+id="password"
+type="password"
+placeholder="비밀번호 입력"
+aria-describedby="pw-desc"
+required>
+
+<button type="button" class="toggle-password"
+aria-label="비밀번호 보기"
+onclick="togglePassword()">
+👁
+</button>
+</div>
+
+</div>
+
+<!-- 비밀번호 확인 -->
+<div class="form-group">
+<label for="confirm">비밀번호 확인</label>
+
+<input 
+id="confirm"
+type="password"
+placeholder="비밀번호 다시 입력"
+required>
+</div>
+
+
+
+<button type="submit" class="login-btn">회원가입</button>
+<div class="divider">
+  <span>또는</span>
+</div>
+
+<div class="social-login">
+  <button type="button" class="google-btn" aria-label="Google 계정으로 회원가입">
+    Google 회원가입
+  </button>
+  <button type="button" class="kakao-btn" aria-label="Kakao 계정으로 회원가입">
+    Kakao 회원가입
+  </button>
+</div>
+</form>
+
+<p class="signup-link">
+이미 계정이 있으신가요?
+<a href="login.html">로그인</a>
+</p>
+
+</section>
+
+</div>
+
+</main>
+
+<script src="js/signup.js"></script>
+
+</body>
+</html>

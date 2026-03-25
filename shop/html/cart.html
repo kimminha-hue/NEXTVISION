@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>장바구니</title>
+    <link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/page.css">
+<link rel="stylesheet" href="../css/pages/cart.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container">
+        <h1 class="logo"><a href="index.html">All-In-Shop</a></h1>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="index.html">쇼핑하기</a></li>
+                <li><a href="cart.html" aria-current="page">장바구니</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main class="container main-content">
+    <div class="cart-page">
+        <h2 class="cart-title">🛒 장바구니</h2>
+        <div id="cart-list" class="cart-list"></div>
+
+        <div class="cart-summary">
+            <h3 id="total-price">총 금액: ₩0</h3>
+            <button class="btn btn-primary" onclick="goCheckout()">결제하기</button>
+        </div>
+    </div>
+</main>
+
+<script src="../js/cart.js"></script>
+
+</body>
+</html>

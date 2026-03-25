@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AUDIVIEW 로그인</title>
+  <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+
+  <a href="#login-main" class="skip-link">본문 바로가기</a>
+
+  <main id="login-main" class="login-main">
+    <div class="login-container">
+      <section class="login-box" aria-labelledby="login-title">
+
+        <a href="index.html" class="logo" aria-label="AUDIVIEW 메인 화면으로 이동">
+          <span class="logo-audi">AUDI</span><span class="logo-view">VIEW</span>
+        </a>
+
+        <h1 id="login-title">로그인</h1>
+
+        <div id="error-msg" class="error-msg" aria-live="assertive"></div>
+        <div class="form-group voice-group">
+            <button
+              type="button"
+              class="voice-guide"
+              onclick="readGuide()"
+              aria-label="로그인 입력 안내 듣기">
+              🔊 입력 안내 듣기
+            </button>
+          </div>
+        <form id="loginForm" novalidate>
+          <div class="form-group">
+            <label for="email">이메일</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="example@email.com"
+              autocomplete="email"
+              required>
+          </div>
+
+          <div class="form-group">
+            <label for="password">비밀번호</label>
+            <div class="password-wrap">
+              <input
+                id="password"
+                name="password"
+                type="password"
+                placeholder="비밀번호 입력"
+                autocomplete="current-password"
+                required>
+              <button
+                type="button"
+                class="toggle-password"
+                aria-label="비밀번호 보기"
+                onclick="togglePassword()">
+                👁
+              </button>
+            </div>
+          </div>
+
+          
+
+          <button type="submit" class="login-btn">로그인</button>
+        </form>
+
+        <div class="divider" role="separator" aria-label="또는">
+          <span>또는</span>
+        </div>
+
+        <div class="social-login">
+          <button type="button" class="google-btn" aria-label="Google 계정으로 로그인">
+            Google 로그인
+          </button>
+          <button type="button" class="kakao-btn" aria-label="Kakao 계정으로 로그인">
+            Kakao 로그인
+          </button>
+        </div>
+
+        <p class="signup-link">
+          계정이 없으신가요?
+          <a href="signup.html">회원가입</a>
+        </p>
+
+      </section>
+    </div>
+  </main>
+
+  <script src="js/login.js"></script>
+</body>
+</html>

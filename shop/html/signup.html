@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입 - All-In-Shop</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/page.css">
+    <link rel="stylesheet" href="../css/chatbot.css">
+    <link rel="stylesheet" href="../css/pages/signup.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <h1 class="logo"><a href="index.html">All-In-Shop</a></h1>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="index.html">쇼핑하기</a></li>
+                    <li><a href="login.html">로그인</a></li>
+                    <li><a href="signup.html" aria-current="page">회원가입</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container main-content">
+        <div class="signup-box">
+            <h2 class="signup-title">회원가입</h2>
+
+            <!-- 🔥 form -->
+            <form class="signup-form" onsubmit="return validateForm()">
+                
+                <!-- ✅ required + id 유지 -->
+                <input type="text" placeholder="이름" class="input-field" id="name" required>
+                <input type="text" placeholder="아이디" class="input-field" id="username" required>
+                <input type="password" placeholder="비밀번호" class="input-field" id="password" required>
+                <input type="password" placeholder="비밀번호 확인" class="input-field" id="confirm-password" required>
+
+                <button type="submit" class="btn btn-primary">가입하기</button>
+
+                <!-- 🔥 소셜 회원가입 -->
+                <div class="social-signup">
+                    <p class="divider">간편 회원가입</p>
+
+                    <!-- ✅ type="button" 추가 (중요) -->
+                    <button type="button" class="google-btn">
+                        <img src="../images/google.png" alt="구글">
+                        구글로 회원가입
+                    </button>
+
+                    <button type="button" class="kakao-btn">
+                        <img src="../images/kakao.png" alt="카카오">
+                        카카오로 회원가입
+                    </button>
+                </div>
+
+            </form>
+
+            <!-- 🔥 에러 메시지 -->
+            <p id="error-message" 
+               style="color: red; margin-top: 1rem; display: none; font-size: 1.2rem; font-weight: bold;">
+                비밀번호가 다릅니다.
+            </p>
+
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>&copy; 2026 All-In-Shop. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="../js/signup.js"></script>
+</body>
+</html>
