@@ -72,11 +72,11 @@
         </div>
 
         <div class="social-login">
-          <button type="button" class="google-btn" aria-label="Google 계정으로 로그인">
+          <button type="button" class="google-btn" aria-label="Google 계정으로 로그인" onclick="googleLogin()">
             Google 로그인
           </button>
-          <button type="button" class="kakao-btn" aria-label="Kakao 계정으로 로그인">
-            Kakao 로그인
+          <button type="button" class="kakao-btn" aria-label="Kakao 계정으로 로그인" onclick="kakaoLogin()">
+             <img src="../audiview/images/kakaologin.png" alt="카카오로그인">
           </button>
         </div>
 
@@ -88,7 +88,9 @@
       </section>
     </div>
   </main>
-
+  <!-- 카카오 SDK -->
+  <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
   <script src="js/login.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </body>
 </html>

@@ -97,12 +97,12 @@ required>
 </div>
 
 <div class="social-login">
-  <button type="button" class="google-btn" aria-label="Google 계정으로 회원가입">
+  <button type="button" class="google-btn" aria-label="Google 계정으로 회원가입" onclick="googleSignup()">
     Google 회원가입
   </button>
-  <button type="button" class="kakao-btn" aria-label="Kakao 계정으로 회원가입">
-    Kakao 회원가입
-  </button>
+  <button type="button" class="kakao-btn" aria-label="Kakao 계정으로 로그인" onclick="kakaoLogin()">
+      <img src="../audiview/images/kakaologin.png" alt="카카오로그인">
+   </button>
 </div>
 </form>
 
@@ -116,8 +116,8 @@ required>
 </div>
 
 </main>
-
+<script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
 <script src="js/signup.js"></script>
-
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 </body>
 </html>

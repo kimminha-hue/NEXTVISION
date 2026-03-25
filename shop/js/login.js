@@ -26,29 +26,36 @@ function handleLogin() {
     }
 }
 
+function googleLogin() {
+  const clientId = "622053074582-mul8bneofj0v5d7qsd8m4o3rullbp1sp.apps.googleusercontent.com";
 
-// 구글 로그인 콜백 함수
-function onGoogleLogin(response) {
-    console.log("구글 로그인 성공:", response.credential);
+  const redirectUri = "http://127.0.0.1:5500/shop/login.html"; // 🔥 중요
 
-    fetch("http://localhost:8081/google/auth", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            id_token: response.credential
-        })
-    })
-    .then(res => {
-        if (res.ok) {
-            alert("구글 로그인 성공!");
-            window.location.href = "../index.html";
-        } else {
-            alert("구글 로그인 실패");
-        }
-    });
+  const params = new URLSearchParams({
+    client_id: clientId,
+    redirect_uri: redirectUri,
+    response_type: "token",
+    scope: "profile email",
+    prompt: "select_account"
+  });
+
+  window.location.href =
+    "https://accounts.google.com/o/oauth2/v2/auth?" + params.toString();
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // 카카오 로그인 함수
 function kakaoLogin() {
     window.Kakao.Auth.login({
