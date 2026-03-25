@@ -1,12 +1,24 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
 <title>메인페이지</title>
 </head>
 <body>
-    <h1>AudiView 메인페이지</h1>
-    <a href="/avw/join">회원가입</a><br>
-    <a href="/avw/login">로그인</a>
+
+	<h1>AudiView 메인페이지</h1>
+
+	<div th:if="${session.loginAccount == null}">
+		<a th:href="@{/join}">회원가입</a><br> <a th:href="@{/login}">로그인</a>
+	</div>
+
+	<div th:if="${session.loginAccount != null}">
+		<p>
+			<span th:text="${session.loginAccount.name}"></span>님 환영합니다!
+		</p>
+
+		<a th:href="@{/update}">회원정보 수정</a><br> <a th:href="@{/logout}">로그아웃</a>
+	</div>
+
 </body>
 </html>

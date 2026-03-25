@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>회원정보 수정</title>
+<style>
+.error {
+	color: red;
+	margin-bottom: 10px;
+}
+</style>
+</head>
+<body>
+
+	<h1>회원정보 수정</h1>
+
+	<div th:if="${param.pwError != null and param.pwError[0] == 'current'}"
+		class="error">현재 비밀번호가 일치하지 않습니다.</div>
+
+	<div th:if="${param.pwError != null and param.pwError[0] == 'length'}"
+		class="error">새 비밀번호는 8자 이상이어야 합니다.</div>
+
+	<div th:if="${param.pwError != null and param.pwError[0] == 'format'}"
+		class="error">새 비밀번호는 영문과 숫자를 포함해야 합니다.</div>
+
+	<div th:if="${param.pwError != null and param.pwError[0] == 'confirm'}"
+		class="error">새 비밀번호와 비밀번호 확인이 일치하지 않습니다.</div>
+
+	<form th:action="@{/updateProcess}" method="post">
+		아이디: <input type="text" th:value="${account.loginId}" readonly><br>
+
+		이름: <input type="text" name="name" th:value="${account.name}" required><br>
+		<br>
+
+		<h3>비밀번호 변경</h3>
+		현재 비밀번호: <input type="password" name="currentPassword"><br>
+		새 비밀번호: <input type="password" name="newPassword"><br> 새
+		비밀번호 확인: <input type="password" name="newPasswordConfirm"><br>
+		<br>
+
+		<button type="submit">수정</button>
+	</form>
+
+	<a th:href="@{/main}">메인으로</a>
+
+</body>
+</html>

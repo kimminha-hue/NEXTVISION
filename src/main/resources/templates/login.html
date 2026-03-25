@@ -1,15 +1,42 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
 <title>로그인</title>
+
+<style>
+.error {
+	color: red;
+	margin-bottom: 10px;
+}
+</style>
+
 </head>
 <body>
-    <h1>로그인</h1>
-    <form action="/avw/loginProcess" method="post">
-        아이디: <input type="text" name="loginId"><br>
-        비밀번호: <input type="password" name="password"><br>
-        <button type="submit">로그인</button>
-    </form>
+	<h1>로그인</h1>
+
+	<div th:if="${param.idError != null and param.idError[0] == 'empty'}"
+		class="error">아이디를 입력해주세요.</div>
+
+	<div th:if="${param.pwError != null and param.pwError[0] == 'empty'}"
+		class="error">비밀번호를 입력해주세요.</div>
+
+	<div th:if="${param.error != null and param.error[0] == 'true'}"
+		class="error">아이디 또는 비밀번호가 틀렸습니다.</div>
+
+	<div th:if="${param.locked != null and param.locked[0] == 'true'}"
+		class="error">계정이 잠겼습니다. 10분 후 다시 시도하세요.</div>
+
+	<div th:if="${param.error != null and param.error[0] == 'need_login'}"
+		class="error">로그인 후 이용해주세요.</div>
+
+	<form th:action="@{/loginProcess}" method="post">
+		아이디: <input type="text" name="loginId"
+			th:value="${param.loginId != null ? param.loginId[0] : ''}" required><br>
+
+		비밀번호: <input type="password" name="password" required><br>
+
+		<button type="submit">로그인</button>
+	</form>
 </body>
 </html>
