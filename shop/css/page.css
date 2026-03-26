@@ -474,3 +474,93 @@
     writing-mode: horizontal-tb;
     text-align: center;
 }
+
+/* 상단 헤더 영역 간격 축소 */
+.detail-header-compact {
+    margin-bottom: 1.2rem !important;
+}
+
+.detail-header-compact .review-summary {
+    margin-bottom: 0.8rem;
+}
+
+/* 음성 버튼 섹션 스타일 */
+.voice-audio-section-inline {
+    margin: 0.5rem 0;
+    padding: 0.8rem 0;
+    border-top: 1px solid var(--border-color);
+    /* 필요하다면 border-bottom: 1px solid var(--border-color); 추가 */
+}
+
+/* 버튼 스타일: 사이버틱하고 미니멀한 느낌 */
+.btn-voice-command-small {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: transparent; /* 배경은 투명하게 */
+    color: var(--text-primary);
+    border: 1px solid var(--accent-color); /* 테두리를 포인트 컬러로 */
+    padding: 12px 20px;
+    border-radius: var(--border-radius);
+    font-size: 0.95rem;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* 호버 효과: 포인트 컬러가 채워지는 느낌 */
+.btn-voice-command-small:hover {
+    background: rgba(102, 252, 241, 0.1); /* accent-color의 투명 버전 */
+    box-shadow: 0 0 15px rgba(102, 252, 241, 0.2);
+    transform: translateY(-2px);
+}
+
+/* 아이콘에 미세한 애니메이션 추가 */
+.voice-icon {
+    font-size: 1.1rem;
+    color: var(--accent-color);
+    transition: transform 0.3s ease;
+}
+
+.btn-voice-command-small:hover .voice-icon {
+    transform: scale(1.2);
+}
+
+/* 재생 중일 때의 상태 (고급스러운 펄스 효과) */
+.btn-voice-command-small.is-playing {
+    background: var(--accent-color);
+    color: #000;
+    border-color: var(--accent-color);
+}
+
+.btn-voice-command-small.is-playing .voice-icon {
+    color: #000;
+    animation: voiceWave 1s infinite;
+}
+
+@keyframes voiceWave {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+/* 하단 구매 영역 간격 축소 */
+.actions-compact {
+    padding-top: 0 !important;
+    border-top: none !important;
+}
+
+.actions-compact .size-options {
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.actions-compact .quantity-selector {
+    margin-top: 0.8rem;
+}

@@ -135,52 +135,56 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
 });
 renderOrders();
 
-// ===== 리뷰 렌더링 & 작성/삭제/수정 =====
-function getReviews() { return userData.reviews || []; }
-function saveReviews(reviews){ userData.reviews = reviews; localStorage.setItem("userData", JSON.stringify(userData)); }
+// [mypage.js] 기존 리뷰 관련 함수들을 지우고 이 코드를 넣으세요.
 
-function renderReviews(){
+function renderMyReviews() {
     const reviewsList = document.querySelector('.reviews-list');
-    reviewsList.innerHTML = "";
-    const reviews = getReviews();
-    if(reviews.length===0){ reviewsList.innerHTML="<p>작성한 리뷰가 없습니다.</p>"; return; }
+    if (!reviewsList) return; // 요소가 없으면 중단
 
-    reviews.sort((a,b)=>b.id - a.id);
-    reviews.forEach(review=>{
+    reviewsList.innerHTML = "";
+    
+    // 1. 전체 리뷰 저장소에서 데이터 가져오기
+    const allReviews = JSON.parse(localStorage.getItem("all_reviews")) || [];
+    const currentUserEmail = localStorage.getItem("userEmail") || "guest";
+
+    // 2. 내 이메일과 일치하는 리뷰만 필터링
+    const myReviews = allReviews.filter(r => r.userEmail === currentUserEmail);
+
+    if (myReviews.length === 0) {
+        reviewsList.innerHTML = "<p>작성한 리뷰가 없습니다.</p>";
+        return;
+    }
+
+    // 3. 최신순 정렬 후 화면에 그리기
+    myReviews.sort((a, b) => b.id - a.id);
+    myReviews.forEach(review => {
         const div = document.createElement('div');
-        div.className='review-card';
+        div.className = 'review-card';
         div.innerHTML = `
             <div class="review-content">
-                <strong>${review.product || "상품명 없음"}</strong> | 작성자: ${review.user || '알 수 없음'}<br>
+                <strong>${review.product}</strong><br>
                 ⭐ ${review.rating} / 5 <br>
-                ${review.content}
+                <p>${review.content}</p>
             </div>
             <div class="review-actions">
-                <button class="btn btn-outline edit-review">수정</button>
-                <button class="btn btn-outline delete-review">삭제</button>
+                <button class="btn btn-outline delete-review" data-id="${review.id}">삭제</button>
             </div>
         `;
         reviewsList.appendChild(div);
 
-        // 수정
-        div.querySelector('.edit-review').addEventListener('click', () => {
-            const newContent = prompt("리뷰 수정", review.content);
-            if(newContent !== null && newContent.trim() !== ""){
-                review.content = newContent;
-                localStorage.setItem("userData_" + email, JSON.stringify(userData));
-                renderReviews();
+        // 삭제 버튼 이벤트 연결
+        div.querySelector('.delete-review').onclick = () => {
+            if (confirm("리뷰를 삭제하시겠습니까?")) {
+                const updatedReviews = allReviews.filter(r => r.id !== review.id);
+                localStorage.setItem("all_reviews", JSON.stringify(updatedReviews));
+                renderMyReviews(); // 다시 그리기
             }
-        });
-
-        // 삭제
-        div.querySelector('.delete-review').addEventListener('click', ()=>{
-            if(confirm("리뷰를 삭제하시겠습니까?")){
-                saveReviews(getReviews().filter(r=>r.id!==review.id));
-                renderReviews();
-            }
-        });
+        };
     });
 }
+
+// 페이지 로드 시 실행
+document.addEventListener('DOMContentLoaded', renderMyReviews);
 
 // ===== 리뷰 작성 버튼 연동 =====
 const submitBtn = document.getElementById('submit-review');
@@ -222,34 +226,6 @@ if(submitBtn){
 
 // 초기 리뷰 렌더링
 renderReviews();
-
-// ===== 쿠폰 렌더링 =====
-const couponList = document.querySelector('.coupon-list');
-const applyCouponBtn = document.getElementById('apply-coupon');
-const couponCodeInput = document.getElementById('coupon-code');
-
-function renderCoupons(){
-    couponList.innerHTML = "";
-    if(userData.coupons.length===0){ couponList.innerHTML="<p>등록된 쿠폰이 없습니다.</p>"; return; }
-    userData.coupons.forEach(c=>{
-        const div = document.createElement('div');
-        div.className='coupon-card';
-        div.innerHTML=`쿠폰: ${c.id} | 할인: ${c.discount}% | 상태: ${c.status} | 만료: ${c.expiry}`;
-        couponList.appendChild(div);
-    });
-}
-renderCoupons();
-
-applyCouponBtn.addEventListener('click', ()=>{
-    const code = couponCodeInput.value.trim();
-    if(!code){ alert("쿠폰 코드를 입력해주세요."); return; }
-    if(userData.coupons.some(c=>c.id===code)){ alert("이미 등록된 쿠폰입니다."); return; }
-    userData.coupons.push({id:code, discount:5, status:"active", expiry:"2026-12-31"});
-    couponCodeInput.value="";
-    renderCoupons();
-    localStorage.setItem("userData_" + email, JSON.stringify(userData));
-    alert("쿠폰이 등록되었습니다!");
-});
 
 // ===== 로그아웃 후 정보 초기화=====
 function logout(){
