@@ -4,7 +4,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     let products = [];
     try {
-        const response = await fetch('../data.json');
+        // script.js 7번째 줄을 아래 코드로 완전히 교체하세요.
+    // (?t=... 부분을 넣으면 브라우저가 매번 새로운 파일인 줄 알고 캐시를 무시합니다)
+    const response = await fetch('../data.json?t=' + new Date().getTime());
         if (!response.ok) throw new Error('Network response was not ok');
         products = await response.json();
     } catch (error) {
@@ -14,7 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         else if (detailContainer) detailContainer.innerHTML = errMsg;
         return;
     }
-
+ 
     // --- [1] Index Page Logic (메인 페이지) ---
     if (grid) {
         const renderProducts = (category) => {
@@ -384,7 +386,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             formData.append('image', file);
 
             try {
-                const response = await fetch('http://localhost:8000/api/chat/start', {
+                const response = await fetch('http://223.130.161.162:8000/api/chat/start', {
                     method: 'POST',
                     body: formData
                 });
@@ -411,7 +413,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         input.value = "";
 
         try {
-            const response = await fetch('http://localhost:8000/api/chat/ask', {
+            const response = await fetch('http://223.130.161.162:8000/api/chat/ask', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ session_id: sessionId, user_message: text })
