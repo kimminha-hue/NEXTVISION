@@ -1,26 +1,35 @@
-document.addEventListener("DOMContentLoaded", () => {
-
+document.addEventListener("DOMContentLoaded", async () => {
     const detailContainer = document.getElementById('product-detail-container');
 
-    // 로그인 확인 (localStorage 기반)
+    // 로그인 확인
     const isLogin = localStorage.getItem("isLogin") === "true";
     const userName = isLogin ? localStorage.getItem("username") : "익명";
 
-    const newReview = {
-    id: Date.now(),
-    product: product.name,
-    rating: selectedRating,
-    content: content,
-    user: username    // ✅ 사용자 이름 추가
-};
-    // 상품 ID 가져오기
-    const productId = new URLSearchParams(location.search).get("id") || 1;
+    // productId 가져오기
+    const productId = new URLSearchParams(location.search).get("id");
 
-    // 리뷰 저장소 가져오기
+    // 데이터 가져오기 (data.json)
+    let products = [];
+    try {
+        const res = await fetch('../data.json');
+        if(!res.ok) throw new Error('Failed to fetch data.json');
+        products = await res.json();
+    } catch(e) {
+        console.error(e);
+        if(detailContainer) detailContainer.innerHTML = "<p>상품 데이터를 불러올 수 없습니다.</p>";
+        return;
+    }
+
+    const product = products.find(p => String(p.id) === String(productId));
+    if(!product){
+        detailContainer.innerHTML = `<p>상품을 찾을 수 없습니다.</p>`;
+        return;
+    }
+
+    // 리뷰 저장/불러오기
     function getReviews() {
         return JSON.parse(localStorage.getItem("userData"))?.reviews || [];
     }
-
     function saveReviews(reviews) {
         const savedData = JSON.parse(localStorage.getItem("userData")) || {};
         savedData.reviews = reviews;
@@ -28,141 +37,95 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // =========================
-    // ⭐ 별점 선택 기능
+    // 별점 선택
     // =========================
     let selectedRating = 0;
     const stars = document.querySelectorAll('#review-rating span');
-
     stars.forEach(star => {
-        const value = Number(star.dataset.value);
-
-        // 클릭
         star.addEventListener('click', () => {
-            selectedRating = value;
+            selectedRating = Number(star.dataset.value);
             stars.forEach(s => s.classList.toggle('active', Number(s.dataset.value) <= selectedRating));
         });
-
-        // hover
         star.addEventListener('mouseover', () => {
-            const value = Number(star.dataset.value);
-            stars.forEach(s => s.classList.toggle('active', Number(s.dataset.value) <= value));
+            const val = Number(star.dataset.value);
+            stars.forEach(s => s.classList.toggle('active', Number(s.dataset.value) <= val));
         });
-
-        // hover 해제
         star.addEventListener('mouseout', () => {
             stars.forEach(s => s.classList.toggle('active', Number(s.dataset.value) <= selectedRating));
         });
-
     });
 
     // =========================
     // 평균 별점 계산
     // =========================
     function calculateAverageRating() {
-        const reviews = getReviews().filter(r => r.productId == productId);
-        if (reviews.length === 0) return 0;
+        const reviews = getReviews().filter(r => String(r.productId) === String(productId));
+        if(reviews.length === 0) return 0;
         const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
-        return (sum / reviews.length).toFixed(1); // 소수점 한자리
+        return (sum / reviews.length).toFixed(1);
     }
 
-    // 평균 별점 HTML 렌더링
-    function renderAverageRating() {
-        const avgRating = calculateAverageRating();
-        const avgStars = renderStarsHTML(avgRating);
-        const ratingContainers = document.querySelectorAll('.product-rating');
-
-        ratingContainers.forEach(container => {
-            if (avgRating == 0) {
-                container.innerHTML = "아직 별점이 없습니다.";
-            } else {
-                container.innerHTML = `${avgStars} (평균: ${avgRating})`;
-            }
-        });
-    }
-
-    // 대표 리뷰 렌더링
-    function renderHighlightReview() {
-        const reviews = getReviews().filter(r => r.productId == productId);
-        const highlightContainers = document.querySelectorAll('.highlight-review');
-        
-        highlightContainers.forEach(highlight => {
-            if (reviews.length === 0) {
-                highlight.innerHTML = "<p>대표 리뷰가 없습니다.</p>";
-                return;
-            }
-
-            // 별점이 가장 높은 리뷰(동점일 경우 최신 작성순)를 대표로 표시
-            const r = reviews.reduce((best, current) => {
-                if (current.rating > best.rating) return current;
-                if (current.rating === best.rating && current.id > best.id) return current;
-                return best;
-            }, reviews[0]);
-
-            const starHtml = Array.from({length: 5}, (_, i) =>
-                `<span class="review-star ${i < r.rating ? 'active' : ''}">★</span>`
-            ).join('');
-
-            highlight.innerHTML = `
-                <div class="review-header">
-                    <strong>${r.name}</strong> ${starHtml}
-                </div>
-                <p>${r.content}</p>
-            `;
-        });
-    }
-
-    // ⭐ 별점 HTML 생성 (정수/소수점 반별 표현)
     function renderStarsHTML(avgRating) {
         const fullStars = Math.floor(avgRating);
         const halfStar = avgRating - fullStars >= 0.5 ? 1 : 0;
         const emptyStars = 5 - fullStars - halfStar;
-
         return '★'.repeat(fullStars) + '⯨'.repeat(halfStar) + '☆'.repeat(emptyStars);
     }
 
+    function renderAverageRating() {
+        const avgRating = calculateAverageRating();
+        const containers = document.querySelectorAll('.product-rating');
+        containers.forEach(c => {
+            c.innerHTML = avgRating == 0 ? "아직 별점이 없습니다." : `${renderStarsHTML(avgRating)} (평균: ${avgRating})`;
+        });
+    }
+
     // =========================
-    // 리뷰 렌더링 (삭제 버튼 포함)
+    // 대표 리뷰
+    // =========================
+    function renderHighlightReview() {
+        const reviews = getReviews().filter(r => String(r.productId) === String(productId));
+        const containers = document.querySelectorAll('.highlight-review');
+        containers.forEach(c => {
+            if(reviews.length === 0){
+                c.innerHTML = "<p>대표 리뷰가 없습니다.</p>";
+                return;
+            }
+            const best = reviews.reduce((best, r) => {
+                if(r.rating > best.rating) return r;
+                if(r.rating === best.rating && r.id > best.id) return r;
+                return best;
+            }, reviews[0]);
+            const starsHtml = Array.from({length:5}, (_, i) => `<span class="review-star ${i < best.rating ? 'active' : ''}">★</span>`).join('');
+            c.innerHTML = `<div class="review-header"><strong>${best.name}</strong> ${starsHtml}</div><p>${best.content}</p>`;
+        });
+    }
+
+    // =========================
+    // 리뷰 렌더링
     // =========================
     function renderReviews() {
         const list = document.querySelector('.review-list');
-        if (!list) return;
-
-        const reviews = getReviews().filter(r => r.productId == productId);
-
+        if(!list) return;
+        const reviews = getReviews().filter(r => String(r.productId) === String(productId));
         list.innerHTML = "";
-
-        if (reviews.length === 0) {
+        if(reviews.length === 0){
             list.innerHTML = "<p>아직 리뷰가 없습니다.</p>";
             return;
         }
-
+        reviews.sort((a,b) => b.id - a.id);
         reviews.forEach(r => {
             const div = document.createElement('div');
-            div.className = 'review-item';
-
-            // ⭐ 별점 표시
-            const starHtml = Array.from({length: 5}, (_, i) => {
-                return `<span class="review-star ${i < r.rating ? 'active' : ''}">★</span>`;
-            }).join('');
-
-            // 삭제 버튼 (자신 리뷰만 표시)
+            div.className = "review-item";
+            const starsHtml = Array.from({length:5}, (_, i) => `<span class="review-star ${i < r.rating ? 'active' : ''}">★</span>`).join('');
             let deleteBtn = "";
-            if (r.name === userName) {
-                // inline 스타일 제거하고 클래스만 남김
+            if(r.name === userName){
                 deleteBtn = `<button class="delete-review" data-id="${r.id}">삭제</button>`;
             }
-
-            div.innerHTML = `
-                <div class="review-header">
-                    <strong>${r.name}</strong> ${starHtml} ${deleteBtn}
-                </div>
-                <p>${r.content}</p>
-            `;
-
+            div.innerHTML = `<div class="review-header"><strong>${r.name}</strong> ${starsHtml} ${deleteBtn}</div><p>${r.content}</p>`;
             list.appendChild(div);
         });
 
-         // 삭제 버튼 이벤트 연결
         document.querySelectorAll('.delete-review').forEach(btn => {
             btn.addEventListener('click', () => {
                 const id = Number(btn.dataset.id);
@@ -172,8 +135,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 window.updateProductReviews();
             });
         });
-
-
     }
 
     // =========================
@@ -181,38 +142,15 @@ document.addEventListener("DOMContentLoaded", () => {
     // =========================
     const submitBtn = document.getElementById('submit-review');
     if(submitBtn){
-        let selectedRating = 0;
-        const stars = document.querySelectorAll('#review-rating span');
-
-        // 별점 선택
-        stars.forEach(star => {
-            star.addEventListener('click', () => {
-                selectedRating = parseInt(star.dataset.value);
-                stars.forEach(s => s.classList.remove('active'));
-                star.classList.add('active');
-            });
-        });
-
-        // 리뷰 제출
         submitBtn.addEventListener('click', () => {
-
             if(!isLogin || !userName){
                 alert("리뷰 작성은 회원만 가능합니다. 로그인해주세요.");
                 return;
             }
-
             const content = document.getElementById('review-content').value.trim();
-            if(!content){
-                alert("리뷰를 입력하세요");
-                return;
-            }
+            if(!content){ alert("리뷰를 입력하세요"); return; }
+            if(selectedRating === 0){ alert("별점을 선택하세요"); return; }
 
-            if(selectedRating === 0){
-                alert("별점을 선택하세요");
-                return;
-            }
-
-            // 리뷰 저장
             const reviews = getReviews();
             reviews.push({
                 id: Date.now(),
@@ -223,27 +161,24 @@ document.addEventListener("DOMContentLoaded", () => {
             });
             saveReviews(reviews);
 
-            // 초기화
             document.getElementById('review-content').value = "";
             selectedRating = 0;
             stars.forEach(s => s.classList.remove('active'));
 
-            // 리뷰 렌더링 업데이트
-            if(typeof window.updateProductReviews === "function"){
-                window.updateProductReviews();
-            }
-
+            window.updateProductReviews();
             alert("리뷰가 등록되었습니다!");
         });
     }
 
-    // 전역 노출하여 외부(script.js)에서 새로고침 후 호출 가능하게 함
+    // =========================
+    // 전역 함수
+    // =========================
     window.updateProductReviews = function() {
         renderReviews();
         renderAverageRating();
         renderHighlightReview();
     };
 
-    // 초기 실행
+    // 초기 렌더링
     window.updateProductReviews();
 });

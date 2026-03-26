@@ -20,26 +20,18 @@ let userData = {
     phone: "010-1234-5678",
     address: "서울시 강남구 OO로 123",
     orders: [
-        {
-            id:"ORDER_001", date:"2026-03-15", status:"배송중", total:54000,
-            items:[{name:"상품1", qty:2, price:20000}, {name:"상품2", qty:1, price:14000}]
-        },
-        {
-            id:"ORDER_002", date:"2026-02-10", status:"배송완료", total:32000,
-            items:[{name:"상품3", qty:1, price:32000}]
-        }
+        { id:"ORDER_001", date:"2026-03-15", status:"배송중", total:54000,
+          items:[{name:"상품1", qty:2, price:20000}, {name:"상품2", qty:1, price:14000}] },
+        { id:"ORDER_002", date:"2026-02-10", status:"배송완료", total:32000,
+          items:[{name:"상품3", qty:1, price:32000}] }
     ],
     reviews: [],
-    coupons:[
-        {id:"COUPON_01", discount:10, status:"active", expiry:"2026-06-30"}
-    ]
+    coupons:[{id:"COUPON_01", discount:10, status:"active", expiry:"2026-06-30"}]
 };
 
 // 🔥 localStorage에 저장된 데이터가 있으면 불러오기
 const savedData = localStorage.getItem("userData");
-if(savedData){
-    userData = JSON.parse(savedData);
-}
+if(savedData) userData = JSON.parse(savedData);
 
 // ===== 회원정보 초기값 =====
 document.getElementById('name').value = userData.name;
@@ -54,7 +46,6 @@ document.getElementById('profile-form').addEventListener('submit', e => {
     userData.email = document.getElementById('email').value;
     userData.phone = document.getElementById('phone').value;
     userData.address = document.getElementById('address').value;
-
     localStorage.setItem("userData", JSON.stringify(userData));
     alert("회원정보가 저장되었습니다!");
 });
@@ -102,7 +93,6 @@ document.getElementById('delete-account').addEventListener('click', () => {
 
 // ===== 주문내역 렌더링 =====
 const ordersList = document.querySelector('.orders-list');
-
 function renderOrders(filter="all"){
     ordersList.innerHTML = "";
     const filteredOrders = userData.orders.filter(o => filter==="all" || o.status === filter);
@@ -110,7 +100,6 @@ function renderOrders(filter="all"){
         ordersList.innerHTML = "<p>해당 주문이 없습니다.</p>";
         return;
     }
-
     filteredOrders.forEach(order => {
         const div = document.createElement('div');
         div.className = 'order-card';
@@ -119,14 +108,12 @@ function renderOrders(filter="all"){
             <button class="btn btn-outline view-details">상세보기</button>
         `;
         ordersList.appendChild(div);
-
         div.querySelector('.view-details').addEventListener('click', () => {
             const itemsHTML = order.items.map(item => `${item.name} x${item.qty} = ₩${item.price.toLocaleString()}`).join("<br>");
             alert(`주문 상세\n${itemsHTML}`);
         });
     });
 }
-
 document.querySelectorAll('.filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -134,32 +121,26 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
         renderOrders(btn.dataset.status);
     });
 });
-
 renderOrders();
 
-// ===== 리뷰 렌더링 (마이페이지 연동) =====
+// ===== 리뷰 렌더링 & 작성/삭제/수정 =====
+function getReviews() { return userData.reviews || []; }
+function saveReviews(reviews){ userData.reviews = reviews; localStorage.setItem("userData", JSON.stringify(userData)); }
+
 function renderReviews(){
     const reviewsList = document.querySelector('.reviews-list');
     reviewsList.innerHTML = "";
+    const reviews = getReviews();
+    if(reviews.length===0){ reviewsList.innerHTML="<p>작성한 리뷰가 없습니다.</p>"; return; }
 
-    const userData = JSON.parse(localStorage.getItem("userData")) || {};
-    const reviews = userData.reviews || [];
+    reviews.sort((a,b)=>b.id - a.id);
 
-    if(reviews.length === 0){
-        reviewsList.innerHTML = "<p>작성한 리뷰가 없습니다.</p>";
-        return;
-    }
-
-    // 최신 리뷰 먼저
-    reviews.sort((a,b) => b.id - a.id);
-
-    reviews.forEach(review => {
+    reviews.forEach(review=>{
         const div = document.createElement('div');
-        div.className = 'review-card';
-
+        div.className='review-card';
         div.innerHTML = `
             <div class="review-content">
-                <strong>${review.product}</strong> | 작성자: ${review.user || '알 수 없음'}<br>
+                <strong>${review.product || "상품명 없음"}</strong> | 작성자: ${review.user || '알 수 없음'}<br>
                 ⭐ ${review.rating} / 5 <br>
                 ${review.content}
             </div>
@@ -168,32 +149,68 @@ function renderReviews(){
                 <button class="btn btn-outline delete-review">삭제</button>
             </div>
         `;
-
         reviewsList.appendChild(div);
 
-        // 수정  
+        // 수정
         div.querySelector('.edit-review').addEventListener('click', () => {
             const newContent = prompt("리뷰 수정", review.content);
-            if(newContent !== null && newContent.trim() !== ""){
-                review.content = newContent;
-                localStorage.setItem("userData", JSON.stringify(userData));
+            if(newContent && newContent.trim()!==""){
+                review.content=newContent;
+                saveReviews(getReviews());
                 renderReviews();
             }
         });
 
         // 삭제
-        div.querySelector('.delete-review').addEventListener('click', () => {
+        div.querySelector('.delete-review').addEventListener('click', ()=>{
             if(confirm("리뷰를 삭제하시겠습니까?")){
-                userData.reviews = userData.reviews.filter(r => r.id !== review.id);
-                localStorage.setItem("userData", JSON.stringify(userData));
+                saveReviews(getReviews().filter(r=>r.id!==review.id));
                 renderReviews();
             }
         });
     });
 }
 
-// 초기 렌더
-document.addEventListener("DOMContentLoaded", renderReviews);
+// ===== 리뷰 작성 버튼 연동 =====
+const submitBtn = document.getElementById('submit-review');
+if(submitBtn){
+    const stars = document.querySelectorAll('#review-rating span');
+    let selectedRating = 0;
+
+    stars.forEach(star=>{
+        star.addEventListener('click', ()=>{
+            selectedRating = Number(star.dataset.value);
+            stars.forEach(s=>s.classList.toggle('active', Number(s.dataset.value)<=selectedRating));
+        });
+    });
+
+    submitBtn.addEventListener('click', ()=>{
+        const content = document.getElementById('review-content').value.trim();
+        if(!localStorage.getItem("isLogin") || !localStorage.getItem("username")){ alert("로그인 후 작성 가능합니다."); return; }
+        if(!content){ alert("리뷰 내용을 입력해주세요."); return; }
+        if(selectedRating===0){ alert("별점을 선택해주세요."); return; }
+
+        const reviews = getReviews();
+        reviews.push({
+            id: Date.now(),
+            product: document.getElementById('product-name')?.textContent || "상품명 없음",
+            rating: selectedRating,
+            content: content,
+            user: localStorage.getItem("username")
+        });
+        saveReviews(reviews);
+
+        document.getElementById('review-content').value="";
+        selectedRating=0;
+        stars.forEach(s=>s.classList.remove('active'));
+
+        renderReviews();
+        alert("리뷰가 등록되었습니다!");
+    });
+}
+
+// 초기 리뷰 렌더링
+renderReviews();
 
 // ===== 쿠폰 렌더링 =====
 const couponList = document.querySelector('.coupon-list');
@@ -202,27 +219,22 @@ const couponCodeInput = document.getElementById('coupon-code');
 
 function renderCoupons(){
     couponList.innerHTML = "";
-    if(userData.coupons.length===0){
-        couponList.innerHTML = "<p>등록된 쿠폰이 없습니다.</p>";
-        return;
-    }
-    userData.coupons.forEach(c => {
+    if(userData.coupons.length===0){ couponList.innerHTML="<p>등록된 쿠폰이 없습니다.</p>"; return; }
+    userData.coupons.forEach(c=>{
         const div = document.createElement('div');
-        div.className = 'coupon-card';
-        div.innerHTML = `쿠폰: ${c.id} | 할인: ${c.discount}% | 상태: ${c.status} | 만료: ${c.expiry}`;
+        div.className='coupon-card';
+        div.innerHTML=`쿠폰: ${c.id} | 할인: ${c.discount}% | 상태: ${c.status} | 만료: ${c.expiry}`;
         couponList.appendChild(div);
     });
 }
-
 renderCoupons();
 
-applyCouponBtn.addEventListener('click', () => {
+applyCouponBtn.addEventListener('click', ()=>{
     const code = couponCodeInput.value.trim();
-    if(!code) return alert("쿠폰 코드를 입력해주세요.");
-    const exists = userData.coupons.some(c => c.id === code);
-    if(exists) return alert("이미 등록된 쿠폰입니다.");
+    if(!code){ alert("쿠폰 코드를 입력해주세요."); return; }
+    if(userData.coupons.some(c=>c.id===code)){ alert("이미 등록된 쿠폰입니다."); return; }
     userData.coupons.push({id:code, discount:5, status:"active", expiry:"2026-12-31"});
-    couponCodeInput.value = "";
+    couponCodeInput.value="";
     renderCoupons();
     localStorage.setItem("userData", JSON.stringify(userData));
     alert("쿠폰이 등록되었습니다!");
