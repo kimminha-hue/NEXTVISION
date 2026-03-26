@@ -28,6 +28,15 @@
 		</dependency>
 
 		<!-- 웹 -->
+    	
+    	<!-- 클라우드(S3통신 라이브러리)-->
+    	<dependency>
+		    <groupId>com.amazonaws</groupId>
+		    <artifactId>aws-java-sdk-s3</artifactId>
+		    <version>1.12.700</version>
+		</dependency>
+    	
+        <!-- 웹 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
