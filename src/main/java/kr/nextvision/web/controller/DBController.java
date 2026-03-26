@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.util.HtmlUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -16,109 +15,160 @@ import kr.nextvision.web.repository.AccountRepository;
 @Controller
 public class DBController {
 
-    @Autowired
-    private AccountRepository repository;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+	@Autowired
+	private AccountRepository repository;
 
-    // 회원가입
-    @PostMapping("/joinProcess")
-    public String joinProcess(Account joinAcc) {
+	@PostMapping("/joinProcess")
+	public String joinProcess(Account joinAcc) {
 
-        // 1. 입력값 검증
-        if (joinAcc.getLoginId() == null || joinAcc.getLoginId().length() < 4) {
-            return "redirect:/join?error=loginid_too_short";
-        }
+		if (joinAcc.getLoginId() == null || joinAcc.getPassword() == null || joinAcc.getName() == null) {
+			return "redirect:/join?error=invalid";
+		}
 
-        if (joinAcc.getPassword() == null || joinAcc.getPassword().length() < 8) {
-            return "redirect:/join?error=password_too_short";
-        }
+		if (joinAcc.getLoginId().trim().isEmpty()) {
+			return "redirect:/join?idError=empty";
+		}
 
-        // 2. 비밀번호 정책 (영문+숫자+특수문자)
-        if (!joinAcc.getPassword().matches("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&]).{8,}$")) {
-            return "redirect:/join?error=weak_password";
-        }
+		if (joinAcc.getName().trim().isEmpty()) {
+			return "redirect:/join?nameError=empty";
+		}
 
-        // 3. 아이디 중복 체크
-        if (repository.findByLoginId(joinAcc.getLoginId()).isPresent()) {
-            return "redirect:/join?error=duplicate_id";
-        }
+		String pw = joinAcc.getPassword();
 
-        // 4. XSS 방지
-        joinAcc.setLoginId(HtmlUtils.htmlEscape(joinAcc.getLoginId()));
-        joinAcc.setName(HtmlUtils.htmlEscape(joinAcc.getName()));
+		if (pw.trim().isEmpty()) {
+			return "redirect:/join?pwError=empty";
+		}
 
-        // 5. 비밀번호 암호화
-        String encodedPw = passwordEncoder.encode(joinAcc.getPassword());
-        joinAcc.setPassword(encodedPw);
+		if (pw.length() < 8) {
+			return "redirect:/join?pwError=length";
+		}
 
-        // 6. 기본값 설정
-        joinAcc.setRole("USER");
-        joinAcc.setCreatedAt(LocalDateTime.now());
-        joinAcc.setLoginFailCount(0);
-        joinAcc.setLockUntil(null);
+		if (!pw.matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d!@#$%^&*()_+=-]{8,}$")) {
+			return "redirect:/join?pwError=format";
+		}
 
-        // 7. 저장
-        repository.save(joinAcc);
+		Account existAcc = repository.findByLoginId(joinAcc.getLoginId());
+		if (existAcc != null) {
+			return "redirect:/join?duplicate=true";
+		}
 
-        return "redirect:/main";
-    }
+		joinAcc.setPassword(passwordEncoder.encode(pw));
+		joinAcc.setRole("USER");
+		joinAcc.setLoginFailCount(0);
+		joinAcc.setLockUntil(null);
 
-    // 로그인
-    @PostMapping("/loginProcess")
-    public String loginProcess(String loginId, String password,
-                               HttpServletRequest request,
-                               HttpSession session) {
+		repository.save(joinAcc);
+		return "redirect:/main";
+	}
 
-        // 0. 입력값 검증
-        if (loginId == null || loginId.trim().isEmpty()) {
-            return "redirect:/login?error=invalid";
-        }
+	@PostMapping("/loginProcess")
+	public String loginProcess(String loginId, String password, HttpSession session, HttpServletRequest request) {
 
-        // 1. 사용자 조회
-        Account loginAcc = repository.findByLoginId(loginId).orElse(null);
+		if (loginId == null || loginId.trim().isEmpty()) {
+			return "redirect:/login?idError=empty";
+		}
 
-        // 2. 계정 잠금 체크
-        if (loginAcc != null && loginAcc.getLockUntil() != null &&
-            loginAcc.getLockUntil().isAfter(LocalDateTime.now())) {
+		if (password == null || password.trim().isEmpty()) {
+			return "redirect:/login?pwError=empty&loginId=" + loginId;
+		}
 
-            return "redirect:/login?error=locked";
-        }
+		loginId = loginId.trim();
 
-        // 3. 로그인 검증
-        if (loginAcc == null || !passwordEncoder.matches(password, loginAcc.getPassword())) {
+		Account loginAcc = repository.findByLoginId(loginId);
 
-            if (loginAcc != null) {
-                loginAcc.setLoginFailCount(loginAcc.getLoginFailCount() + 1);
+		if (loginAcc == null) {
+			return "redirect:/login?error=true&loginId=" + loginId;
+		}
 
-                // 5회 실패 시 10분 잠금
-                if (loginAcc.getLoginFailCount() >= 5) {
-                    loginAcc.setLockUntil(LocalDateTime.now().plusMinutes(10));
-                }
+		if (loginAcc.getLockUntil() != null && LocalDateTime.now().isBefore(loginAcc.getLockUntil())) {
+			return "redirect:/login?locked=true&loginId=" + loginId;
+		}
 
-                repository.save(loginAcc);
-            }
+		if (loginAcc.getLockUntil() != null && !LocalDateTime.now().isBefore(loginAcc.getLockUntil())) {
+			loginAcc.setLoginFailCount(0);
+			loginAcc.setLockUntil(null);
+			repository.save(loginAcc);
+		}
 
-            System.out.println("로그인 실패: " + loginId);
-            return "redirect:/login?error=true";
-        }
+		if (!passwordEncoder.matches(password, loginAcc.getPassword())) {
+			int failCount = loginAcc.getLoginFailCount() + 1;
+			loginAcc.setLoginFailCount(failCount);
 
-        // 4. 로그인 성공 시 초기화
-        loginAcc.setLoginFailCount(0);
-        loginAcc.setLockUntil(null);
-        repository.save(loginAcc);
+			if (failCount >= 5) {
+				loginAcc.setLockUntil(LocalDateTime.now().plusMinutes(10));
+				repository.save(loginAcc);
+				return "redirect:/login?locked=true&loginId=" + loginId;
+			}
 
-        // 5. 세션 고정 공격 방지
-        session.invalidate();
-        HttpSession newSession = request.getSession(true);
+			repository.save(loginAcc);
+			return "redirect:/login?error=true&loginId=" + loginId;
+		}
 
-        // 6. 세션 저장
-        newSession.setAttribute("loginAccount", loginAcc);
+		loginAcc.setLoginFailCount(0);
+		loginAcc.setLockUntil(null);
+		repository.save(loginAcc);
 
-        // 7. 세션 타임아웃 설정 (30분)
-        newSession.setMaxInactiveInterval(1800);
+		session.invalidate();
+		HttpSession newSession = request.getSession(true);
+		newSession.setAttribute("loginAccount", loginAcc);
+		newSession.setMaxInactiveInterval(1800);
 
-        return "redirect:/main";
-    }
+		return "redirect:/main";
+	}
+
+	@PostMapping("/updateProcess")
+	public String updateProcess(String name, String currentPassword, String newPassword, String newPasswordConfirm,
+			HttpSession session) {
+
+		Account loginAcc = (Account) session.getAttribute("loginAccount");
+
+		if (loginAcc == null) {
+			return "redirect:/login?error=need_login";
+		}
+
+		Account acc = repository.findById(loginAcc.getUserIdx()).orElse(null);
+		if (acc == null) {
+			return "redirect:/main";
+		}
+
+		if (name == null || name.trim().isEmpty()) {
+			return "redirect:/update?error=invalid";
+		}
+
+		acc.setName(name.trim());
+
+		boolean wantsPasswordChange = newPassword != null && !newPassword.trim().isEmpty();
+
+		if (wantsPasswordChange) {
+			if (currentPassword == null || currentPassword.trim().isEmpty()) {
+				return "redirect:/update?pwError=current";
+			}
+
+			if (!passwordEncoder.matches(currentPassword, acc.getPassword())) {
+				return "redirect:/update?pwError=current";
+			}
+
+			if (newPassword.length() < 8) {
+				return "redirect:/update?pwError=length";
+			}
+
+			if (!newPassword.matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d!@#$%^&*()_+=-]{8,}$")) {
+				return "redirect:/update?pwError=format";
+			}
+
+			if (newPasswordConfirm == null || !newPassword.equals(newPasswordConfirm)) {
+				return "redirect:/update?pwError=confirm";
+			}
+
+			acc.setPassword(passwordEncoder.encode(newPassword));
+		}
+
+		repository.save(acc);
+		session.setAttribute("loginAccount", acc);
+
+		return "redirect:/main";
+	}
 }

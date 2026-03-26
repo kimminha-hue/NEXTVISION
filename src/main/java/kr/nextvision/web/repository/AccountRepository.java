@@ -7,6 +7,8 @@ import kr.nextvision.web.entity.Account;
 public interface AccountRepository extends JpaRepository<Account, Integer> {
 
     Account findByLoginIdAndPassword(String loginId, String password);
+    
+    Account findByLoginId(String loginId);
 
     boolean existsByLoginId(String loginId);
 }
