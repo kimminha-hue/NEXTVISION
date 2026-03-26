@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <img src="../${product.image}" alt="${product.name}" class="detail-image">
                 </div>
                 <div class="detail-content">
-                    <div class="detail-header">
+                    <div class="detail-header detail-header-compact">
                         <span class="detail-category">${product.category || '기타'}</span>
                         <h1 class="detail-name">${product.name}</h1>
                         <p class="detail-price">₩${product.price.toLocaleString()}</p>
@@ -106,10 +106,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                             <div class="product-rating"></div>
                             <div class="highlight-review"></div>
                         </div>
+                        
+                        <div class="voice-audio-section-inline">
+                            <button id="product-voice-btn" class="btn-voice-command-small">
+                                <span class="voice-icon">🔊</span>
+                                <span class="voice-text">상품 음성 설명 듣기</span>
+                            </button>
+                        </div>
+                    
                     </div>
 
-                    <div class="purchase-actions">
 
+                    <div class="purchase-actions actions-compact">
                     <!-- ⭐ 여기 사이즈 들어감 -->
                         ${product.category === "의류" ? `
                         <div class="size-options">
@@ -157,6 +165,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                 `).join('') : ''}
             </div>
         `;
+
+        // 🚨 [매우 중요] innerHTML 주입 바로 다음에 클릭 이벤트를 연결해야 작동합니다!
+        const voiceBtn = document.getElementById('product-voice-btn');
+        if (voiceBtn) {
+            voiceBtn.addEventListener('click', () => {
+                // 음성 설명 함수 실행 (이전에 만든 함수 이름 확인 필요)
+                if (typeof speakProductDescription === 'function') {
+                    speakProductDescription();
+                } else {
+                    console.log("음성 출력 함수를 찾을 수 없습니다.");
+                }
+            });
+        }
 
         // ⭐ 사이즈 선택 이벤트
         if (product.category === "의류") {
