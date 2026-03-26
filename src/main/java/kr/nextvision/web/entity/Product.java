@@ -1,28 +1,55 @@
-package kr.nextvision.web.entity; // 본인 프로젝트의 실제 패키지 경로로 맞춰주세요.
+package kr.nextvision.web.entity;
 
-import jakarta.persistence.*;
+import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
+
+
 @Entity
+@Table(name = "tb_product")
 @Getter
 @Setter
-public class Product {
+public class Product{
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "p_idx")
+	private Long id;
+	
+	@Column(name = "p_name", nullable = false)
+	private String name; // DB의 p_name 연결
+	
+	@Column(name = "p_category")
+    private String category; // DB의 p_category 연결
 
-    @Id // 이 필드를 기본키(PK)로 지정합니다.
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // MySQL의 AUTO_INCREMENT 속성을 사용해 번호를 1씩 자동 증가시킵니다.
-    private Long id;
+    @Column(name = "p_price")
+    private int price; // DB의 p_price 연결
 
-    @Column(nullable = false) // 필수 입력값 (NOT NULL)
-    private String name; // 상품명
+    // RAG 성능을 위한 긴 텍스트
+    @Column(name = "p_desc", columnDefinition = "TEXT")
+    private String description; // DB의 p_desc 연결
 
-    private int price; // 상품 가격
+    // 팀원이 만들어둔 상세 이미지 컬럼 3개 연결
+    @Column(name = "img1")
+    private String img1; // 메인 썸네일 역할
 
-    // AI 챗봇(RAG)의 성능을 결정지을 핵심 필드입니다.
-    // 시각장애인 분들을 위해 색상, 재질, 촉감 등 텍스트가 매우 길어질 수 있으므로, 일반 String(Varchar)이 아닌 TEXT 타입으로 데이터베이스에 생성되도록 강제합니다.
-    @Column(columnDefinition = "TEXT", nullable = false)
-    private String description;
+    @Column(name = "img2")
+    private String img2; // 상세 이미지 1
 
-    // 나중에 클라우드 Object Storage에 이미지를 올리고 나면, 그 이미지에 접근할 수 있는 URL 주소만 이곳에 저장합니다.
-    private String imageUrl;
+    @Column(name = "img3")
+    private String img3; // 상세 이미지 2
+
+    // 생성 일자 (보통 팀 프로젝트 DB에 필수로 들어갑니다)
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+	
+	
 }
