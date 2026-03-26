@@ -29,7 +29,7 @@ function handleLogin() {
 function googleLogin() {
   const clientId = "622053074582-mul8bneofj0v5d7qsd8m4o3rullbp1sp.apps.googleusercontent.com";
 
-  const redirectUri = "http://127.0.0.1:5500/shop/login.html"; // 🔥 중요
+  const redirectUri = "http://127.0.0.1:5500/shop/html/login.html";
 
   const params = new URLSearchParams({
     client_id: clientId,
@@ -42,17 +42,6 @@ function googleLogin() {
   window.location.href =
     "https://accounts.google.com/o/oauth2/v2/auth?" + params.toString();
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -85,3 +74,41 @@ function kakaoLogin() {
         }
     });
 }
+
+// =========================
+// 🔥 구글 로그인 성공 처리
+// =========================
+
+window.onload = () => {
+
+  const hash = window.location.hash;
+
+  // 👉 access_token 있으면 = 구글 로그인 성공
+  if(hash.includes("access_token")){
+
+    const token = new URLSearchParams(hash.substring(1)).get("access_token");
+
+    // 👉 구글 사용자 정보 가져오기
+    fetch("https://www.googleapis.com/oauth2/v1/userinfo?alt=json", {
+      headers: {
+        Authorization: "Bearer " + token
+      }
+    })
+    .then(res => res.json())
+    .then(data => {
+
+      const email = data.email;
+      const name = data.name;
+
+      // 👉 로그인 상태 저장
+      localStorage.setItem("isLogin", "true");
+      localStorage.setItem("username", name);
+
+      alert(name + "님 로그인 성공!");
+
+      // 👉 메인으로 이동
+      window.location.href = "../html/index.html";
+    });
+
+  }
+};

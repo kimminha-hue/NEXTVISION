@@ -39,7 +39,7 @@ function validateForm() {
 function googleLogin() {
   const clientId = "622053074582-mul8bneofj0v5d7qsd8m4o3rullbp1sp.apps.googleusercontent.com";
 
-  const redirectUri = "http://127.0.0.1:5500/shop/signup.html";
+  const redirectUri = "http://127.0.0.1:5500/shop/html/signup.html";
 
   const params = new URLSearchParams({
     client_id: clientId,
@@ -53,8 +53,9 @@ function googleLogin() {
     "https://accounts.google.com/o/oauth2/v2/auth?" + params.toString();
 }
 
+
 // =========================
-// 🚀 구글 로그인 성공 처리
+// 🔥 구글 회원가입/로그인 처리
 // =========================
 
 window.onload = () => {
@@ -63,11 +64,35 @@ window.onload = () => {
 
   if(hash.includes("access_token")){
 
-    localStorage.setItem("isLogin", "true");
-    localStorage.setItem("username", "googleUser");
+    const token = new URLSearchParams(hash.substring(1)).get("access_token");
 
-    alert("구글 회원가입/로그인 성공!");
+    fetch("https://www.googleapis.com/oauth2/v1/userinfo?alt=json", {
+      headers: {
+        Authorization: "Bearer " + token
+      }
+    })
+    .then(res => res.json())
+    .then(data => {
 
-    location.href = "index.html";
+      const email = data.email;
+      const name = data.name;
+
+      // 🔥 기존 회원 체크
+      const existingUser = localStorage.getItem(email);
+
+      if(existingUser){
+        alert("이미 가입된 계정입니다. 로그인됩니다!");
+      } else {
+        // 👉 회원가입 처리
+        localStorage.setItem(email, "googleUser");
+        alert("회원가입 완료!");
+      }
+
+      // 👉 로그인 처리
+      localStorage.setItem("isLogin", "true");
+      localStorage.setItem("username", name);
+
+      location.href = "index.html";
+    });
   }
 };
