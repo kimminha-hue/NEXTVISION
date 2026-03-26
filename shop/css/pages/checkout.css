@@ -8,8 +8,8 @@
 
 .checkout-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-  gap: 1rem;
+  grid-template-columns: 1fr 1fr; /* ⭐ 강제 2열 */
+  gap: 1.5rem;
   max-width: 1300px;
   margin: 0 auto;
 }
@@ -68,4 +68,67 @@
   margin-bottom: 0.5rem;
   border-top: 1px solid var(--border-color);
   padding-top: 0.8rem;
+}
+
+/* 배송정보 */
+.shipping-box {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+/* 결제수단 */
+.payment-box {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+/* 주문상품 */
+.order-summary {
+  grid-column: 1;   /* 왼쪽 */
+  grid-row: 3;      /* 아래 줄 */
+  max-width: 100%;
+  padding: 0.8rem;
+  font-size: 0.9rem;
+}
+
+.order-summary img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+}
+
+/* 주문상품 한 줄 */
+.order-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* 이미지 */
+.order-item img {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* 가운데 정보 */
+.order-info {
+  flex: 1;
+}
+
+.order-name {
+  font-weight: 500;
+  margin-bottom: 0.3rem;
+}
+
+.order-option {
+  font-size: 0.85rem;
+  color: #888;
+}
+
+/* 가격 */
+.order-price {
+  font-weight: 600;
+  font-size: 1rem;
 }

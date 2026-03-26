@@ -1,24 +1,30 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    // 🔥 예시: 로그인된 회원 이름 (실제 환경에서는 서버 세션/토큰)
-    const userName = sessionStorage.getItem("userName") || "테스트회원";
-    sessionStorage.setItem("userName", userName);
-    console.log("사용자 이름:", userName);
+    const detailContainer = document.getElementById('product-detail-container');
 
-    
+    // 로그인 확인 (localStorage 기반)
+    const isLogin = localStorage.getItem("isLogin") === "true";
+    const userName = isLogin ? localStorage.getItem("username") : "익명";
 
-    // 🔥 상품 ID
+    const newReview = {
+    id: Date.now(),
+    product: product.name,
+    rating: selectedRating,
+    content: content,
+    user: username    // ✅ 사용자 이름 추가
+};
+    // 상품 ID 가져오기
     const productId = new URLSearchParams(location.search).get("id") || 1;
 
-    // =========================
-    // 리뷰 저장 / 불러오기
-    // =========================
+    // 리뷰 저장소 가져오기
     function getReviews() {
-        return JSON.parse(localStorage.getItem("reviews") || "[]");
+        return JSON.parse(localStorage.getItem("userData"))?.reviews || [];
     }
 
     function saveReviews(reviews) {
-        localStorage.setItem("reviews", JSON.stringify(reviews));
+        const savedData = JSON.parse(localStorage.getItem("userData")) || {};
+        savedData.reviews = reviews;
+        localStorage.setItem("userData", JSON.stringify(savedData));
     }
 
     // =========================
@@ -28,17 +34,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const stars = document.querySelectorAll('#review-rating span');
 
     stars.forEach(star => {
+        const value = Number(star.dataset.value);
 
         // 클릭
         star.addEventListener('click', () => {
-            selectedRating = Number(star.dataset.value);
-
-            stars.forEach(s => s.classList.remove('active'));
-            stars.forEach(s => {
-                if (Number(s.dataset.value) <= selectedRating) {
-                    s.classList.add('active');
-                }
-            });
+            selectedRating = value;
+            stars.forEach(s => s.classList.toggle('active', Number(s.dataset.value) <= selectedRating));
         });
 
         // hover
@@ -179,38 +180,47 @@ document.addEventListener("DOMContentLoaded", () => {
     // 리뷰 작성
     // =========================
     const submitBtn = document.getElementById('submit-review');
+    if(submitBtn){
+        let selectedRating = 0;
+        const stars = document.querySelectorAll('#review-rating span');
 
-    if (submitBtn) {
+        // 별점 선택
+        stars.forEach(star => {
+            star.addEventListener('click', () => {
+                selectedRating = parseInt(star.dataset.value);
+                stars.forEach(s => s.classList.remove('active'));
+                star.classList.add('active');
+            });
+        });
+
+        // 리뷰 제출
         submitBtn.addEventListener('click', () => {
 
-            // 회원 체크
-            if (!userName) {
+            if(!isLogin || !userName){
                 alert("리뷰 작성은 회원만 가능합니다. 로그인해주세요.");
                 return;
             }
 
             const content = document.getElementById('review-content').value.trim();
-
-            if (!content) {
+            if(!content){
                 alert("리뷰를 입력하세요");
                 return;
             }
 
-            if (selectedRating === 0) {
+            if(selectedRating === 0){
                 alert("별점을 선택하세요");
                 return;
             }
 
+            // 리뷰 저장
             const reviews = getReviews();
-
             reviews.push({
                 id: Date.now(),
                 productId: productId,
                 rating: selectedRating,
                 content: content,
-                name: userName // 🔥 작성자 이름 추가
+                name: userName
             });
-
             saveReviews(reviews);
 
             // 초기화
@@ -218,7 +228,12 @@ document.addEventListener("DOMContentLoaded", () => {
             selectedRating = 0;
             stars.forEach(s => s.classList.remove('active'));
 
-            window.updateProductReviews();
+            // 리뷰 렌더링 업데이트
+            if(typeof window.updateProductReviews === "function"){
+                window.updateProductReviews();
+            }
+
+            alert("리뷰가 등록되었습니다!");
         });
     }
 

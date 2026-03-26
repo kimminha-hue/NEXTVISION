@@ -32,7 +32,7 @@
         <h2 class="checkout-title">주문 결제</h2>
 
         <!-- 배송 정보 -->
-        <div class="checkout-box">
+        <div class="checkout-box shipping-box">
             <h3 class="checkout-subtitle">배송 정보</h3>
             <form class="checkout-form">
                 <input type="text" placeholder="이름" class="input-field">
@@ -46,8 +46,26 @@
             </form>
         </div>
         
+        <div class="checkout-box order-summary">
+            <h3 class="checkout-subtitle">주문 상품</h3>
+
+            <div class="order-item">
+                <img id="order-image" src="" alt="상품이미지">
+
+                <div class="order-info">
+                    <p id="order-name" class="order-name">상품명</p>
+                    <p class="order-option">
+                        수량: <span id="product-qty">1</span>
+                        <span id="size-wrap"> / 사이즈: <span id="product-size">M</span></span>
+                    </p>
+                </div>
+
+                <div class="order-price" id="order-price">₩0</div>
+            </div>
+        </div>
+
         <!-- 결제 수단 -->
-        <div class="checkout-box">
+        <div class="checkout-box payment-box">
             <h3 class="checkout-subtitle">결제 수단</h3>
             <div id="pay-methods" class="pay-methods">
                 <button type="button" class="btn btn-outline" onclick="selectPayMethod(this, 'card')">신용카드</button>

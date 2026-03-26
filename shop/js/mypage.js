@@ -13,7 +13,7 @@ menuItems.forEach(item => {
     });
 });
 
-// ===== 더미 사용자 데이터 =====
+// ===== 더미 사용자 데이터 (초기값) =====
 let userData = {
     name: "홍길동",
     email: "user@example.com",
@@ -29,13 +29,17 @@ let userData = {
             items:[{name:"상품3", qty:1, price:32000}]
         }
     ],
-    reviews: [
-        {id:"REVIEW_001", product:"상품명1", rating:5, content:"좋아요!", date:"2026-03-18"}
-    ],
+    reviews: [],
     coupons:[
         {id:"COUPON_01", discount:10, status:"active", expiry:"2026-06-30"}
     ]
 };
+
+// 🔥 localStorage에 저장된 데이터가 있으면 불러오기
+const savedData = localStorage.getItem("userData");
+if(savedData){
+    userData = JSON.parse(savedData);
+}
 
 // ===== 회원정보 초기값 =====
 document.getElementById('name').value = userData.name;
@@ -50,79 +54,49 @@ document.getElementById('profile-form').addEventListener('submit', e => {
     userData.email = document.getElementById('email').value;
     userData.phone = document.getElementById('phone').value;
     userData.address = document.getElementById('address').value;
+
+    localStorage.setItem("userData", JSON.stringify(userData));
     alert("회원정보가 저장되었습니다!");
 });
 
+// ===== 비밀번호 모달 =====
 const changeBtn = document.getElementById("change-password");
 const modal = document.getElementById("password-modal");
 const closeBtn = document.querySelector(".modal .close");
 
-// 입력값 초기화 함수
 function resetPasswordInputs() {
     document.getElementById("current-password").value = "";
     document.getElementById("new-password").value = "";
     document.getElementById("confirm-password").value = "";
 }
 
-// 모달 열기
-changeBtn.addEventListener("click", () => {
-    modal.style.display = "flex";
-});
+changeBtn.addEventListener("click", () => modal.style.display = "flex");
+closeBtn.addEventListener("click", () => { modal.style.display = "none"; resetPasswordInputs(); });
+window.addEventListener("click", (e) => { if(e.target === modal){ modal.style.display = "none"; resetPasswordInputs(); }});
 
-// × 버튼 클릭 시 모달 닫기 + 초기화
-closeBtn.addEventListener("click", () => {
-    modal.style.display = "none";
-    resetPasswordInputs(); // 🔥 초기화 추가
-});
-
-// 모달 외부 클릭 시 모달 닫기 + 초기화
-window.addEventListener("click", (e) => {
-    if (e.target === modal) {
-        modal.style.display = "none";
-        resetPasswordInputs(); // 🔥 초기화 추가
-    }
-});
-
-// 비밀번호 변경 완료 버튼
 document.getElementById("save-password").addEventListener("click", () => {
     const current = document.getElementById("current-password").value;
     const newPw = document.getElementById("new-password").value;
     const confirmPw = document.getElementById("confirm-password").value;
-
     const savedPw = localStorage.getItem("password");
 
-    if (current !== savedPw) {
-        alert("현재 비밀번호가 틀립니다.");
-        return;
-    }
-
-    if (newPw !== confirmPw) {
-        alert("새 비밀번호가 일치하지 않습니다.");
-        return;
-    }
+    if(current !== savedPw){ alert("현재 비밀번호가 틀립니다."); return; }
+    if(newPw !== confirmPw){ alert("새 비밀번호가 일치하지 않습니다."); return; }
 
     localStorage.setItem("password", newPw);
     alert("비밀번호가 변경되었습니다.");
-
-    // 초기화 + 모달 닫기
     modal.style.display = "none";
-    resetPasswordInputs(); // 🔥 초기화
+    resetPasswordInputs();
 });
 
-// ===== 회원탈퇴 렌더링 =====
+// ===== 회원탈퇴 =====
 document.getElementById('delete-account').addEventListener('click', () => {
-    const confirmDelete = confirm("탈퇴 시 모든 정보가 삭제됩니다.\n정말 회원 탈퇴하시겠습니까?");
-
-    if (!confirmDelete) return;
-
-    // 🔥 사용자 데이터 삭제
+    if(!confirm("탈퇴 시 모든 정보가 삭제됩니다.\n정말 회원 탈퇴하시겠습니까?")) return;
     localStorage.removeItem("isLogin");
     localStorage.removeItem("username");
     localStorage.removeItem("password");
-
+    localStorage.removeItem("userData");
     alert("회원 탈퇴가 완료되었습니다.");
-
-    // 🔥 메인 페이지 이동
     location.href = "index.html";
 });
 
@@ -136,6 +110,7 @@ function renderOrders(filter="all"){
         ordersList.innerHTML = "<p>해당 주문이 없습니다.</p>";
         return;
     }
+
     filteredOrders.forEach(order => {
         const div = document.createElement('div');
         div.className = 'order-card';
@@ -152,7 +127,6 @@ function renderOrders(filter="all"){
     });
 }
 
-// 필터 버튼
 document.querySelectorAll('.filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -161,28 +135,33 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
     });
 });
 
-// 초기 렌더
 renderOrders();
 
-// ===== 리뷰 렌더링 =====
-const reviewsList = document.querySelector('.reviews-list');
-
+// ===== 리뷰 렌더링 (마이페이지 연동) =====
 function renderReviews(){
+    const reviewsList = document.querySelector('.reviews-list');
     reviewsList.innerHTML = "";
 
-    if(userData.reviews.length === 0){
+    const userData = JSON.parse(localStorage.getItem("userData")) || {};
+    const reviews = userData.reviews || [];
+
+    if(reviews.length === 0){
         reviewsList.innerHTML = "<p>작성한 리뷰가 없습니다.</p>";
         return;
     }
 
-    userData.reviews.forEach(review => {
+    // 최신 리뷰 먼저
+    reviews.sort((a,b) => b.id - a.id);
+
+    reviews.forEach(review => {
         const div = document.createElement('div');
         div.className = 'review-card';
 
-        // ⭐ 구조 변경 부분
         div.innerHTML = `
             <div class="review-content">
-                <strong>${review.product}</strong> | 별점: ${review.rating} | ${review.content}
+                <strong>${review.product}</strong> | 작성자: ${review.user || '알 수 없음'}<br>
+                ⭐ ${review.rating} / 5 <br>
+                ${review.content}
             </div>
             <div class="review-actions">
                 <button class="btn btn-outline edit-review">수정</button>
@@ -192,19 +171,21 @@ function renderReviews(){
 
         reviewsList.appendChild(div);
 
-        // 수정 버튼
+        // 수정  
         div.querySelector('.edit-review').addEventListener('click', () => {
             const newContent = prompt("리뷰 수정", review.content);
-            if(newContent !== null){
+            if(newContent !== null && newContent.trim() !== ""){
                 review.content = newContent;
+                localStorage.setItem("userData", JSON.stringify(userData));
                 renderReviews();
             }
         });
 
-        // 삭제 버튼
+        // 삭제
         div.querySelector('.delete-review').addEventListener('click', () => {
             if(confirm("리뷰를 삭제하시겠습니까?")){
                 userData.reviews = userData.reviews.filter(r => r.id !== review.id);
+                localStorage.setItem("userData", JSON.stringify(userData));
                 renderReviews();
             }
         });
@@ -212,9 +193,9 @@ function renderReviews(){
 }
 
 // 초기 렌더
-renderReviews();
+document.addEventListener("DOMContentLoaded", renderReviews);
 
-// ===== 쿠폰 렌더링 + 등록 =====
+// ===== 쿠폰 렌더링 =====
 const couponList = document.querySelector('.coupon-list');
 const applyCouponBtn = document.getElementById('apply-coupon');
 const couponCodeInput = document.getElementById('coupon-code');
@@ -233,10 +214,8 @@ function renderCoupons(){
     });
 }
 
-// 초기 렌더
 renderCoupons();
 
-// 쿠폰 등록
 applyCouponBtn.addEventListener('click', () => {
     const code = couponCodeInput.value.trim();
     if(!code) return alert("쿠폰 코드를 입력해주세요.");
@@ -245,5 +224,6 @@ applyCouponBtn.addEventListener('click', () => {
     userData.coupons.push({id:code, discount:5, status:"active", expiry:"2026-12-31"});
     couponCodeInput.value = "";
     renderCoupons();
+    localStorage.setItem("userData", JSON.stringify(userData));
     alert("쿠폰이 등록되었습니다!");
 });

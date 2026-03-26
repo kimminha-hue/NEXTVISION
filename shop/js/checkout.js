@@ -42,18 +42,58 @@ if (isLogin !== "true") {
         const params = new URLSearchParams(window.location.search);
         const price = params.get('price');
         const name = params.get('name');
-        
+        const qty = params.get('qty');      // ⭐ 추가
+        const size = params.get('size');    // ⭐ 추가
+        const nameEl = document.getElementById("order-name");
+
+        if (nameEl && name) {
+        nameEl.textContent = decodeURIComponent(name);
+        }
+
         if (price) {
         checkoutPrice = parseInt(price, 10);
-        // HTML의 총 결제 금액 ID가 'checkout-total-price'인지 확인하세요.
         const priceElement = document.getElementById('checkout-total-price');
         if (priceElement) {
             priceElement.textContent = '₩' + checkoutPrice.toLocaleString();
         }
-    }
-        if (name) {
-            checkoutName = name;
         }
+        if (name) {
+            checkoutName = size ? `${name} (${size})` : name;
+        }
+
+        // ⭐ 화면 표시 (있을 때만)
+        if (qty) {
+            const qtyEl = document.getElementById("product-qty");
+            if (qtyEl) qtyEl.textContent = qty;
+        }
+
+        
+        const sizeEl = document.getElementById("product-size");
+            
+        if (sizeEl) {
+            if (size) {
+                sizeEl.textContent = size;
+            } else {
+                sizeEl.parentElement.style.display = "none";
+            }
+        }
+
+        // ⭐ 이미지 추가
+        const image = params.get('image');
+        const imgEl = document.getElementById("order-image");
+
+        if (imgEl && image) {
+            imgEl.src = "../" + image;
+        }
+
+        // ⭐ 가격 표시 (주문상품 카드용)
+        const orderPriceEl = document.getElementById("order-price");
+
+        if (orderPriceEl && price) {
+            orderPriceEl.textContent = '₩' + parseInt(price).toLocaleString();
+        }
+            
+
     });
 
     // 결제 수단 선택 함수

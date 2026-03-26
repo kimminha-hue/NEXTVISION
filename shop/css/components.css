@@ -350,3 +350,54 @@
     width: 20px;
     height: 20px;
 }
+
+
+/* 사이즈 전체 영역 */
+.size-options {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.size-options button {
+    margin-bottom: 0.5rem;
+}
+
+/* "사이즈 선택" 텍스트 */
+.size-label {
+    display: block;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.6rem;
+}
+
+/* 버튼 기본 */
+.size-btn {
+    padding: 0.6rem 1.2rem;
+    margin-right: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+}
+
+/* hover 효과 */
+.size-btn:hover {
+    border-color: #00ffd0;
+    box-shadow: 0 0 6px rgba(0, 255, 208, 0.6);
+}
+
+/* ⭐ 선택된 상태 (핵심) */
+.size-btn.active {
+    background: var(--accent-color);
+    color: var(--bg-color);
+    font-weight: 600;
+}
+
+/* 클릭 느낌 (눌림 효과) */
+.size-btn:active {
+    transform: scale(0.95);
+}

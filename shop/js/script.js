@@ -109,6 +109,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                     </div>
 
                     <div class="purchase-actions">
+
+                    <!-- ⭐ 여기 사이즈 들어감 -->
+                        ${product.category === "의류" ? `
+                        <div class="size-options">
+                            <span class="size-label">사이즈 선택:</span>
+                            <button class="size-btn">S</button>
+                            <button class="size-btn">M</button>
+                            <button class="size-btn">L</button>
+                            <button class="size-btn">XL</button>
+                        </div>
+                        ` : ""}
+
                         <div class="quantity-selector">
                             <span style="font-weight:500;">수량</span>
                             <div style="display: flex; align-items: center; gap: 1rem;">
@@ -125,7 +137,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                         <div class="btn-group">
                             <button class="btn btn-outline" onclick="addToCart('${product.name}', ${product.price}, '${product.image}')">장바구니</button>
-                            <button class="btn btn-primary" onclick="const qty=document.getElementById('qty').value; const totalPrice = ${product.price} * qty; location.href='checkout.html?price=' + totalPrice + '&name=' + encodeURIComponent('${product.name}')"> 구매하기 </button>
+                             <button class="btn btn-primary" id="buy-btn">구매하기</button>
                         </div>
                     </div>
                 </div>
@@ -146,9 +158,99 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
         `;
 
+        // ⭐ 사이즈 선택 이벤트
+        if (product.category === "의류") {
+            const sizeButtons = document.querySelectorAll(".size-btn");
+
+            sizeButtons.forEach(btn => {
+                btn.addEventListener("click", () => {
+                    sizeButtons.forEach(b => b.classList.remove("active"));
+                    btn.classList.add("active");
+                });
+            });
+        }
+
+        // ⭐ 구매 버튼 (사이즈 체크 포함)
+        const buyBtn = document.getElementById("buy-btn");
+
+        if (buyBtn) {
+            buyBtn.addEventListener("click", () => {
+                const qty = document.getElementById('qty').value;
+
+                let selectedSize = "";
+
+                // 의류일 경우 사이즈 체크
+                if (product.category === "의류") {
+                    const activeBtn = document.querySelector(".size-options .size-btn.active");
+
+                    if (!activeBtn) {
+                        alert("사이즈를 선택해주세요");
+                        return;
+                    }
+
+                    selectedSize = activeBtn.textContent; // ✅ 정상
+                }
+
+                const totalPrice = product.price * qty;
+
+                location.href = `checkout.html?price=${totalPrice}&name=${encodeURIComponent(product.name)}&qty=${qty}&size=${selectedSize}&image=${product.image}`;
+            });
+        }
+
             // 데이터 로드 후 product-detail.js의 함수를 이용해 별점 및 리뷰 렌더링 업데이트
             if (typeof window.updateProductReviews === 'function') {
                 window.updateProductReviews();
+            }
+
+            // =========================
+            // ⭐ 리뷰 작성 기능 추가
+            // =========================
+           function initReviewForm(productName) {
+                const submitBtn = document.getElementById('submit-review');
+                if (!submitBtn) return;
+
+                let selectedRating = 0;
+                const stars = document.querySelectorAll('#review-rating span');
+
+                // 별점 선택
+                stars.forEach(star => {
+                    star.addEventListener('click', () => {
+                        selectedRating = parseInt(star.dataset.value);
+                        stars.forEach(s => s.classList.remove('active'));
+                        star.classList.add('active');
+                    });
+                });
+
+                // 리뷰 제출
+                submitBtn.addEventListener('click', () => {
+                    const content = document.getElementById('review-content').value.trim();
+                    if (!content) return alert("리뷰를 입력하세요");
+                    if (selectedRating === 0) return alert("별점을 선택하세요");
+
+                    const savedData = localStorage.getItem("userData");
+                    let userData = savedData ? JSON.parse(savedData) : { reviews: [] };
+
+                    const newReview = {
+                        id: Date.now(),
+                        product: productName,
+                        rating: selectedRating,
+                        content: content
+                    };
+
+                    userData.reviews = userData.reviews || [];
+                    userData.reviews.push(newReview);
+                    localStorage.setItem("userData", JSON.stringify(userData));
+
+                    alert("리뷰가 등록되었습니다!");
+
+                    // 초기화
+                    document.getElementById('review-content').value = "";
+                    selectedRating = 0;
+                    stars.forEach(s => s.classList.remove('active'));
+
+                    // 리뷰 렌더링 업데이트
+                    window.updateProductReviews(productName);
+                });
             }
 
     }
