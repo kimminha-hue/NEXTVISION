@@ -36,9 +36,18 @@ let userData = {
 };
 
 // 🔥 localStorage에 저장된 데이터가 있으면 불러오기
-const savedData = localStorage.getItem("userData");
-if(savedData){
-    userData = JSON.parse(savedData);
+const isLogin = localStorage.getItem("isLogin");
+// 🔥 현재 로그인 유저 이메일 가져오기
+const email = localStorage.getItem("userEmail");
+if(isLogin === "true"){
+    const savedData = localStorage.getItem("userData_" + email);
+    if(savedData){
+        userData = JSON.parse(savedData);
+    }
+} else {
+    // 🔥 로그아웃 상태면 데이터 초기화
+    localStorage.removeItem("userData");
+    location.href = "index.html";
 }
 
 // ===== 회원정보 초기값 =====
@@ -55,7 +64,7 @@ document.getElementById('profile-form').addEventListener('submit', e => {
     userData.phone = document.getElementById('phone').value;
     userData.address = document.getElementById('address').value;
 
-    localStorage.setItem("userData", JSON.stringify(userData));
+    localStorage.setItem("userData_" + email, JSON.stringify(userData));
     alert("회원정보가 저장되었습니다!");
 });
 
@@ -142,7 +151,8 @@ function renderReviews(){
     const reviewsList = document.querySelector('.reviews-list');
     reviewsList.innerHTML = "";
 
-    const userData = JSON.parse(localStorage.getItem("userData")) || {};
+    const email = localStorage.getItem("userEmail");
+    const userData = JSON.parse(localStorage.getItem("userData_" + email)) || {};
     const reviews = userData.reviews || [];
 
     if(reviews.length === 0){
@@ -176,7 +186,7 @@ function renderReviews(){
             const newContent = prompt("리뷰 수정", review.content);
             if(newContent !== null && newContent.trim() !== ""){
                 review.content = newContent;
-                localStorage.setItem("userData", JSON.stringify(userData));
+                localStorage.setItem("userData_" + email, JSON.stringify(userData));
                 renderReviews();
             }
         });
@@ -224,6 +234,15 @@ applyCouponBtn.addEventListener('click', () => {
     userData.coupons.push({id:code, discount:5, status:"active", expiry:"2026-12-31"});
     couponCodeInput.value = "";
     renderCoupons();
-    localStorage.setItem("userData", JSON.stringify(userData));
+    localStorage.setItem("userData_" + email, JSON.stringify(userData));
     alert("쿠폰이 등록되었습니다!");
 });
+
+// ===== 로그아웃 후 정보 초기화=====
+function logout(){
+  localStorage.removeItem("isLogin");
+  localStorage.removeItem("username");
+
+  alert("로그아웃 되었습니다.");
+  location.href = "index.html";
+}
