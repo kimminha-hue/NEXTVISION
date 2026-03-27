@@ -82,12 +82,23 @@
   <div id="chat-messages"></div>
 
   <div class="chat-input">
-    <button id="voice-btn">🎤</button>
-    <label for="chat-file-input" id="image-btn" style="cursor: pointer;">📷</label>
-    <input type="file" id="chat-file-input" style="display:none;" accept="image/*" />
-    <input type="text" id="chat-input" placeholder="상품에 대해 자유롭게 질문해 주세요" />
-    <button id="send-btn">전송</button>
+  <button id="voice-btn" aria-label="음성 입력">
+  <span class="mic-icon">🎤</span>
+  <div class="wave">
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
   </div>
+</button>
+
+  <!-- ✅ 수정 -->
+  <button id="image-btn" aria-label="이미지 업로드">📷</button>
+  <input type="file" id="chat-file-input" style="display:none;" accept="image/*" />
+
+  <input type="text" id="chat-input" placeholder="상품에 대해 자유롭게 질문해 주세요" />
+  <button id="send-btn">전송</button>
+</div>
 </div>
 
 <script src="../js/script.js"></script>
