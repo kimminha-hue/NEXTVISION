@@ -22,7 +22,7 @@ public class Product{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "p_idx")
-	private Long id;
+	private Integer pIdx;
 	
 	@Column(name = "p_name", nullable = false)
 	private String name; // DB의 p_name 연결
