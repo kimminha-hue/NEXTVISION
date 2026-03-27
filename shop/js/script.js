@@ -4,14 +4,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     let products = [];
     try {
-        // script.js 7번째 줄을 아래 코드로 완전히 교체하세요.
-    // (?t=... 부분을 넣으면 브라우저가 매번 새로운 파일인 줄 알고 캐시를 무시합니다)
-    const response = await fetch('../data.json?t=' + new Date().getTime());
-        if (!response.ok) throw new Error('Network response was not ok');
-        products = await response.json();
+        // 1. 호성 님의 찐 백엔드 서버 주소로 요청을 보냅니다!
+        const response = await fetch('http://localhost:8088/avw/api/product/list');
+        if (!response.ok) throw new Error('백엔드 서버 응답 오류');
+        
+        // 2. 백엔드에서 받아온 날것의 데이터를 가져옵니다.
+        const backendData = await response.json();
+        
+        // 3. 프론트엔드 화면이 이해할 수 있는 이름표로 싹 바꿔줍니다. (데이터 매핑)
+        products = backendData.map(item => ({
+            id: item.id || item.p_idx, // 백엔드의 식별자 (엔티티 설정에 따라 id 또는 p_idx)
+            name: item.name,           // 상품명
+            price: item.price,         // 가격
+            category: item.category,   // 카테고리
+            image: item.img1,          // 🌟 백엔드의 img1을 프론트의 image로 연결
+            description: item.description, // 상세 설명
+            ingredients: [],           // (임시) 성분이나 특징 데이터가 비어있을 때 에러 방지용
+            // 🌟 img2, img3가 존재할 경우에만 배열로 묶어서 상세 이미지 란에 넣어줍니다.
+            detailImages: [item.img2, item.img3].filter(img => img !== null && img !== undefined && img !== "")
+        }));
+
+        console.log("백엔드에서 가져온 진짜 데이터:", products); // 확인용 콘솔 로그
+        
     } catch (error) {
-        console.error("Failed to load data.json:", error);
-        const errMsg = `<p class="error-message">데이터를 불러오는 데 실패했습니다. 개발 서버를 확인하세요.</p>`;
+        console.error("데이터 연동 실패:", error);
+        const errMsg = `<p class="error-message">데이터를 불러오는 데 실패했습니다. 서버가 켜져 있는지 확인해 주세요.</p>`;
         if (grid) grid.innerHTML = errMsg;
         else if (detailContainer) detailContainer.innerHTML = errMsg;
         return;
@@ -34,7 +51,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 card.innerHTML = `
                     <a href="product.html?id=${product.id}&category=${product.category}" class="product-link">
                         <div class="product-image-wrapper">
-                            <img src="../${product.image}" alt="${product.name}" class="product-image">
+                            <img src="${product.image}" alt="${product.name}" class="product-image">
                         </div>
                         <div class="product-info">
                             <span class="product-category">${product.category}</span>
@@ -95,7 +112,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         detailContainer.innerHTML = `
             <div class="product-summary">
                 <div class="detail-image-wrapper">
-                    <img src="../${product.image}" alt="${product.name}" class="detail-image">
+                    <img src="${product.image}" alt="${product.name}" class="detail-image">
                 </div>
                 <div class="detail-content">
                     <div class="detail-header detail-header-compact">
@@ -163,7 +180,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <ul class="features-list">${ingredientsList}</ul>
                 </section>
                 ${product.detailImages ? product.detailImages.map(img => `
-                    <img src="../${img}" alt="상세이미지" class="long-detail-image" loading="lazy">
+                    <img src="${img}" alt="상세이미지" class="long-detail-image" loading="lazy">
                 `).join('') : ''}
             </div>
         `;
