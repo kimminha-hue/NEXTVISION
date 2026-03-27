@@ -127,10 +127,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                         </div>
                         
                         <div class="voice-audio-section-inline">
+                            <p class="voice-guide">버튼을 누르면 상품의 특징과 소재를 AI가 설명해 드립니다.</p>
                             <button id="product-voice-btn" class="btn-voice-command-small">
                                 <span class="voice-icon">🔊</span>
                                 <span class="voice-text">상품 음성 설명 듣기</span>
                             </button>
+
                         </div>
                     
                     </div>
@@ -310,7 +312,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     const messages = document.getElementById("chat-messages");
     const voiceBtn = document.getElementById("voice-btn"); 
     const fileInput = document.getElementById("chat-file-input"); 
-    
+    // ✅ 여기 추가!!
+const imageBtn = document.getElementById("image-btn");
+
+if (imageBtn && fileInput) {
+  imageBtn.addEventListener("click", () => {
+    fileInput.click();
+  });
+}
     // 대화 세션 관리
     let isChatting = true; // 🚨 사진 없이도 바로 질문 가능하도록 무조건 true로 변경!
     const sessionId = 'session_' + Date.now();
@@ -475,7 +484,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // 🎤 3단계: STT 로직
+// 🎤 3단계: STT 로직
     if (window.SpeechRecognition || window.webkitSpeechRecognition) {
         const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
         recognition.lang = "ko-KR";
