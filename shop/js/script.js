@@ -227,57 +227,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 window.updateProductReviews();
             }
 
-            // =========================
-            // ⭐ 리뷰 작성 기능 추가
-            // =========================
-           function initReviewForm(productName) {
-                const submitBtn = document.getElementById('submit-review');
-                if (!submitBtn) return;
-
-                let selectedRating = 0;
-                const stars = document.querySelectorAll('#review-rating span');
-
-                // 별점 선택
-                stars.forEach(star => {
-                    star.addEventListener('click', () => {
-                        selectedRating = parseInt(star.dataset.value);
-                        stars.forEach(s => s.classList.remove('active'));
-                        star.classList.add('active');
-                    });
-                });
-
-                // 리뷰 제출
-                submitBtn.addEventListener('click', () => {
-                    const content = document.getElementById('review-content').value.trim();
-                    if (!content) return alert("리뷰를 입력하세요");
-                    if (selectedRating === 0) return alert("별점을 선택하세요");
-
-                    const savedData = localStorage.getItem("userData");
-                    let userData = savedData ? JSON.parse(savedData) : { reviews: [] };
-
-                    const newReview = {
-                        id: Date.now(),
-                        product: productName,
-                        rating: selectedRating,
-                        content: content
-                    };
-
-                    userData.reviews = userData.reviews || [];
-                    userData.reviews.push(newReview);
-                    localStorage.setItem("userData", JSON.stringify(userData));
-
-                    alert("리뷰가 등록되었습니다!");
-
-                    // 초기화
-                    document.getElementById('review-content').value = "";
-                    selectedRating = 0;
-                    stars.forEach(s => s.classList.remove('active'));
-
-                    // 리뷰 렌더링 업데이트
-                    window.updateProductReviews(productName);
-                });
-            }
-
     }
 });
 
@@ -508,6 +457,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const userLi = document.createElement("li");
     userLi.innerHTML = `<span>${username}님</span>`;
 
+    const introLi = document.createElement("li");
+    introLi.innerHTML = `<a href="intro.html">소개페이지</a>`;
+
     const mypageLi = document.createElement("li");
     mypageLi.innerHTML = `<a href="mypage.html">👤마이페이지</a>`;
 
@@ -517,11 +469,25 @@ document.addEventListener("DOMContentLoaded", () => {
     const logoutLi = document.createElement("li");
     logoutLi.innerHTML = `<a href="#" id="logout-btn">로그아웃</a>`;
 
-    // 👉 순서대로 추가
-    nav.appendChild(userLi);
-    nav.appendChild(mypageLi);
-    nav.appendChild(cartLi);
-    nav.appendChild(logoutLi);    
+     // ===== 기준점 (쇼핑하기 버튼) =====
+        const shopLink = document.querySelector('a[href="index.html"]');
+        const shopLi = shopLink ? shopLink.closest('li') : null;
+
+        if (shopLi) {
+            // 👉 원하는 순서대로 삽입
+            nav.insertBefore(userLi, shopLi);    // 김광훈님
+            nav.insertBefore(introLi, shopLi);   // 소개
+            nav.insertBefore(mypageLi, shopLi);  // 마이페이지
+            nav.insertBefore(cartLi, shopLi);    // 장바구니
+            nav.insertBefore(logoutLi, shopLi);  // 로그아웃
+        } else {
+            // fallback (혹시 쇼핑하기 못 찾으면 그냥 뒤에 추가)
+            nav.appendChild(userLi);
+            nav.appendChild(introLi);
+            nav.appendChild(mypageLi);
+            nav.appendChild(cartLi);
+            nav.appendChild(logoutLi);
+        }   
 
         // 로그아웃 기능
         document.getElementById("logout-btn").addEventListener("click", () => {

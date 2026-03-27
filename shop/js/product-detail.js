@@ -55,6 +55,39 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     // =========================
+    // 📷 이미지 업로드
+    // =========================
+    const imageInput = document.getElementById("review-image");
+
+    imageDataList = [];
+
+    imageInput.addEventListener("change", () => {
+        const files = Array.from(imageInput.files);
+        const previewWrap = document.getElementById("preview-wrap");
+
+        imageDataList = [];
+        previewWrap.innerHTML = "";
+
+        files.forEach(file => {
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                imageDataList.push(e.target.result);
+
+                const img = document.createElement("img");
+                img.src = e.target.result;
+                img.style.width = "60px";
+                img.style.marginRight = "5px";
+
+                previewWrap.appendChild(img);
+            };
+
+            reader.readAsDataURL(file);
+        });
+    });
+
+
+    // =========================
     // 평균 별점 계산 (통합 저장소 기준)
     // =========================
     function calculateAverageRating() {
@@ -120,6 +153,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         reviews.forEach(r => {
             const div = document.createElement('div');
             div.className = "review-item";
+
+            const imagesHTML = (r.images || []).map(img => 
+                `<img src="${img}" class="review-img">`
+            ).join('');
+
             const starsHtml = Array.from({length:5}, (_, i) => `<span class="review-star ${i < r.rating ? 'active' : ''}">★</span>`).join('');
             
             // 본인 확인 (이름 또는 이메일)
@@ -133,6 +171,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <strong>${r.user || r.name}</strong> ${starsHtml} ${deleteBtn}
                 </div>
                 <p>${r.content}</p>
+
+                <div class="review-images">
+                    ${imagesHTML}
+                </div>
+
                 <small style="color:#999;">${r.date || ""}</small>
             `;
             list.appendChild(div);
@@ -150,6 +193,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             });
         });
+
+
     }
 
     // =========================
@@ -176,7 +221,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 content: content,
                 user: userName,
                 userEmail: userEmail,
-                date: new Date().toLocaleDateString()
+                date: new Date().toLocaleDateString(),
+                images: imageDataList
+
             };
 
             allReviews.push(newReview);
@@ -186,6 +233,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             document.getElementById('review-content').value = "";
             selectedRating = 0;
             stars.forEach(s => s.classList.remove('active'));
+
+            imageData = [];
+            if(imageInput) imageInput.value = "";
 
             window.updateProductReviews();
             alert("리뷰가 등록되었습니다!");
@@ -202,4 +252,48 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
 
     window.updateProductReviews();
+
+    let currentImages = [];
+    let currentIndex = 0;
+
+    const modal = document.getElementById("slider-modal");
+    const sliderImg = document.getElementById("slider-image");
+
+    // 이미지 클릭 → 슬라이드 열기
+    document.addEventListener("click", (e) => {
+        if (e.target.classList.contains("review-img")) {
+            const parent = e.target.closest(".review-images");
+            const imgs = parent.querySelectorAll("img");
+
+            currentImages = Array.from(imgs).map(img => img.src);
+            currentIndex = currentImages.indexOf(e.target.src);
+
+            sliderImg.src = currentImages[currentIndex];
+            modal.style.display = "flex";
+        }
+    });
+
+    // 다음
+    document.getElementById("next-btn").onclick = () => {
+        currentIndex = (currentIndex + 1) % currentImages.length;
+        sliderImg.src = currentImages[currentIndex];
+    };
+
+    // 이전
+    document.getElementById("prev-btn").onclick = () => {
+        currentIndex = (currentIndex - 1 + currentImages.length) % currentImages.length;
+        sliderImg.src = currentImages[currentIndex];
+    };
+
+    // 닫기
+    document.getElementById("close-slider").onclick = () => {
+        modal.style.display = "none";
+    };
+
+    // 바깥 클릭 닫기
+    modal.addEventListener("click", (e) => {
+        if (e.target === modal) {
+            modal.style.display = "none";
+        }
+    });
 });

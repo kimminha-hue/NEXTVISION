@@ -5,6 +5,32 @@ if (isLogin !== "true") {
     window.location.href = "login.html";
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+    const isLogin = localStorage.getItem("isLogin");
+    const username = localStorage.getItem("username");
+
+    const loginBtn = document.querySelector('a[href="login.html"]');
+    const signupBtn = document.querySelector('a[href="signup.html"]');
+    const nav = document.querySelector('.nav-links');
+
+    if (isLogin === "true" && username) {
+        if (loginBtn) loginBtn.style.display = "none";
+        if (signupBtn) signupBtn.style.display = "none";
+
+        const userLi = document.createElement("li");
+        userLi.innerHTML = `<span>${username}님</span>`;
+
+        const shopLi = document.querySelector('.nav-links li a[href="index.html"]').closest('li');
+
+        if (shopLi) {
+            nav.insertBefore(userLi, shopLi); // 👈 쇼핑하기 앞에 넣기
+        } else {
+            nav.appendChild(userLi);
+        }
+    }
+});
+
+
 // 2. 주소 검색 (카카오 우편번호)
 function execDaumPostcode() {
     new daum.Postcode({
