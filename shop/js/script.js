@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
 
             <div class="product-long-description">
-                <section class="detail-section">
+                <section class="detail-section" style="display: none;">
                     <h2 class="section-title">상품 상세 설명</h2>
                     <p class="detail-description">${product.description}</p>
                 </section>
@@ -409,7 +409,8 @@ if (imageBtn && fileInput) {
         input.value = "";
 
         try {
-            const response = await fetch('http://223.130.161.162:8000/api/chat/ask', {
+
+            const response = await fetch('http://localhost:8000/api/chat/ask', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ session_id: sessionId, user_message: text })

@@ -22,7 +22,14 @@ public class Product{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "p_idx")
+<<<<<<< HEAD
 	private Long id;
+=======
+	private Integer id;
+	
+	@Column(name = "seller_idx", nullable = false)
+	private Integer sellerIdx;
+>>>>>>> 2b6d96510abb3662af1e01f609ea682404efdab5
 	
 	@Column(name = "p_name", nullable = false)
 	private String name; // DB의 p_name 연결
@@ -31,12 +38,27 @@ public class Product{
     private String category; // DB의 p_category 연결
 
     @Column(name = "p_price")
+<<<<<<< HEAD
     private int price; // DB의 p_price 연결
 
     // RAG 성능을 위한 긴 텍스트
     @Column(name = "p_desc", columnDefinition = "TEXT")
     private String description; // DB의 p_desc 연결
 
+=======
+    private Integer price; // DB의 p_price 연결
+
+    // RAG 성능을 위한 긴 텍스트
+    @Column(name = "p_desc", nullable = false ,columnDefinition = "TEXT")
+    private String description; // DB의 p_desc 연결
+    
+    @Column(name = "p_stock", nullable = false)
+    private Integer stock;
+    
+    @Column(name = "p_status", nullable = false)
+    private String status = "COMMON";
+    
+>>>>>>> 2b6d96510abb3662af1e01f609ea682404efdab5
     // 팀원이 만들어둔 상세 이미지 컬럼 3개 연결
     @Column(name = "img1")
     private String img1; // 메인 썸네일 역할
@@ -48,8 +70,16 @@ public class Product{
     private String img3; // 상세 이미지 2
 
     // 생성 일자 (보통 팀 프로젝트 DB에 필수로 들어갑니다)
+<<<<<<< HEAD
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+=======
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+    
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updateAt;
+>>>>>>> 2b6d96510abb3662af1e01f609ea682404efdab5
 	
 	
 }
