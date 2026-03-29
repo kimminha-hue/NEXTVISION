@@ -1,0 +1,318 @@
+[
+  {
+    "id": "1",
+    "name": "핑크 퍼플 컬러블록 재킷",
+    "price": 67000,
+    "description": "라이트 핑크와 퍼플 톤을 조화롭게 배치해 감각적인 비주얼을 완성했습니다.\n 전면 지퍼 클로저와 포켓 디테일로 활동성과 편의성을 동시에 갖췄습니다. \n 파스텔 톤의 핑크와 라벤더 컬러가 조합되어 독특하면서도 세련된 분위기를 연출합니다. ",
+    "ingredients": ["폴리에스터 80%, 스판덱스 20%"],
+    "image": "images/adi.jpg",
+    "detailImages": [
+    "images/adi1.jpg",
+    "images/adi2.jpg",
+    "images/adi3.jpg",
+    "images/size1.png"
+    ],
+    "category": "의류"
+  },
+  {
+    "id": "2",
+    "name": "프리미엄 원목도마 ",
+    "price": 21800,
+    "description": "위생적이고 실용적인 주방 필수 아이템, 프리미엄 도마입니다. \n 내구성이 뛰어난 소재로 제작되어 칼자국이 쉽게 나지 않으며 오랫동안 깔끔하게 사용할 수 있습니다. \n 가벼운 무게와 안정적인 사용감으로 다양한 식재료 손질에 적합하며, \n 주방 환경에 자연스럽게 어우러지는 심플한 디자인을 갖추었습니다. ",
+    "ingredients": ["본체: 천연 원목(느티나무)","마감: 식품용 오일 코팅"],
+    "image": "images/board.jpg",
+    "detailImages": [
+    "images/board1.jpg",
+    "images/board2.jpg",
+    "images/board3.jpg",
+    "images/board4.png"
+    ],
+    "category": "주방용품"
+  },
+  {
+    "id": "3",
+    "name": "스테인리스 냄비 & 팬 세트 - 5종 구성",
+    "price": 36900,
+    "description": "다양한 요리를 한 번에 해결할 수 있는 스테인리스 냄비 & 팬 5종 세트입니다.\n 내구성이 뛰어난 스테인리스 소재를 사용해 위생적이며 오래도록 사용할 수 있습니다. \n 튀김, 햄버거, 핫도그뿐만 아니라 볶음 요리나 소스 베이스로도 활용도가 높습니다. ",
+    "ingredients": ["구성:", "프라이팬 1종, 냄비(소) 1종, 냄비(중) 1종, 냄비(대) 1종, 멀티팬 또는 뚜껑 포함"],
+    "image": "images/pot.jpg",
+    "detailImages": [
+    "images/pot1.jpg",
+    "images/pot2.jpg",
+    "images/pot3.jpg",
+    "images/pot4.png"
+    ],
+    "category": "주방용품"
+  },
+  {
+    "id": "4",
+    "name": "진한 토마토 케찹",
+    "price": 8300,
+    "description": "엄선된 토마토를 사용해 자연 그대로의 풍미를 살린 케첩입니다.\n 과하지 않은 단맛과 은은한 산미가 조화를 이루어 다양한 요리에 잘 어울립니다. \n 3중 바닥 구조로 열 전도율이 높아 음식이 빠르고 고르게 조리되며,  \n 가정용은 물론 자취생, 신혼부부에게도 실용적인 구성의 주방 필수 아이템입니다. " ,
+    "ingredients": ["보관방법: 직사광선을 피해 서늘한 곳에 보관, 개봉 후 냉장보관", "유통기한: 제조일로부터 12개월 "],
+    "image": "images/toma.png",
+    "detailImages": [
+    "images/toma1.png",
+    "images/toma2.png",
+    "images/toma4.png"
+    ],
+    "category": "식품"
+  },
+  {
+    "id": "5",
+    "name": "토스트기",
+    "price": 28900,
+    "description": "간편하게 바삭한 토스트를 완성할 수 있는 실용적인 토스트기입니다. \n 균일한 열 전달로 겉은 바삭하고 속은 촉촉한 식감을 살려주며, 원하는 굽기 정도를 자유롭게 조절할 수 있습니다. \n 아침 식사나 간편한 간식 준비에 최적화된 제품입니다.",
+    "ingredients": ["굽기 조절: 6단계", "슬롯 수: 2구", "소재: 스테인리스 + 내열 플라스틱", "크기: 약 250 x 150 x 180 mm", "무게: 약 1.2kg"],
+    "image": "images/toast.jpg",
+    "detailImages": [
+    "images/toast1.jpg",
+    "images/toast2.jpg",
+    "images/toast3.jpg"
+    ],
+    "category": "가전디지털"
+  },
+  {
+    "id": "6",
+    "name": "블랙 오버사이즈 레더 재킷",
+    "price": 79000,
+    "description": "매트한 질감의 블랙 레더 소재로 모던하면서도 세련된 분위기를 연출합니다.\n 드롭 숄더와 루즈핏 디자인으로 트렌디한 스트릿 감성을 살렸습니다. \n 사이드 포켓으로 활용도를 높여 데일리 아우터로 적합합니다. \n 미니멀한 무드를 유지하면서 깔끔한 마감 처리로 완성도를 높였습니다. ",
+    "ingredients": ["겉감: 합성가죽 100%"],
+    "image": "images/girl.jpg",
+    "detailImages": [
+    "images/girl1.jpg",
+    "images/girl2.jpg",
+    "images/girl3.jpg",
+    "images/size1.png"
+    ],
+    "category": "의류"
+  },
+  {
+    "id": "7",
+    "name": "브라운 오버핏 블레이저",
+    "price": 87500,
+    "description": "따뜻한 브라운 톤으로 세련된 무드를 연출하며, 가을·겨울 시즌에 적합한 컬러감입니다.\n 루즈한 핏과 드롭 숄더 디자인으로 트렌디한 감각을 살려 다양한 이너와 매치하기 좋습니다. \n 포멀한 자리에서는 셔츠와 매치해 클래식한 무드를, 캐주얼하게는 티셔츠와 함께 스타일링할 수 있습니다. ",
+    "ingredients": ["겉감: 울 60%, 나일론 40%"],
+    "image": "images/black.jpg",
+    "detailImages": [
+    "images/black1.jpg",
+    "images/black2.jpg",
+    "images/black3.jpg",
+    "images/black4.jpg",
+    "images/size.png"
+    ],
+    "category": "의류"
+  },
+  {
+    "id": "8",
+    "name": "믹스 과일 주스 세트",
+    "price": 4400,
+    "description": "다양한 과일의 풍미를 한 번에 즐길 수 있는 주스 버라이어티 세트입니다.\n 상큼한 오렌지, 달콤한 사과, 부드러운 망고 등 여러 가지 맛으로 구성되어 취향에 따라 골라 마실 수 있습니다. \n 간식이나 가벼운 식사 대용으로도 활용 가능합니다. ",
+    "ingredients": ["보관방법: 직사광선을 피해 서늘한 곳에 보관", "개봉 후 냉장보관 유통기한: 제조일로부터 12개월"],
+    "image": "images/drink.png",
+    "detailImages": [
+    "images/drink1.png",
+    "images/drink2.png",
+    "images/drink3.png"
+    ],
+    "category": "식품"
+  },
+   {
+    "id": "9",
+    "name": "프리미엄 립아이 스테이크 세트-2인분",
+    "price": 38900,
+    "description": "신선한 소고기 등심을 엄선하여 부드러운 식감과 깊은 풍미를 그대로 담았습니다. \n 적당한 마블링이 어우러져 육즙이 풍부하며, 한 입 베어 물었을 때 고소한 맛이 입안 가득 퍼집니다. \n 가정은 물론 캠핑이나 홈파티에서도 특별한 한 끼를 완성해보세요. ",
+    "ingredients": ["원산지: 국내산 (한우) / 또는 미국산 (초이스 등급)", "부위: 소고기 등심", "보관방법: 냉장보관 (0~4℃) 또는 냉동보관 (-18℃ 이하)"],
+    "image": "images/beef.jpg",
+    "detailImages": [
+    "images/beef1.jpg",
+    "images/beef4.png"
+    ],
+    "category": "식품"
+  },
+  {
+    "id": "10",
+    "name": "블랙 디테일 자켓",
+    "price": 45900,
+    "description": "미니멀한 블랙 컬러에 디테일을 더해 세련된 무드를 완성한 자켓입니다. \n 군더더기 없는 실루엣에 포인트 디테일을 더해 단정하면서도 스타일리시한 연출이 가능합니다. \n 적당한 두께감과 부드러운 착용감으로 간절기 시즌에 활용하기 좋으며. \n 캐주얼부터 포멀한 룩까지 다양한 스타일에 매치하기 좋은 아이템입니다. " ,
+    "ingredients": ["겉감: 폴리에스터 70%, 레이온 30% ", "안감: 폴리에스터 100%"],
+    "image": "images/man.jpg",
+    "detailImages": [
+    "images/man5.jpg"
+    ],
+    "category": "의류"
+  },
+  {
+    "id": "11",
+    "name": "프리미엄 패딩",
+    "price": 189000,
+    "description": "가볍지만 뛰어난 보온성을 자랑하는 패딩 자켓입니다. \n 풍부한 충전재가 체온을 효과적으로 유지해주어 한겨울에도 따뜻하게 착용할 수 있습니다. \n 심플한 디자인으로 다양한 스타일에 자연스럽게 어울리며, \n 데일리룩은 물론 야외 활동에도 활용하기 좋은 실용적인 아이템입니다. " ,
+    "ingredients": ["겉감: 나일론 100%" , "충전재: 오리솜털 80%, 깃털 20%", "안감: 폴리에스터 100%"],
+    "image": "images/nort.jpg",
+    "detailImages": [
+    "images/nort1.png"
+    ],
+    "category": "의류"
+  },
+  {
+    "id": "12",
+    "name": "프리미엄 가든 샐러드-드레싱 포함",
+    "price": 8500,
+    "description": "신선한 채소와 다양한 토핑을 담아 건강하게 즐길 수 있는 샐러드입니다. \n 아삭한 식감과 균형 잡힌 영양으로 가볍지만 든든한 한 끼를 완성해줍니다. \n 간편하게 즐길 수 있도록 구성되어 바쁜 일상 속에서도 부담 없이 건강한 식사를 할 수 있습니다. ",
+    "ingredients": ["구성: 양상추, 방울토마토, 오이, 닭가슴살, 견과류", "중량: 약 250g", "칼로리: 약 220kcal", "섭취 방법: 드레싱을 기호에 맞게 뿌려 섭취"],
+    "image": "images/sael.png",
+    "detailImages": [
+    "images/sael1.png",
+    "images/sael2.png",
+    "images/sael3.png"
+    ],
+    "category": "식품"
+  },
+  {
+    "id": "13",
+    "name": "디오스 오브제컬렉션 베이직 냉장고",
+    "price": 1290000,
+    "description": "미니멀한 디자인과 실용성을 동시에 갖춘 오브제컬렉션 냉장고입니다. \n 공간에 자연스럽게 어우러지는 세련된 컬러와 깔끔한 외관으로 인테리어 완성도를 높여줍니다. \n 넉넉한 수납공간과 효율적인 내부 설계로 다양한 식재료를 신선하게 보관할 수 있으며, \n 일상에서 편리함을 더해주는 스마트한 기능을 갖춘 프리미엄 가전입니다.",
+    "ingredients": ["타입: 상냉장/하냉동 또는 양문형", "색상: 베이지", "에너지 효율: 1~2등급", "소음: 저소음 설계", "냉기 균일 순환 시스템", "스마트 온도 제어"],
+    "image": "images/ice.jpg",
+    "detailImages": [
+    "images/ice1.png",
+    "images/ice2.png",
+    "images/ice3.png"
+    ],
+    "category": "가전디지털"
+  },
+  {
+    "id": "14",
+    "name": "스트라이프 럭비 카라 스웻셔츠",
+    "price": 39900,
+    "description": "클래식 스트라이프 디자인 &nbsp;&nbsp;-&nbsp;&nbsp; 네이비와 아이보리 컬러의 스트라이프 패턴으로 클래식하면서도 트렌디한 캐주얼 무드를 연출합니다. \n 럭비 카라 디테일 &nbsp;&nbsp;-&nbsp;&nbsp; 일반 스웻셔츠와 차별화된 카라 디자인으로 단정하면서도 스타일리시한 분위기를 완성합니다. \n 편안한 세미 오버핏 &nbsp;&nbsp;-&nbsp;&nbsp; 여유 있는 실루엣으로 자연스럽고 편안한 착용감을 제공하며 다양한 체형에 잘 어울립니다. ",
+    "ingredients": ["면 (Cotton) : 60%", "폴리에스터 (Polyester) : 40%"],
+    "image": "images/stripe.jpg",
+    "detailImages": [
+    "images/stripe1.jpg",
+    "images/stripe2.jpg",
+    "images/stripe3.jpg",
+    "images/size.png"
+    ],
+    "category": "의류"
+  }, 
+  {
+    "id": "15",
+    "name": "데님 크롭 브라렛 톱",
+    "price": 38500,
+    "description": "유니크한 데님 디자인 &nbsp;&nbsp;-&nbsp;&nbsp; 청바지의 상단부를 모티브로 한 디자인으로 포켓, 버튼, 스티치 디테일이 그대로 살아있어 개성 있는 무드를 연출합니다. \n 크롭 기장 &nbsp;&nbsp;-&nbsp;&nbsp; 허리 위로 떨어지는 짧은 기장으로 스타일리시한 실루엣을 완성합니다. \n 빈티지 워싱 텍스처 &nbsp;&nbsp;-&nbsp;&nbsp; 데님 특유의 워싱감이 더해져 자연스럽고 감각적인 분위기를 연출합니다 \n 트렌디한 포인트 아이템 &nbsp;&nbsp;-&nbsp;&nbsp; 단독 착용은 물론, 셔츠나 아우터와 레이어드 시 강렬한 포인트가 됩니다.",
+    "ingredients": ["면 (Cotton) : 90%", "폴리에스터 (Polyester) : 10%"],
+    "image": "images/top.jpg",
+    "detailImages": [
+    "images/top1.jpg",
+    "images/top2.jpg",
+    "images/top3.jpg"
+    ],
+    "category": "의류"
+  },
+  {
+    "id": "16",
+    "name": "네이비 와이드 테일러드 슬랙스",
+    "price": 58900,
+    "description": "클래식 와이드 핏 &nbsp;&nbsp;-&nbsp;&nbsp; 허리부터 밑단까지 자연스럽게 떨어지는 와이드 스트레이트 핏으로 세련된 실루엣을 완성 \n 딥 네이비 컬러 &nbsp;&nbsp;-&nbsp;&nbsp; 차분하고 깊이 있는 네이비 컬러로 다양한 상의와 매치하기 쉬운 활용도 높은 디자인 \n 편안한 착용감 &nbsp;&nbsp;-&nbsp;&nbsp; 힙과 허벅지에 여유를 준 패턴으로 활동성과 스타일을 동시에 만족 \n 세련된 드레이프감 &nbsp;&nbsp;-&nbsp;&nbsp; 자연스럽게 떨어지는 원단감으로 클래식하면서도 도시적인 스타일 완성",
+    "ingredients": ["폴리에스터 (Polyester) : 70%", "레이온 (Rayon) : 25%", "스판 (Span / Polyurethane) : 5%"],
+    "image": "images/Slacks.png",
+    "detailImages": [
+    "images/Slacks1.png",
+    "images/Slacks2.png",
+    "images/pants.png"
+    ],
+    "category": "의류"
+  },
+  {
+    "id": "17",
+    "name": "라이트 블루 데님 셔츠",
+    "price": 35000,
+    "description": "클래식한 데님 소재 &nbsp;&nbsp;-&nbsp;&nbsp; 은은한 라이트 블루 컬러로 계절에 구애받지 않고 착용 가능 \n 슬림한 핏감 &nbsp;&nbsp;-&nbsp;&nbsp; 몸에 자연스럽게 떨어지는 실루엣으로 깔끔한 스타일 연출 \n 버튼업 디자인 &nbsp;&nbsp;-&nbsp;&nbsp; 기본에 충실한 버튼 디테일로 다양한 코디에 활용 가능",
+    "ingredients": ["면 (Cotton) : 100%"],
+    "image": "images/shirt.png",
+    "detailImages": [
+    "images/shirt1.png",
+    "images/shirt2.png",
+    "images/shirt3.png",
+    "images/shirtsize.png"
+    ],
+    "category": "의류"
+  },
+  {
+    "id": "18",
+    "name": "KF94 고성능 마스크",
+    "price": 4000,
+    "description": "미세먼지 및 외부 유해 입자를 효과적으로 차단해 일상 속에서도 안심하고 착용할 수 있는 제품입니다. \n 얼굴에 밀착되는 3D 입체 구조로 설계되어 편안한 호흡과 안정적인 착용감을 동시에 제공합니다. \n 부드러운 소재와 귀 끈으로 장시간 착용에도 부담이 적으며, 가벼운 무게로 데일리용으로 활용하기 좋습니다",
+    "ingredients": ["KF94 등급 미세먼지 차단", "부드러운 이어밴드로 귀 통증 최소화", "3D 입체 구조로 편안한 착용감"],
+    "image": "images/mask.png",
+    "detailImages": [
+    "images/mask1.png",
+    "images/mask2.png",
+    "images/mask3.png"
+    ],
+    "category": "생활용품"
+  },
+  {
+    "id": "19",
+    "name": "퓨어 클린 물티슈",
+    "price": 3500,
+    "description": "부드럽고 도톰한 원단으로 제작된 물티슈로 피부 자극을 최소화하면서도 깨끗하게 닦아낼 수 있는 제품입니다. \n 정제수를 기반으로 한 안전한 성분으로 아이부터 성인까지 누구나 안심하고 사용할수 있습니다. \n 한 장씩 깔끔하게 뽑아 사용할 수 있는 구조로 사용 편의성을 높였으며, 휴대와 보관이 간편합니다. ",
+    "ingredients": ["부드럽고 도톰한 원단 사용", "피부 자극 최소화", "휴대 및 보관이 편리한 패키지"],
+    "image": "images/wetwipes.jpg",
+    "detailImages": [
+    "images/wetwipes1.jpg",
+    "images/wetwipes2.jpg",
+    "images/wetwipes3.jpg",
+    "images/wetwipes4.jpg",
+    "images/wetwipes.jpg"
+    ],
+    "category": "생활용품"
+  },
+  {
+    "id": "20",
+    "name": "프리미엄 저소음 드럼세탁기 (12kg/21kg 등 용량 기재)",
+    "price": 685000,
+    "description": "강력한 버블 세척 &nbsp;&nbsp;-&nbsp;&nbsp; 미세한 거품이 옷감 사이사이 침투해 찌든 때를 효과적으로 제거합니다. \n 인버터 DD 모터 &nbsp;&nbsp;-&nbsp;&nbsp; 소음과 진동은 최소화하고 에너지 효율은 극대화했습니다. \n 알러지 안심 스팀 &nbsp;&nbsp;-&nbsp;&nbsp; 고온 스팀으로 유해 세균과 진드기를 99.9% 살균하여 민감한 피부도 안심할 수 있습니다. \n 스마트 AI 맞춤 세탁 &nbsp;&nbsp;-&nbsp;&nbsp; 세탁물의 무게와 오염도를 감지하여 최적의 세탁 시간과 물 수위를 조절합니다. ",
+    "ingredients": ["옷감 손상 걱정 없는 '소프트 케어' &nbsp;&nbsp;-&nbsp;&nbsp; 드럼 내부의 다이아몬드 패턴 설계로 세탁 시 옷감 엉킴을 방지하고, 마치 손빨래를 한 듯 부드럽게 세탁합니다. 고급 소재의 의류도 변형 걱정 없이 맡기세요.", "밤에도 조용한 '저진동 저소음' 기술 &nbsp;&nbsp;-&nbsp;&nbsp; 늦은 밤 세탁기 돌리기 눈치 보이셨나요? 3중 진동 저감 센서가 불균형을 잡아주어 아파트나 오피스텔에서도 조용하게 사용 가능합니다.", "무세제 통세척으로 언제나 청결하게 &nbsp;&nbsp;-&nbsp;&nbsp; 전용 세제 없이도 고온의 물살과 강력한 회전으로 세탁조 내부의 오염물과 곰팡이를 제거합니다. 보이지 않는 곳까지 깨끗해야 진짜 세탁입니다."],
+    "image": "images/washing.jpg",
+    "detailImages": [
+    "images/washing4.jpg",
+    "images/washing1.jpg",
+    "images/washing2.jpg",
+    "images/washing3.jpg"
+    ],
+    "category": "가전디지털"
+  },
+  {
+    "id": "21",
+    "name": "UltraVax P10 Pro",
+    "price": 138500,
+    "description": "강력한 흡입력 &nbsp;&nbsp;-&nbsp;&nbsp; 눈에 보이지 않는 미세먼지부터 무거운 알갱이까지, 단 한 번의 움직임으로 완벽하게. \n 가벼운 무게 &nbsp;&nbsp;-&nbsp;&nbsp; 손목 부담 제로. 초경량 설계로 집안 구석구석을 자유롭게 이동하세요. \n 긴 배터리 &nbsp;&nbsp;-&nbsp;&nbsp; 청소 도중 끊길 걱정 없이, 한 번의 충전으로 집 전체를 여유롭게. \n 스마트 센서 &nbsp;&nbsp;-&nbsp;&nbsp; 먼지 양을 스스로 감지하여 흡입력을 조절하는 똑똑한 청소 파트너. ",
+    "ingredients": ["강력 흡입 (210W+) &nbsp;&nbsp;-&nbsp;&nbsp; 초강력 BLDC 모터를 탑재하여 틈새 먼지까지 남김없이 빨아들입니다. ", "고성능 필터 &nbsp;&nbsp;-&nbsp;&nbsp; 5단계 헤파(HEPA) 필터 시스템으로 미세먼지를 99.9% 차단하여 깨끗한 공기만 배출합니다.", "대용량 배터리 &nbsp;&nbsp;-&nbsp;&nbsp; 분리형 배터리 채택으로 최대 60분 동안 끊김 없는 청소가 가능합니다. ", "LED 브러시 &nbsp;&nbsp;-&nbsp;&nbsp; 어두운 가구 밑이나 침대 아래 숨은 먼지도 LED 라이트로 놓치지 않고 청소하세요. ","간편 세척 &nbsp;&nbsp;-&nbsp;&nbsp; 먼지통과 필터 모두 물세척이 가능해 언제나 새것처럼 위생적으로 관리할 수 있습니다."],
+    "image": "images/cleaner.jpg",
+    "detailImages": [
+    "images/cleaner1.jpg",
+    "images/cleaner2.jpg",
+    "images/cleaner3.png"
+    ],
+    "category": "가전디지털"
+  },
+  {
+    "id": "22",
+    "name": "tv",
+    "price": 1190000,
+    "description": "초고화질 경험 &nbsp;&nbsp;-&nbsp;&nbsp; 거실이 영화관이 되는 순간. 4K UHD의 압도적인 몰입감을 느껴보세요. \n 베젤리스 디자인 &nbsp;&nbsp;-&nbsp;&nbsp; 경계를 허물다. 화면 가득 펼쳐지는 영상미로 인테리어의 품격을 높입니다. \n 스마트 라이프 &nbsp;&nbsp;-&nbsp;&nbsp; OTT부터 게임까지, 당신이 사랑하는 모든 콘텐츠를 한곳에서 간편하게. \n 사운드 시스템 &nbsp;&nbsp;-&nbsp;&nbsp; 화면 속 움직임을 따라가는 입체 사운드. 귀로 느끼는 생동감을 선사합니다. ",
+    "ingredients": ["4K Crystal Processor &nbsp;&nbsp;-&nbsp;&nbsp; 저해상도 영상도 4K급으로 업스케일링하여 언제나 선명하게 감상하세요. ", "HDR10+ 지원 &nbsp;&nbsp;-&nbsp;&nbsp; 밝은 곳은 더 밝게, 어두운 곳은 더 깊게. 제작자의 의도 그대로의 색감을 구현합니다.", "스마트 허브 (WebOS/Tizen) &nbsp;&nbsp;-&nbsp;&nbsp; 넷플릭스, 유튜브, 디즈니+ 등 인기 앱을 별도 기기 없이 바로 실행합니다. ", "슬림 디자인 &nbsp;&nbsp;-&nbsp;&nbsp; 벽면과 밀착되는 슬림한 두께로 공간 효율을 극대화하고 세련된 무드를 연출합니다. "],
+    "image": "images/tv.jpg",
+    "detailImages": [
+    "images/tv1.jpg",
+    "images/tv2.jpg",
+    "images/tv3.jpg",
+    "images/tv4.jpg"
+    ],
+    "category": "가전디지털"
+  }
+
+]
