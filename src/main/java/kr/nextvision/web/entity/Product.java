@@ -11,8 +11,6 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-
-
 @Entity
 @Table(name = "tb_product")
 @Getter
@@ -22,8 +20,10 @@ public class Product{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "p_idx")
-	private Integer id;
+	// 💡 민하님의 백엔드 표준 세팅(Long)을 존중하면서, 충돌을 방지합니다.
+	private Long id;
 	
+	// 💡 호성님이 에러를 잡기 위해 추가한 필수 외래키 방어 코드입니다!
 	@Column(name = "seller_idx", nullable = false)
 	private Integer sellerIdx;
 	
@@ -40,9 +40,11 @@ public class Product{
     @Column(name = "p_desc", nullable = false ,columnDefinition = "TEXT")
     private String description; // DB의 p_desc 연결
     
+    // 호성님이 추가한 재고량 방어 코드
     @Column(name = "p_stock", nullable = false)
     private Integer stock;
     
+    // 호성님이 추가한 상태 방어 코드
     @Column(name = "p_status", nullable = false)
     private String status = "COMMON";
     
@@ -56,12 +58,12 @@ public class Product{
     @Column(name = "img3")
     private String img3; // 상세 이미지 2
 
-    // 생성 일자 (보통 팀 프로젝트 DB에 필수로 들어갑니다)
+    // 생성 일자 (업데이트 시 변경되지 않도록 updatable = false 옵션 유지)
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
     
+    // 호성님이 추가한 업데이트 일자
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updateAt;
-	
 	
 }
