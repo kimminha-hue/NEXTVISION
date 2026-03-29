@@ -468,7 +468,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (signupBtn) signupBtn.style.display = "none";
 
         // 사용자 이름 가져오기
-        const username = localStorage.getItem("username");
+        const user = JSON.parse(localStorage.getItem("loginUser"));
+        const username = user?.name || "사용자";
 
         // 상단 네비게이션에 사용자 이름, 마이페이지, 장바구니, 로그아웃 버튼 추가
     const userLi = document.createElement("li");
@@ -483,6 +484,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const cartLi = document.createElement("li");
     cartLi.innerHTML = `<a href="cart.html">🛒장바구니</a>`;
 
+    let adminLi = null;
+        if (user && user.role === "admin") {
+            adminLi = document.createElement("li");
+            adminLi.innerHTML = `<a href="admin_test.html">🛠 상품등록</a>`;
+        }
+
     const logoutLi = document.createElement("li");
     logoutLi.innerHTML = `<a href="#" id="logout-btn">로그아웃</a>`;
 
@@ -496,20 +503,18 @@ document.addEventListener("DOMContentLoaded", () => {
             nav.insertBefore(introLi, shopLi);   // 소개
             nav.insertBefore(mypageLi, shopLi);  // 마이페이지
             nav.insertBefore(cartLi, shopLi);    // 장바구니
+            if (adminLi) nav.insertBefore(adminLi, shopLi);
             nav.insertBefore(logoutLi, shopLi);  // 로그아웃
         } else {
-            // fallback (혹시 쇼핑하기 못 찾으면 그냥 뒤에 추가)
-            nav.appendChild(userLi);
-            nav.appendChild(introLi);
-            nav.appendChild(mypageLi);
-            nav.appendChild(cartLi);
-            nav.appendChild(logoutLi);
+            nav.append(userLi, introLi, mypageLi, cartLi);
+            if (adminLi) nav.append(adminLi);
+            nav.append(logoutLi);
         }   
 
         // 로그아웃 기능
         document.getElementById("logout-btn").addEventListener("click", () => {
             localStorage.removeItem("isLogin");
-            localStorage.removeItem("username");
+            localStorage.removeItem("loginUser");
             alert("로그아웃 되었습니다.");
             location.reload();
         });
