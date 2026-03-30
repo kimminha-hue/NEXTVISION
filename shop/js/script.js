@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
 
             <div class="product-long-description">
-                <section class="detail-section">
+                <section class="detail-section" style="display: none;">
                     <h2 class="section-title">상품 상세 설명</h2>
                     <p class="detail-description">${product.description}</p>
                 </section>
@@ -242,57 +242,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             // 데이터 로드 후 product-detail.js의 함수를 이용해 별점 및 리뷰 렌더링 업데이트
             if (typeof window.updateProductReviews === 'function') {
                 window.updateProductReviews();
-            }
-
-            // =========================
-            // ⭐ 리뷰 작성 기능 추가
-            // =========================
-           function initReviewForm(productName) {
-                const submitBtn = document.getElementById('submit-review');
-                if (!submitBtn) return;
-
-                let selectedRating = 0;
-                const stars = document.querySelectorAll('#review-rating span');
-
-                // 별점 선택
-                stars.forEach(star => {
-                    star.addEventListener('click', () => {
-                        selectedRating = parseInt(star.dataset.value);
-                        stars.forEach(s => s.classList.remove('active'));
-                        star.classList.add('active');
-                    });
-                });
-
-                // 리뷰 제출
-                submitBtn.addEventListener('click', () => {
-                    const content = document.getElementById('review-content').value.trim();
-                    if (!content) return alert("리뷰를 입력하세요");
-                    if (selectedRating === 0) return alert("별점을 선택하세요");
-
-                    const savedData = localStorage.getItem("userData");
-                    let userData = savedData ? JSON.parse(savedData) : { reviews: [] };
-
-                    const newReview = {
-                        id: Date.now(),
-                        product: productName,
-                        rating: selectedRating,
-                        content: content
-                    };
-
-                    userData.reviews = userData.reviews || [];
-                    userData.reviews.push(newReview);
-                    localStorage.setItem("userData", JSON.stringify(userData));
-
-                    alert("리뷰가 등록되었습니다!");
-
-                    // 초기화
-                    document.getElementById('review-content').value = "";
-                    selectedRating = 0;
-                    stars.forEach(s => s.classList.remove('active'));
-
-                    // 리뷰 렌더링 업데이트
-                    window.updateProductReviews(productName);
-                });
             }
 
     }
@@ -460,7 +409,8 @@ if (imageBtn && fileInput) {
         input.value = "";
 
         try {
-            const response = await fetch('http://223.130.161.162:8000/api/chat/ask', {
+
+            const response = await fetch('http://localhost:8000/api/chat/ask', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ session_id: sessionId, user_message: text })
@@ -519,11 +469,15 @@ document.addEventListener("DOMContentLoaded", () => {
         if (signupBtn) signupBtn.style.display = "none";
 
         // 사용자 이름 가져오기
-        const username = localStorage.getItem("username");
+        const user = JSON.parse(localStorage.getItem("loginUser"));
+        const username = user?.name || "사용자";
 
         // 상단 네비게이션에 사용자 이름, 마이페이지, 장바구니, 로그아웃 버튼 추가
     const userLi = document.createElement("li");
     userLi.innerHTML = `<span>${username}님</span>`;
+
+    const introLi = document.createElement("li");
+    introLi.innerHTML = `<a href="../../audiview/index.html">소개페이지</a>`;
 
     const mypageLi = document.createElement("li");
     mypageLi.innerHTML = `<a href="mypage.html">👤마이페이지</a>`;
@@ -531,19 +485,37 @@ document.addEventListener("DOMContentLoaded", () => {
     const cartLi = document.createElement("li");
     cartLi.innerHTML = `<a href="cart.html">🛒장바구니</a>`;
 
+    let adminLi = null;
+        if (user && user.role === "admin") {
+            adminLi = document.createElement("li");
+            adminLi.innerHTML = `<a href="admin_test.html">🛠 상품등록</a>`;
+        }
+
     const logoutLi = document.createElement("li");
     logoutLi.innerHTML = `<a href="#" id="logout-btn">로그아웃</a>`;
 
-    // 👉 순서대로 추가
-    nav.appendChild(userLi);
-    nav.appendChild(mypageLi);
-    nav.appendChild(cartLi);
-    nav.appendChild(logoutLi);    
+     // ===== 기준점 (쇼핑하기 버튼) =====
+        const shopLink = document.querySelector('a[href="index.html"]');
+        const shopLi = shopLink ? shopLink.closest('li') : null;
+
+        if (shopLi) {
+            // 👉 원하는 순서대로 삽입
+            nav.insertBefore(userLi, shopLi);    // 김광훈님
+            nav.insertBefore(introLi, shopLi);   // 소개
+            nav.insertBefore(mypageLi, shopLi);  // 마이페이지
+            nav.insertBefore(cartLi, shopLi);    // 장바구니
+            if (adminLi) nav.insertBefore(adminLi, shopLi);
+            nav.insertBefore(logoutLi, shopLi);  // 로그아웃
+        } else {
+            nav.append(userLi, introLi, mypageLi, cartLi);
+            if (adminLi) nav.append(adminLi);
+            nav.append(logoutLi);
+        }   
 
         // 로그아웃 기능
         document.getElementById("logout-btn").addEventListener("click", () => {
             localStorage.removeItem("isLogin");
-            localStorage.removeItem("username");
+            localStorage.removeItem("loginUser");
             alert("로그아웃 되었습니다.");
             location.reload();
         });

@@ -568,3 +568,191 @@
 .voice-guide {
     text-align: center;
 } 
+
+.review-images {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.review-img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.slider-modal {
+    display: none;
+    position: fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    background: rgba(0,0,0,0.9);
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.slider-modal img {
+    max-width: 80%;
+    max-height: 80%;
+    border-radius: 10px;
+}
+
+#prev-btn, #next-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 30px;
+    color: white;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+#prev-btn { left: 30px; }
+#next-btn { right: 30px; }
+
+#close-slider {
+    position: absolute;
+    top: 20px;
+    right: 40px;
+    font-size: 30px;
+    color: white;
+    cursor: pointer;
+}
+
+/* ===== 리뷰 수정 모달 ===== */
+.modal {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+#edit-modal .modal-content {
+    background: #1a1a2e;          /* 어두운 네이비 배경 — 기존 사이트 톤과 맞춤 */
+    border: 1px solid var(--accent-color);
+    border-radius: var(--border-radius);
+    padding: 3rem;
+    width: 90vw;
+    max-width: 750px;
+    box-shadow: 0 0 30px rgba(102, 252, 241, 0.15);
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+}
+
+#edit-modal .modal-content h3 {
+    font-size: 2rem;            /* ✅ 원하는 크기로 조절 */
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+#edit-modal .modal-content textarea {
+    font-size: 1.9rem;            /* ✅ 원하는 크기로 조절 */
+}
+
+.modal-content #edit-product-name {
+    font-size: 0.95rem;
+    color: var(--accent-color);
+    letter-spacing: 0.5px;
+    margin: 0;
+}
+
+/* 별점 (모달 안) */
+.modal-content .star-rating {
+    display: flex;
+    gap: 6px;
+    font-size: 1.8rem;
+    cursor: pointer;
+}
+
+.modal-content .star-rating span {
+    color: #444;
+    transition: color 0.2s;
+}
+
+.modal-content .star-rating span.active {
+    color: gold;
+}
+
+/* 텍스트에어리어 */
+.modal-content textarea {
+    width: 100%;
+    min-height: 160px;
+    padding: 1rem 1.2rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: #111827;          /* 입력창만 더 어둡게 */
+    color: var(--text-primary);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    resize: vertical;
+    transition: border-color 0.2s;
+}
+
+.modal-content textarea:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 8px rgba(102, 252, 241, 0.15);
+}
+
+/* 버튼 그룹 */
+.modal-actions {
+    display: flex;
+    gap: 0.8rem;
+    justify-content: flex-end;
+    margin-top: 0.5rem;
+}
+
+.modal-actions #save-edit {
+    background: var(--accent-color);
+    color: #000;
+    border: none;
+    padding: 0.7rem 1.5rem;
+    border-radius: var(--border-radius);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.modal-actions #save-edit:hover {
+    opacity: 0.85;
+}
+
+.modal-actions #cancel-edit {
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    padding: 0.7rem 1.5rem;
+    border-radius: var(--border-radius);
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.modal-actions #cancel-edit:hover {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+    .modal-content {
+        margin: 0 1rem;
+        padding: 1.8rem;
+    }
+}

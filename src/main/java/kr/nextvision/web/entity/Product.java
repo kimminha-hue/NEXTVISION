@@ -23,7 +23,7 @@ public class Product{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "p_idx")
 	private Integer id;
-	
+
 	@Column(name = "p_name", nullable = false)
 	private String name; // DB의 p_name 연결
 	
@@ -31,12 +31,18 @@ public class Product{
     private String category; // DB의 p_category 연결
 
     @Column(name = "p_price")
-    private int price; // DB의 p_price 연결
+    private Integer price; // DB의 p_price 연결
 
     // RAG 성능을 위한 긴 텍스트
-    @Column(name = "p_desc", columnDefinition = "TEXT")
+    @Column(name = "p_desc", nullable = false ,columnDefinition = "TEXT")
     private String description; // DB의 p_desc 연결
-
+    
+    @Column(name = "p_stock", nullable = false)
+    private Integer stock;
+    
+    @Column(name = "p_status", nullable = false)
+    private String status = "COMMON";
+    
     // 팀원이 만들어둔 상세 이미지 컬럼 3개 연결
     @Column(name = "img1")
     private String img1; // 메인 썸네일 역할
@@ -51,9 +57,10 @@ public class Product{
     private String img4; // 상세 이미지 3 (선택)
 
     // 생성 일자 (보통 팀 프로젝트 DB에 필수로 들어갑니다)
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
     
+
     // 호성님이 추가한 업데이트 일자
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;

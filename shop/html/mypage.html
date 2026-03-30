@@ -13,7 +13,7 @@
 <body>
     <header class="site-header">
         <div class="container">
-            <h1 class="logo" aria-label="AURA store homepage"><a href="index.html">All-In-Shop</a></h1>
+            <h1 class="logo" aria-label="AURA store homepage"><a href="index.html">AUDI MALL</a></h1>
             <nav aria-label="메인 내비게이션">
                 <ul class="nav-links">
                     <li><a href="index.html" aria-current="page">쇼핑하기</a></li>
@@ -80,6 +80,31 @@
 
     </div>
 </div>
-</body>
+
+<!-- 🔥 리뷰 수정 모달 -->
+<div id="edit-modal" class="modal hidden">
+  <div class="modal-content">
+    <h3>리뷰 수정</h3>
+
+    <p id="edit-product-name"></p>
+
+    <div id="edit-stars" class="star-rating">
+      <span data-value="1">★</span>
+      <span data-value="2">★</span>
+      <span data-value="3">★</span>
+      <span data-value="4">★</span>
+      <span data-value="5">★</span>
+    </div>
+
+    <textarea id="edit-content" placeholder="리뷰를 수정하세요"></textarea>
+
+    <div class="modal-actions">
+      <button id="save-edit" class="btn">저장</button>
+      <button id="cancel-edit" class="btn btn-outline">취소</button>
+    </div>
+  </div>
+</div>
 <script src="../js/script.js"></script>
 <script src="../js/mypage.js"></script>
+</body>
+</html>
