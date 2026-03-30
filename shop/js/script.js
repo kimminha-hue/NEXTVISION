@@ -477,7 +477,7 @@ document.addEventListener("DOMContentLoaded", () => {
     userLi.innerHTML = `<span>${username}님</span>`;
 
     const introLi = document.createElement("li");
-    introLi.innerHTML = `<a href="intro.html">소개페이지</a>`;
+    introLi.innerHTML = `<a href="../../audiview/index.html">소개페이지</a>`;
 
     const mypageLi = document.createElement("li");
     mypageLi.innerHTML = `<a href="mypage.html">👤마이페이지</a>`;
