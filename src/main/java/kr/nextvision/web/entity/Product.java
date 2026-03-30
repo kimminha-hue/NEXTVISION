@@ -15,7 +15,7 @@ import lombok.Setter;
 @Table(name = "tb_product")
 @Getter
 @Setter
-public class Product{
+public class Product {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,7 +23,7 @@ public class Product{
 	// 💡 민하님의 백엔드 표준 세팅(Long)을 존중하면서, 충돌을 방지합니다.
 	private Integer id;
 	
-	// 💡 호성님이 에러를 잡기 위해 추가한 필수 외래키 방어 코드입니다!
+	// 💡 필수 외래키 방어 코드 유지
 	@Column(name = "seller_idx", nullable = false)
 	private Integer sellerIdx;
 	
@@ -40,11 +40,11 @@ public class Product{
     @Column(name = "p_desc", nullable = false ,columnDefinition = "TEXT")
     private String description; // DB의 p_desc 연결
     
-    // 호성님이 추가한 재고량 방어 코드
+    // 💡 재고량 방어 코드 유지
     @Column(name = "p_stock", nullable = false)
     private Integer stock;
     
-    // 호성님이 추가한 상태 방어 코드
+    // 💡 상태 방어 코드 유지 (기본값 설정)
     @Column(name = "p_status", nullable = false)
     private String status = "COMMON";
     
@@ -58,12 +58,16 @@ public class Product{
     @Column(name = "img3")
     private String img3; // 상세 이미지 2
 
+    // 팀원이 새롭게 추가한 이미지 4 컬럼 반영
+    @Column(name = "img4")
+    private String img4; // 상세 이미지 3 (선택)
+
     // 생성 일자 (업데이트 시 변경되지 않도록 updatable = false 옵션 유지)
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
     
-    // 호성님이 추가한 업데이트 일자
+    // 업데이트 일자 (팀원의 카멜케이스 변수명 반영)
     @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updateAt;
+    private LocalDateTime updatedAt;
 	
 }

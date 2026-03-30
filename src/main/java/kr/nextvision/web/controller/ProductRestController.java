@@ -40,11 +40,14 @@ public class ProductRestController {
     /**
      * [관리자용] 새로운 상품 정보와 이미지를 등록하는 API
      * @param img1 프론트엔드에서 넘어온 메인 썸네일 이미지 파일
-     * @param sellerIdx 프론트엔드에서 넘어온 판매자 고유 번호 (추가됨!)
+     * @param img2 상세 이미지 1 (선택)
+     * @param img3 상세 이미지 2 (선택)
+     * @param img4 상세 이미지 3 (선택)
      * @param pName 상품명
      * @param pCategory 카테고리
      * @param pPrice 가격
      * @param pDesc 상세 설명 (RAG용)
+     * @param sellerIdx 프론트엔드에서 넘어온 판매자 고유 번호
      * @return 성공 여부 및 업로드된 이미지 URL 반환
      */
     @PostMapping("/register")
@@ -52,6 +55,7 @@ public class ProductRestController {
             @RequestParam("img1") MultipartFile img1,
             @RequestParam(value = "img2", required = false) MultipartFile img2,
             @RequestParam(value = "img3", required = false) MultipartFile img3,
+            @RequestParam(value = "img4", required = false) MultipartFile img4,
             @RequestParam("p_name") String pName,
             @RequestParam("p_category") String pCategory,
             @RequestParam("p_price") int pPrice,
@@ -67,35 +71,44 @@ public class ProductRestController {
             
             Product product = new Product();
             
-            // 🚨 핵심 수정: 받은 sellerIdx를 Product 엔티티에 세팅합니다!
-            product.setSellerIdx(sellerIdx); 
-            
+            // 프론트에서 넘어온 파라미터 세팅
             product.setName(pName);       
             product.setCategory(pCategory); 
             product.setPrice(pPrice);
             product.setDescription(pDesc);
             product.setImg1(img1Url); 
-            product.setCreatedAt(java.time.LocalDateTime.now());
-            product.setUpdateAt(java.time.LocalDateTime.now());
             
-            // (안전 장치) 엔티티 설계에 따라 pStock이 필수일 경우를 대비해 기본값 세팅
-            product.setStock(100); 
+            // 🚨 핵심 수정: 하드코딩된 값을 지우고, 프론트에서 받은 sellerIdx를 엔티티에 세팅합니다.
+            product.setSellerIdx(sellerIdx); 
+            
+            // 상태 및 재고량 기본값 세팅 (중복 로직 하나로 통합)
+            product.setStock(100);
+            product.setStatus("판매중");
+            
+            // 날짜 세팅 (엔티티 수정본에 맞춰 updatedAt으로 통일)
+            product.setCreatedAt(java.time.LocalDateTime.now());
+            product.setUpdatedAt(java.time.LocalDateTime.now());
 
-            // 2. 2번 이미지(선택)가 들어왔다면 업로드 후 세팅!
+            // 2. 2번 이미지(선택)가 들어왔다면 업로드 후 세팅
             if (img2 != null && !img2.isEmpty()) {
                 String img2Url = fileUploadService.uploadFile(img2, "products");
                 product.setImg2(img2Url);
             }
 
-            // 3. 3번 이미지(선택)가 들어왔다면 업로드 후 세팅!
+            // 3. 3번 이미지(선택)가 들어왔다면 업로드 후 세팅
             if (img3 != null && !img3.isEmpty()) {
                 String img3Url = fileUploadService.uploadFile(img3, "products");
                 product.setImg3(img3Url);
             }
+            
+            // 4. 4번 이미지(선택)가 들어왔다면 업로드 후 세팅
+            if (img4 != null && !img4.isEmpty()) {
+                String img4Url = fileUploadService.uploadFile(img4, "products");
+                product.setImg4(img4Url);
+            }
 
             // DB에 최종 저장!
             productRepository.save(product);
-
             response.put("status", "success");
             response.put("message", "상품과 모든 이미지가 성공적으로 등록되었습니다.");
             response.put("imageUrl", img1Url); 

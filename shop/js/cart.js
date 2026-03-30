@@ -63,9 +63,12 @@ function goCheckout() {
         return;
     }
 
+    // 총 금액 계산
     const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+    localStorage.setItem("checkoutTotal", total); // 필요하면 결제페이지에서 사용
 
-    window.location.href = `checkout.html?price=${total}&name=장바구니상품`;
+    // 결제 페이지로 이동
+    window.location.href = "checkout.html"; // 더 이상 URL에 정보 전달 X
 }
 
 function changeQty(index, amount) {

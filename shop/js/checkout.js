@@ -1,145 +1,178 @@
-   
-   // 🔥 로그인 체크 추가
+// 1. 로그인 체크
 const isLogin = localStorage.getItem("isLogin");
-
 if (isLogin !== "true") {
     alert("로그인이 필요합니다.");
     window.location.href = "login.html";
 }
-   
-   
-    function execDaumPostcode() {
-            new daum.Postcode({
-                oncomplete: function(data) {
-                    var addr = ''; // 주소 변수
 
-                    //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
-                    if (data.userSelectedType === 'R') { // 도로명 주소
-                        addr = data.roadAddress;
-                    } else { // 지번 주소
-                        addr = data.jibunAddress;
-                    }
+document.addEventListener("DOMContentLoaded", () => {
+    const isLogin = localStorage.getItem("isLogin");
+    const username = localStorage.getItem("username");
 
-                    // 우편번호와 주소 정보를 해당 필드에 넣는다.
-                    document.getElementById('postcode').value = data.zonecode;
-                    document.getElementById('address').value = addr;
-                    // 커서를 상세주소 필드로 이동한다.
-                    document.getElementById('detailAddress').focus();
-                }
-            }).open();
+    const loginBtn = document.querySelector('a[href="login.html"]');
+    const signupBtn = document.querySelector('a[href="signup.html"]');
+    const nav = document.querySelector('.nav-links');
+
+    if (isLogin === "true" && username) {
+        if (loginBtn) loginBtn.style.display = "none";
+        if (signupBtn) signupBtn.style.display = "none";
+
+        const userLi = document.createElement("li");
+        userLi.innerHTML = `<span>${username}님</span>`;
+
+        const shopLi = document.querySelector('.nav-links li a[href="index.html"]').closest('li');
+
+        if (shopLi) {
+            nav.insertBefore(userLi, shopLi); // 👈 쇼핑하기 앞에 넣기
+        } else {
+            nav.appendChild(userLi);
         }
-   
-   
-    var IMP = window.IMP; 
-    IMP.init("imp14397622"); // 포트원 공용 테스트 가맹점 식별코드
+    }
+});
 
-    // 기본 결제 수단은 null로 설정 (자동 카드 선택 방지)
-    let currentPayMethod = null;
-    let checkoutPrice = 0;
-    let checkoutName = "All-In-Shop 상품 결제";
 
-    document.addEventListener('DOMContentLoaded', () => {
-        const params = new URLSearchParams(window.location.search);
-        const price = params.get('price');
-        const name = params.get('name');
-        const qty = params.get('qty');      // ⭐ 추가
-        const size = params.get('size');    // ⭐ 추가
-        const nameEl = document.getElementById("order-name");
-
-        if (nameEl && name) {
-        nameEl.textContent = decodeURIComponent(name);
+// 2. 주소 검색 (카카오 우편번호)
+function execDaumPostcode() {
+    new daum.Postcode({
+        oncomplete: function(data) {
+            const addr = data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress;
+            document.getElementById('postcode').value = data.zonecode;
+            document.getElementById('address').value = addr;
+            document.getElementById('detailAddress').focus();
         }
+    }).open();
+}
 
-        if (price) {
-        checkoutPrice = parseInt(price, 10);
-        const priceElement = document.getElementById('checkout-total-price');
-        if (priceElement) {
-            priceElement.textContent = '₩' + checkoutPrice.toLocaleString();
-        }
-        }
-        if (name) {
-            checkoutName = size ? `${name} (${size})` : name;
-        }
+// 3. 결제 초기화 (포트원)
+var IMP = window.IMP;
+IMP.init("imp14397622");
 
-        // ⭐ 화면 표시 (있을 때만)
-        if (qty) {
-            const qtyEl = document.getElementById("product-qty");
-            if (qtyEl) qtyEl.textContent = qty;
-        }
+let currentPayMethod = null;
+let itemsToCheckout = []; // [중요] 결제할 상품들을 담을 전역 변수
 
-        
-        const sizeEl = document.getElementById("product-size");
-            
-        if (sizeEl) {
-            if (size) {
-                sizeEl.textContent = size;
-            } else {
-                sizeEl.parentElement.style.display = "none";
-            }
-        }
+// 4. 페이지 로드 시 상품 정보 렌더링
+document.addEventListener('DOMContentLoaded', () => {
+    const orderListEl = document.getElementById("order-list");
+    const totalPriceEl = document.getElementById("checkout-total-price");
+    orderListEl.innerHTML = "";
 
-        // ⭐ 이미지 추가
-        const image = params.get('image');
-        const imgEl = document.getElementById("order-image");
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const params = new URLSearchParams(window.location.search);
+    const singleItemName = params.get('name');
 
-        if (imgEl && image) {
-            imgEl.src = "../" + image;
-        }
+    // [로직 수정] URL 파라미터가 있으면 단독 상품, 없으면 장바구니 데이터를 itemsToCheckout에 할당
+    if (singleItemName) {
+        // 단독 상품 결제일 때
+        const rawPrice = parseInt(params.get('price'), 10) || 0;
+        const rawQty = parseInt(params.get('qty'), 10) || 1;
 
-        // ⭐ 가격 표시 (주문상품 카드용)
-        const orderPriceEl = document.getElementById("order-price");
-
-        if (orderPriceEl && price) {
-            orderPriceEl.textContent = '₩' + parseInt(price).toLocaleString();
-        }
-            
-
-    });
-
-    // 결제 수단 선택 함수
-    function selectPayMethod(btn, method) {
-        currentPayMethod = method;
-        const btns = document.querySelectorAll('#pay-methods button');
-        btns.forEach(b => {
-            b.style.background = 'transparent';
-            b.style.color = 'var(--accent-color)';
-        });
-        btn.style.background = 'var(--accent-color)';
-        btn.style.color = 'var(--bg-color)';
+        itemsToCheckout = [{
+            name: decodeURIComponent(singleItemName),
+            // [수정] 만약 이전 페이지에서 이미 수량이 곱해진 금액을 보냈다면 
+            // 여기서 qty로 나눠서 '단가'를 저장하거나, 
+            // 아래 계산식에서 qty를 곱하지 않아야 합니다.
+            price: rawPrice / rawQty, // 금액을 수량으로 나눠서 '단가'로 강제 변환
+            qty: rawQty,
+            size: params.get('size') || "",
+            image: params.get('image') || ""
+        }];
+    } else {
+        itemsToCheckout = cart;
     }
 
-    // 결제 요청 함수
-    function requestPay() {
+    // 상품이 없는 경우 처리
+    if (itemsToCheckout.length === 0) {
+        orderListEl.innerHTML = "<p class='empty-msg'>결제할 상품이 없습니다.</p>";
+        return;
+    }
+
+    let totalPrice = 0;
+    itemsToCheckout.forEach(item => {
+        const itemTotal = item.price * item.qty;
+        totalPrice += itemTotal;
+
+        const div = document.createElement('div');
+        div.className = "order-item";
+        div.innerHTML = `
+            <img src="../${item.image}" alt="상품 이미지">
+            <div class="order-info">
+                <p class="order-name">${item.name}</p>
+                <p class="order-option">
+                    수량: <span>${item.qty}</span>
+                    ${item.size ? `/ 사이즈: <span>${item.size}</span>` : ''}
+                </p>
+            </div>
+            <div class="order-price">₩${itemTotal.toLocaleString()}</div>
+        `;
+        orderListEl.appendChild(div);
+    });
+
+    totalPriceEl.textContent = "₩" + totalPrice.toLocaleString();
+});
+
+// 5. 결제 수단 선택
+function selectPayMethod(btn, method) {
+    currentPayMethod = method;
+    const btns = document.querySelectorAll('#pay-methods button');
+    btns.forEach(b => {
+        b.style.background = 'transparent';
+        b.style.color = 'var(--accent-color)';
+    });
+    btn.style.background = 'var(--accent-color)';
+    btn.style.color = 'var(--bg-color)';
+}
+
+// 6. 결제 요청 (실제 결제 버튼 클릭 시)
+function requestPay() {
     if (!currentPayMethod) {
         alert("결제 수단을 선택해주세요.");
         return;
     }
 
+    if (itemsToCheckout.length === 0) {
+        alert("결제할 상품이 없습니다.");
+        return;
+    }
+
     const buyerName = document.querySelector('input[placeholder="이름"]').value || "테스트 구매자";
     const buyerTel = document.querySelector('input[placeholder="연락처"]').value || "010-0000-0000";
-    
     const postcode = document.getElementById('postcode').value || "";
     const address = document.getElementById('address').value || "";
     const detailAddress = document.getElementById('detailAddress').value || "";
-    const fullAddress = address + " " + detailAddress;
+    const fullAddress = (address + " " + detailAddress).trim();
+
+    // [로직 수정] 전역 변수 itemsToCheckout을 기준으로 결제 정보 생성
+    let finalTotalPrice = 0;
+    itemsToCheckout.forEach(item => finalTotalPrice += (item.price * item.qty));
+
+    const orderName = itemsToCheckout.length > 1 
+        ? `${itemsToCheckout[0].name} 외 ${itemsToCheckout.length - 1}건` 
+        : itemsToCheckout[0].name;
 
     IMP.request_pay({
         pg: "html5_inicis",
         pay_method: currentPayMethod,
         merchant_uid: "order_" + new Date().getTime(),
-        name: checkoutName,      // DOMContentLoaded에서 설정된 값 사용
-        amount: checkoutPrice,   // DOMContentLoaded에서 설정된 값 사용
+        name: orderName,
+        amount: finalTotalPrice, // 이제 단독 상품 가격이 정상 반영됩니다.
         buyer_email: "test@portone.io",
         buyer_name: buyerName,
         buyer_tel: buyerTel,
-        buyer_addr: fullAddress.trim() === "" ? "서울특별시 강남구 삼성동" : fullAddress,
-        buyer_postcode: postcode === "" ? "123-456" : postcode
+        buyer_addr: fullAddress || "주소 미입력",
+        buyer_postcode: postcode || "00000"
     }, function (rsp) {
         if (rsp.success) {
-            alert('결제가 완료되었습니다. (주문번호: ' + rsp.merchant_uid + ')');
+            alert('결제가 완료되었습니다.');
+            
+            // [로직 추가] 장바구니 결제였을 때만 장바구니를 비움
+            const params = new URLSearchParams(window.location.search);
+            if (!params.get('name')) {
+                localStorage.removeItem("cart");
+            }
+            
             window.location.href = 'index.html';
         } else {
-            alert('결제에 실패하였습니다.\n에러 내용: ' + rsp.error_msg);
+            alert('결제에 실패하였습니다: ' + rsp.error_msg);
         }
     });
 }

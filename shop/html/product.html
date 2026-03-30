@@ -17,7 +17,7 @@
 <body>
     <header class="site-header">
         <div class="container">
-            <div class="logo" aria-label="AURA store homepage"><a href="index.html">All-In-Shop</a></div>
+            <div class="logo" aria-label="AURA store homepage"><a href="index.html">AUDI MALL</a></div>
             <nav aria-label="메인 내비게이션">
                 <ul class="nav-links">
                     <li><a href="index.html">쇼핑하기</a></li>
@@ -43,6 +43,12 @@
             <!-- Product details dynamically inserted here -->
         </article>
 
+        <div class="voice-audio-section">
+            
+        </div>
+
+        <div class="product-reviews">
+        
     <div class="product-reviews">
         <div class="review-box"> <!-- 🔥 이거 추가 -->
 
@@ -51,6 +57,9 @@
             <!-- 작성 영역 -->
             <div class="review-write">
                 <textarea id="review-content" placeholder="리뷰를 작성해주세요"></textarea>
+
+                <input type="file" id="review-image" multiple>
+                <div id="preview-wrap"></div>
 
                 <div class="review-controls">
                     <div class="star-rating" id="review-rating">
@@ -110,6 +119,14 @@
         <button id="send-btn">전송</button>
       </div>
     </div>
+
+    <div id="slider-modal" class="slider-modal">
+    <span id="close-slider">&times;</span>
+
+    <button id="prev-btn">◀</button>
+    <img id="slider-image">
+    <button id="next-btn">▶</button>
+</div>
 
     <script src="../js/script.js"></script>
     <script src="../js/product-detail.js"></script>

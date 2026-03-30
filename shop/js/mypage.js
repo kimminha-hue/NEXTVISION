@@ -20,19 +20,13 @@ let userData = {
     phone: "010-1234-5678",
     address: "서울시 강남구 OO로 123",
     orders: [
-        {
-            id:"ORDER_001", date:"2026-03-15", status:"배송중", total:54000,
-            items:[{name:"상품1", qty:2, price:20000}, {name:"상품2", qty:1, price:14000}]
-        },
-        {
-            id:"ORDER_002", date:"2026-02-10", status:"배송완료", total:32000,
-            items:[{name:"상품3", qty:1, price:32000}]
-        }
+        { id:"ORDER_001", date:"2026-03-15", status:"배송중", total:54000,
+          items:[{name:"상품1", qty:2, price:20000}, {name:"상품2", qty:1, price:14000}] },
+        { id:"ORDER_002", date:"2026-02-10", status:"배송완료", total:32000,
+          items:[{name:"상품3", qty:1, price:32000}] }
     ],
     reviews: [],
-    coupons:[
-        {id:"COUPON_01", discount:10, status:"active", expiry:"2026-06-30"}
-    ]
+    coupons:[{id:"COUPON_01", discount:10, status:"active", expiry:"2026-06-30"}]
 };
 
 // 🔥 localStorage에 저장된 데이터가 있으면 불러오기
@@ -111,7 +105,6 @@ document.getElementById('delete-account').addEventListener('click', () => {
 
 // ===== 주문내역 렌더링 =====
 const ordersList = document.querySelector('.orders-list');
-
 function renderOrders(filter="all"){
     ordersList.innerHTML = "";
     const filteredOrders = userData.orders.filter(o => filter==="all" || o.status === filter);
@@ -119,7 +112,6 @@ function renderOrders(filter="all"){
         ordersList.innerHTML = "<p>해당 주문이 없습니다.</p>";
         return;
     }
-
     filteredOrders.forEach(order => {
         const div = document.createElement('div');
         div.className = 'order-card';
@@ -128,14 +120,12 @@ function renderOrders(filter="all"){
             <button class="btn btn-outline view-details">상세보기</button>
         `;
         ordersList.appendChild(div);
-
         div.querySelector('.view-details').addEventListener('click', () => {
             const itemsHTML = order.items.map(item => `${item.name} x${item.qty} = ₩${item.price.toLocaleString()}`).join("<br>");
             alert(`주문 상세\n${itemsHTML}`);
         });
     });
 }
-
 document.querySelectorAll('.filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -143,106 +133,159 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
         renderOrders(btn.dataset.status);
     });
 });
-
 renderOrders();
 
-// ===== 리뷰 렌더링 (마이페이지 연동) =====
-function renderReviews(){
-    const reviewsList = document.querySelector('.reviews-list');
+// ===== 리뷰 관련 =====
+const reviewsList = document.querySelector('.reviews-list');
+// 모달 관련 요소 전역 선언
+const editModal = document.getElementById("edit-modal");
+const editContent = document.getElementById("edit-content");
+const editProductName = document.getElementById("edit-product-name");
+const saveEditBtn = document.getElementById("save-edit");
+const cancelEditBtn = document.getElementById("cancel-edit");
+const starEls = document.querySelectorAll("#edit-stars span");
+let editingReviewId = null;
+let editRating = 0;
+
+if (!localStorage.getItem("all_reviews")) {
+    const testReviews = [
+        {
+            id: Date.now(),
+            product: "테스트 상품 1",
+            rating: 5,
+            content: "보이면 성공 👍",
+            userEmail: email,
+            user: localStorage.getItem("username") || "testUser"
+        },
+        {
+            id: Date.now() + 1,
+            product: "테스트 상품 2",
+            rating: 3,
+            content: "두번째 리뷰예요",
+            userEmail: email,
+            user: localStorage.getItem("username") || "testUser"
+        }
+    ];
+    localStorage.setItem("all_reviews", JSON.stringify(testReviews));
+}
+
+
+// 리뷰 렌더링 함수
+function renderMyReviews() {
+    if (!reviewsList) return;
     reviewsList.innerHTML = "";
+    const allReviews = JSON.parse(localStorage.getItem("all_reviews")) || [];
+    const myReviews = allReviews.filter(r => r.userEmail === email);
 
-    const email = localStorage.getItem("userEmail");
-    const userData = JSON.parse(localStorage.getItem("userData_" + email)) || {};
-    const reviews = userData.reviews || [];
-
-    if(reviews.length === 0){
+    if (myReviews.length === 0) {
         reviewsList.innerHTML = "<p>작성한 리뷰가 없습니다.</p>";
         return;
     }
 
-    // 최신 리뷰 먼저
-    reviews.sort((a,b) => b.id - a.id);
-
-    reviews.forEach(review => {
+    myReviews.sort((a, b) => b.id - a.id);
+    myReviews.forEach(review => {
         const div = document.createElement('div');
         div.className = 'review-card';
-
         div.innerHTML = `
             <div class="review-content">
-                <strong>${review.product}</strong> | 작성자: ${review.user || '알 수 없음'}<br>
+                <strong>${review.product}</strong><br>
                 ⭐ ${review.rating} / 5 <br>
-                ${review.content}
+                <p>${review.content}</p>
             </div>
             <div class="review-actions">
-                <button class="btn btn-outline edit-review">수정</button>
-                <button class="btn btn-outline delete-review">삭제</button>
+                <button class="btn btn-outline edit-review" data-id="${review.id}">수정</button>
+                <button class="btn btn-outline delete-review" data-id="${review.id}">삭제</button>
             </div>
         `;
-
         reviewsList.appendChild(div);
 
-        // 수정  
-        div.querySelector('.edit-review').addEventListener('click', () => {
-            const newContent = prompt("리뷰 수정", review.content);
-            if(newContent !== null && newContent.trim() !== ""){
-                review.content = newContent;
-                localStorage.setItem("userData_" + email, JSON.stringify(userData));
-                renderReviews();
-            }
-        });
+        // 삭제 버튼
+        div.querySelector('.delete-review').onclick = () => {
+            if (!confirm("리뷰를 삭제하시겠습니까?")) return;
+            const updatedReviews = allReviews.filter(r => r.id !== review.id);
+            localStorage.setItem("all_reviews", JSON.stringify(updatedReviews));
+            renderMyReviews();
+        };
 
-        // 삭제
-        div.querySelector('.delete-review').addEventListener('click', () => {
-            if(confirm("리뷰를 삭제하시겠습니까?")){
-                userData.reviews = userData.reviews.filter(r => r.id !== review.id);
-                localStorage.setItem("userData", JSON.stringify(userData));
-                renderReviews();
-            }
-        });
+        // 수정 버튼
+        div.querySelector('.edit-review').onclick = () => {
+            editingReviewId = review.id;
+            editContent.value = review.content;
+            editProductName.textContent = review.product;
+            editRating = review.rating;
+            starEls.forEach(s => s.classList.toggle("active", Number(s.dataset.value) <= editRating));
+            editModal.classList.remove("hidden");
+        };
     });
 }
+renderMyReviews();
 
-// 초기 렌더
-document.addEventListener("DOMContentLoaded", renderReviews);
-
-// ===== 쿠폰 렌더링 =====
-const couponList = document.querySelector('.coupon-list');
-const applyCouponBtn = document.getElementById('apply-coupon');
-const couponCodeInput = document.getElementById('coupon-code');
-
-function renderCoupons(){
-    couponList.innerHTML = "";
-    if(userData.coupons.length===0){
-        couponList.innerHTML = "<p>등록된 쿠폰이 없습니다.</p>";
-        return;
-    }
-    userData.coupons.forEach(c => {
-        const div = document.createElement('div');
-        div.className = 'coupon-card';
-        div.innerHTML = `쿠폰: ${c.id} | 할인: ${c.discount}% | 상태: ${c.status} | 만료: ${c.expiry}`;
-        couponList.appendChild(div);
+// 별점 클릭 이벤트 (모달)
+starEls.forEach(star => {
+    star.addEventListener("click", () => {
+        editRating = Number(star.dataset.value);
+        starEls.forEach(s => s.classList.toggle("active", Number(s.dataset.value) <= editRating));
     });
-}
-
-renderCoupons();
-
-applyCouponBtn.addEventListener('click', () => {
-    const code = couponCodeInput.value.trim();
-    if(!code) return alert("쿠폰 코드를 입력해주세요.");
-    const exists = userData.coupons.some(c => c.id === code);
-    if(exists) return alert("이미 등록된 쿠폰입니다.");
-    userData.coupons.push({id:code, discount:5, status:"active", expiry:"2026-12-31"});
-    couponCodeInput.value = "";
-    renderCoupons();
-    localStorage.setItem("userData_" + email, JSON.stringify(userData));
-    alert("쿠폰이 등록되었습니다!");
 });
 
-// ===== 로그아웃 후 정보 초기화=====
-function logout(){
-  localStorage.removeItem("isLogin");
-  localStorage.removeItem("username");
+// 수정 저장
+saveEditBtn.addEventListener("click", () => {
+    const newContent = editContent.value.trim();
+    if (!newContent) { alert("내용을 입력해주세요."); return; }
 
-  alert("로그아웃 되었습니다.");
-  location.href = "index.html";
+    const allReviews = JSON.parse(localStorage.getItem("all_reviews")) || [];
+    const updatedReviews = allReviews.map(r => r.id === editingReviewId ? { ...r, content: newContent, rating: editRating } : r);
+    localStorage.setItem("all_reviews", JSON.stringify(updatedReviews));
+    alert("수정 완료!");
+    editModal.classList.add("hidden");
+    renderMyReviews();
+});
+
+// 수정 취소
+cancelEditBtn.addEventListener("click", () => editModal.classList.add("hidden"));
+
+// ===== 리뷰 작성 =====
+const submitBtn = document.getElementById('submit-review');
+if (submitBtn) {
+    const stars = document.querySelectorAll('#review-rating span');
+    let selectedRating = 0;
+
+    stars.forEach(star => {
+        star.addEventListener('click', () => {
+            selectedRating = Number(star.dataset.value);
+            stars.forEach(s => s.classList.toggle('active', Number(s.dataset.value) <= selectedRating));
+        });
+    });
+
+    submitBtn.addEventListener('click', () => {
+        const content = document.getElementById('review-content').value.trim();
+        if (!isLogin || !localStorage.getItem("username")) { alert("로그인 후 작성 가능합니다."); return; }
+        if (!content) { alert("리뷰 내용을 입력해주세요."); return; }
+        if (selectedRating === 0) { alert("별점을 선택해주세요."); return; }
+
+        const reviews = JSON.parse(localStorage.getItem("all_reviews")) || [];
+        reviews.push({
+            id: Date.now(),
+            product: document.getElementById('product-name')?.textContent || "상품명 없음",
+            rating: selectedRating,
+            content: content,
+            userEmail: email,
+            user: localStorage.getItem("username")
+        });
+        localStorage.setItem("all_reviews", JSON.stringify(reviews));
+
+        document.getElementById('review-content').value = "";
+        selectedRating = 0;
+        stars.forEach(s => s.classList.remove('active'));
+        renderMyReviews();
+        alert("리뷰가 등록되었습니다!");
+    });
+}
+
+// ===== 로그아웃 =====
+function logout() {
+    localStorage.removeItem("isLogin");
+    localStorage.removeItem("username");
+    alert("로그아웃 되었습니다.");
+    location.href = "index.html";
 }

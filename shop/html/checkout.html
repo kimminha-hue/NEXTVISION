@@ -15,72 +15,58 @@
 <body>
     <header class="site-header">
         <div class="container">
-            <h1 class="logo"><a href="index.html">All-In-Shop</a></h1>
+            <h1 class="logo"><a href="index.html">AUDI MALL</a></h1>
             <nav>
                 <ul class="nav-links">
                     <li><a href="index.html">쇼핑하기</a></li>
-                    <li><a href="login.html">로그인</a></li>
-                    <li><a href="signup.html">회원가입</a></li>
+                    <li><a href="cart.html">🛒 장바구니</a></li>
                 </ul>
             </nav>
         </div>
     </header>
 
     <main class="container checkout-main">
-    <div class="checkout-grid">
-        <!-- 주문 결제 제목 -->
-        <h2 class="checkout-title">주문 결제</h2>
+        <div class="checkout-grid">
+            <h2 class="checkout-title">주문 결제</h2>
 
-        <!-- 배송 정보 -->
-        <div class="checkout-box shipping-box">
-            <h3 class="checkout-subtitle">배송 정보</h3>
-            <form class="checkout-form">
-                <input type="text" placeholder="이름" class="input-field">
-                <input type="text" placeholder="연락처" class="input-field">
-                <div class="postcode-wrapper">
-                    <input type="text" id="postcode" placeholder="우편번호" readonly class="input-field readonly">
-                    <button type="button" class="btn btn-outline" onclick="execDaumPostcode()">주소 찾기</button>
-                </div>
-                <input type="text" id="address" placeholder="기본 주소" readonly class="input-field readonly">
-                <input type="text" id="detailAddress" placeholder="상세 주소" class="input-field">
-            </form>
-        </div>
-        
-        <div class="checkout-box order-summary">
-            <h3 class="checkout-subtitle">주문 상품</h3>
-
-            <div class="order-item">
-                <img id="order-image" src="" alt="상품이미지">
-
-                <div class="order-info">
-                    <p id="order-name" class="order-name">상품명</p>
-                    <p class="order-option">
-                        수량: <span id="product-qty">1</span>
-                        <span id="size-wrap"> / 사이즈: <span id="product-size">M</span></span>
-                    </p>
+            <!-- 배송 정보 -->
+            <div class="checkout-box shipping-box">
+                <h3 class="checkout-subtitle">배송 정보</h3>
+                <form class="checkout-form">
+                    <input type="text" placeholder="이름" class="input-field">
+                    <input type="text" placeholder="연락처" class="input-field">
+                    <div class="postcode-wrapper">
+                        <input type="text" id="postcode" placeholder="우편번호" readonly class="input-field readonly">
+                        <button type="button" class="btn btn-outline" onclick="execDaumPostcode()">주소 찾기</button>
+                    </div>
+                    <input type="text" id="address" placeholder="기본 주소" readonly class="input-field readonly">
+                    <input type="text" id="detailAddress" placeholder="상세 주소" class="input-field">
+                </form>
+            </div>
+            
+            <!-- 주문 상품 -->
+            <div class="checkout-box order-summary">
+                <h3 class="checkout-subtitle">주문 상품</h3>
+                <div id="order-list"></div>
                 </div>
 
-                <div class="order-price" id="order-price">₩0</div>
+            <div class="checkout-box payment-box">
+                <h3 class="checkout-subtitle">결제 수단</h3>
+                <div id="pay-methods" class="pay-methods">
+                    <button type="button" class="btn btn-outline" onclick="selectPayMethod(this, 'card')">신용카드</button>
+                    <button type="button" class="btn btn-outline" onclick="selectPayMethod(this, 'vbank')">무통장 입금</button>
+                    <button type="button" class="btn btn-outline" onclick="selectPayMethod(this, 'phone')">휴대폰 결제</button>
+                </div>
+
+                <div class="checkout-total" style="margin: 20px 0; border-top: 1px solid #eee; padding-top: 20px;">
+                    <span class="total-label">총 결제 금액</span>
+                    <span id="checkout-total-price" class="total-price">₩0</span>
+                </div>
+
+                <button id="payButton" type="button" class="btn btn-primary" onclick="requestPay()">결제하기</button>
             </div>
         </div>
-
-        <!-- 결제 수단 -->
-        <div class="checkout-box payment-box">
-            <h3 class="checkout-subtitle">결제 수단</h3>
-            <div id="pay-methods" class="pay-methods">
-                <button type="button" class="btn btn-outline" onclick="selectPayMethod(this, 'card')">신용카드</button>
-                <button type="button" class="btn btn-outline" onclick="selectPayMethod(this, 'vbank')">무통장 입금</button>
-                <button type="button" class="btn btn-outline" onclick="selectPayMethod(this, 'phone')">휴대폰 결제</button>
-            </div>
-            <div class="checkout-total">
-                <span class="total-label">총 결제 금액</span>
-                <span id="checkout-total-price" class="total-price">₩0</span>
-            </div>
-            <button id="payButton" type="button" class="btn btn-primary" onclick="requestPay()">결제하기</button>
-        </div>
-    </div>
-</main>
-
+    </main>
 
     <footer class="site-footer">
         <div class="container">
@@ -88,14 +74,10 @@
         </div>
     </footer>
 
-
     <!-- 카카오(다음) 우편번호 API -->
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-
-   <!-- 포트원(아임포트) 결제 API -->
-<script src="https://cdn.iamport.kr/v1/iamport.js"></script>
-<script src="../js/checkout.js"></script>
-
-
+    <!-- 포트원(아임포트) 결제 API -->
+    <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+    <script src="../js/checkout.js"></script>
 </body>
 </html>

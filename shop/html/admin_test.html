@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 - 상품 등록 테스트</title>
+    <style>
+
+        body { font-family: 'Malgun Gothic', sans-serif; background-color: #0b0c10; padding: 50px; color: #f8f8f2;}
+        .form-container { background: #1a1c23; padding: 30px; border-radius: 16px; max-width: 600px; margin: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        input[type="text"], input[type="number"], textarea, input[type="file"] { width: 100%; padding: 10px; border: 1px solid #2b2e3c; border-radius: 8px; box-sizing: border-box; background: #232630; color: #fff; }
+        button { width: 100%; padding: 15px; background-color: #00d2d3; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        button:hover { background-color: #01a3a4; }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2 style="text-align: center; color: #ffffff;">📦 신규 상품 등록</h2>
+    <form id="uploadForm">
+        <div class="form-group">
+            <label>1. 상품 썸네일 이미지 (필수)</label>
+            <input type="file" id="img1" accept="image/*" required>
+        </div>
+        <div class="form-group">
+            <label>2. 상세 통이미지 (선택)</label>
+            <input type="file" id="img2" accept="image/*">
+        </div>
+        <div class="form-group">
+            <label>3. 추가 이미지 (선택)</label>
+            <input type="file" id="img3" accept="image/*">
+        </div>
+        <div class="form-group">
+            <label>4. 추가 이미지 (선택)</label>
+            <input type="file" id="img4" accept="image/*">
+        </div>
+        <div class="form-group">
+            <label>상품명</label>
+            <input type="text" id="p_name" placeholder="예: 프리미엄 5중 스테인리스 냄비 세트" required>
+        </div>
+        <div class="form-group">
+            <label>카테고리</label>
+            <input type="text" id="p_category" placeholder="예: 주방용품" required>
+        </div>
+        <div class="form-group">
+            <label>가격 (원)</label>
+            <input type="number" id="p_price" placeholder="45000" required>
+        </div>
+        <div class="form-group">
+            <label>상세 설명 (RAG 묘사용)</label>
+            <textarea id="p_desc" rows="5" placeholder="시각장애인 분들을 위해 상품의 촉감, 크기, 형태 등을 자세히 묘사해 주세요." required></textarea>
+        </div>
+        <button type="submit">클라우드 업로드 및 DB 저장하기</button>
+    </form>
+
+</div>
+
+<script>
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+        e.preventDefault(); 
+
+        const formData = new FormData();
+        
+        // 1번 썸네일 이미지는 필수이므로 바로 담습니다.
+        formData.append('img1', document.getElementById('img1').files[0]);
+        
+        // 2번, 3번 이미지는 파일이 첨부되었을 때만 데이터에 담습니다.
+        if(document.getElementById('img2').files[0]) {
+            formData.append('img2', document.getElementById('img2').files[0]);
+        }
+        if(document.getElementById('img3').files[0]) {
+            formData.append('img3', document.getElementById('img3').files[0]);
+        }
+        if(document.getElementById('img4').files[0]) {
+        formData.append('img4', document.getElementById('img4').files[0]);
+        }
+        
+
+        // 텍스트 데이터들을 담습니다.
+        formData.append('p_name', document.getElementById('p_name').value);
+        formData.append('p_category', document.getElementById('p_category').value);
+        formData.append('p_price', document.getElementById('p_price').value);
+        formData.append('p_desc', document.getElementById('p_desc').value);
+
+
+        // 🚨 여기에 추가! (테스트용 판매자 번호 1번을 강제로 보냅니다)
+        formData.append('seller_idx', 1);
+
+        try {
+            alert('클라우드로 전송을 시작합니다! 사진이 많아 시간이 조금 걸릴 수 있습니다... 🚀');
+            // ... 이하 기존 코드 동일 ...
+
+            
+            // 호성님의 Spring Boot 서버(컨트롤러)로 전송!
+            const response = await fetch('http://localhost:8088/avw/api/product/register', {
+                method: 'POST',
+                body: formData 
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.status === 'success') {
+                alert('성공! 🎉\n데이터베이스에 완벽하게 저장되었습니다!');
+                // 폼을 비워주어 다음 상품을 입력하기 편하게 만듭니다.
+                document.getElementById('uploadForm').reset();
+            } else {
+                alert('업로드 실패 😢\n에러 메시지: ' + result.message);
+            }
+        } catch (error) {
+            console.error('통신 에러:', error);
+            alert('서버와 연결할 수 없습니다. 스프링 콘솔창의 에러를 확인해 주세요.');
+        }
+    });
+</script>
+
+</body>
+</html>

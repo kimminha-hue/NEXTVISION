@@ -1897,3 +1897,23 @@ outline-offset:3px;
   color: yellow !important;
   border-color: yellow !important;
 }
+
+
+.mall-hero {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: 60px 0 30px;
+}
+
+.mall-hero img {
+  width: 75%;
+  max-width: 900px;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  transition: 0.3s;
+}
+
+.mall-hero img:hover {
+  transform: scale(1.02);
+}
