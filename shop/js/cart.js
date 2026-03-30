@@ -25,7 +25,7 @@ cartList.innerHTML = cart.map((item, index) => {
 
     return `
         <div class="cart-item">
-            <img src="../${item.image}" class="cart-img">
+            <img src="${item.image}" class="cart-img">  <!-- ✅ ../ 제거 -->
 
             <div class="cart-info">
                 <h3>${item.name}</h3>

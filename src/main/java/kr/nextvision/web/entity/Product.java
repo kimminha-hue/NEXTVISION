@@ -23,9 +23,6 @@ public class Product {
 	// 💡 민하님의 백엔드 표준 세팅(Long)을 존중하면서, 충돌을 방지합니다.
 	private Integer id;
 	
-	// 💡 필수 외래키 방어 코드 유지
-	@Column(name = "seller_idx", nullable = false)
-	private Integer sellerIdx;
 	
 	@Column(name = "p_name", nullable = false)
 	private String name; // DB의 p_name 연결
@@ -69,5 +66,8 @@ public class Product {
     // 업데이트 일자 (팀원의 카멜케이스 변수명 반영)
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+    
+    @Column(name = "seller_idx", nullable = false)
+    private Integer sellerIdx;
 	
 }

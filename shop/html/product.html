@@ -17,7 +17,14 @@
 <body>
     <header class="site-header">
         <div class="container">
-            <div class="logo" aria-label="AURA store homepage"><a href="index.html">AUDI MALL</a></div>
+            <div class="logo" aria-label="AUDI MALL homepage">
+                <a href="index.html" style="display:flex; align-items:center; gap:10px; text-decoration:none;">
+                    <img src="../images/audiview.png" alt="AudiMall 로고" class="logo-img">
+                    <span class="logo-text">
+                        <span class="logo-audi">AUDI</span><span class="logo-view">MALL</span>
+                    </span>
+                </a>
+            </div>
             <nav aria-label="메인 내비게이션">
                 <ul class="nav-links">
                     <li><a href="index.html">쇼핑하기</a></li>
@@ -25,6 +32,15 @@
                     <li><a href="signup.html">회원가입</a></li>
                 </ul>
             </nav>
+
+            <div class="accessibility-controls">
+                <button onclick="zoomIn()" aria-label="화면 확대">🔍 확대</button>
+                <button onclick="zoomOut()" aria-label="화면 축소">🔎 축소</button>
+                <button onclick="increaseText()" aria-label="글씨 크게">A+</button>
+                <button onclick="decreaseText()" aria-label="글씨 작게">A-</button>
+                <button onclick="toggleContrast()" aria-label="고대비 모드">🎨 고대비</button>
+            </div>
+
         </div>
     </header>
 
@@ -89,7 +105,7 @@
 
     <footer class="site-footer">
         <div class="container">
-            <p>&copy; 2026 All-In-Shop. All rights reserved.</p>
+            <p>&copy; 2026 AUDI MALL. All rights reserved.</p>
 
         </div>
     </footer>

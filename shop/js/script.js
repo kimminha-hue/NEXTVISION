@@ -12,14 +12,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // 프론트엔드 UI와 백엔드 데이터 매핑 (둘의 장점 결합)
         products = backendData.map(item => ({
-            id: item.id || item.p_idx || item.pidx,
-            name: item.name,
-            price: item.price,
-            category: item.category,
-            image: item.img1,
-            description: item.description,
-            ingredients: [item.category + " 상품", "상세 정보는 AI 음성을 참고해주세요."],
-            detailImages: [item.img2, item.img3].filter(img => img !== null && img !== undefined && img !== "")
+            id: item.id || item.p_idx, // 백엔드의 식별자 (엔티티 설정에 따라 id 또는 p_idx)
+            name: item.name,           // 상품명
+            price: item.price,         // 가격
+            category: item.category,   // 카테고리
+            image: item.img1,          // 🌟 백엔드의 img1을 프론트의 image로 연결
+            description: item.description, // 상세 설명
+            ingredients: [],           // (임시) 성분이나 특징 데이터가 비어있을 때 에러 방지용
+            // 🌟 img2, img3가 존재할 경우에만 배열로 묶어서 상세 이미지 란에 넣어줍니다.
+            detailImages: [item.img2, item.img3,item.img4].filter(Boolean)
         }));
 
         console.log("백엔드에서 가져온 진짜 데이터:", products); 
@@ -133,30 +134,23 @@ document.addEventListener('DOMContentLoaded', async () => {
                             <button class="size-btn">M</button>
                             <button class="size-btn">L</button>
                             <button class="size-btn">XL</button>
-                        </div>` : ''}
-                        <div class="purchase-actions">
-                            <div class="quantity-selector">
-                                <span style="font-weight:500;">수량</span>
-                                <div style="display: flex; align-items: center; gap: 1rem;">
-                                    <button type="button" class="qty-ctrl-btn" onclick="const input=document.getElementById('qty'); if(input.value>1) { input.value--; document.getElementById('total-price').innerText='₩'+(${product.price} * input.value).toLocaleString(); }">-</button>
-                                    <input type="number" id="qty" value="1" readonly class="qty-input">
-                                    <button type="button" class="qty-ctrl-btn" onclick="const input=document.getElementById('qty'); if(input.value<99) { input.value++; document.getElementById('total-price').innerText='₩'+(${product.price} * input.value).toLocaleString(); }">+</button>
-                                </div>
-                            </div>
-                            <div class="total-price-wrapper">
-                                <span>총 상품 금액</span>
-                                <span id="total-price" class="total-price-value">₩${product.price.toLocaleString()}</span>
-                            </div>
-                            <div class="btn-group">
-                                <button class="btn btn-outline" onclick="addToCart('${product.name}', ${product.price}, '${product.image}')">장바구니</button>
-                                <button class="btn btn-primary" id="buy-btn">구매하기</button>
+                            <button class="size-btn">FREE</button>
+                        </div>
+                        ` : ""}
+
+                        <div class="quantity-selector">
+                            <span style="font-weight:500;">수량</span>
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <button type="button" class="qty-ctrl-btn" onclick="const input=document.getElementById('qty'); if(input.value>1) { input.value--; document.getElementById('total-price').innerText='₩'+(${product.price} * input.value).toLocaleString(); }">-</button>
+                                <input type="number" id="qty" value="1" min="1" max="99" readonly class="qty-input">
+                                <button type="button" class="qty-ctrl-btn" onclick="const input=document.getElementById('qty'); if(input.value<99) { input.value++; document.getElementById('total-price').innerText='₩'+(${product.price} * input.value).toLocaleString(); }">+</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="product-long-description">
-                <section class="detail-section" style="display: none;">
+                <section class="detail-section" >
                     <h2 class="section-title">상품 상세 설명</h2>
                     <p class="detail-description">${product.description}</p>
                 </section>
@@ -469,3 +463,54 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+
+
+// ===== 장바구니 기능 =====
+function addToCart(name, price, image) {
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    const existing = cart.find(item => item.name === name);
+
+    if (existing) {
+        existing.qty += 1;
+    } else {
+        cart.push({ name, price, qty: 1, image }); // image가 클라우드 URL로 저장됨 ✅
+    }
+    localStorage.setItem("cart", JSON.stringify(cart));
+    alert("장바구니에 담겼습니다 🛒");
+}
+
+// 🔥 전역 변수 (이게 핵심)
+let zoomLevel = 1;
+let fontSize = 100;
+
+// 🔍 확대 기능
+function zoomIn(){
+  zoomLevel += 0.1;
+  if(zoomLevel > 1.5) zoomLevel = 1;
+  document.body.style.zoom = zoomLevel;
+}
+// 🔍 화면 축소
+function zoomOut(){
+  zoomLevel -= 0.1;
+
+  if(zoomLevel < 0.7) zoomLevel = 0.7; // 최소 제한
+
+  document.body.style.zoom = zoomLevel;
+}
+// 🔠 글씨 확대
+function increaseText(){
+  fontSize += 10;
+  document.body.style.fontSize = fontSize + "%";
+}
+
+// 🔠 글씨 축소
+function decreaseText(){
+  fontSize -= 10;
+  document.body.style.fontSize = fontSize + "%";
+}
+
+// 🎨 고대비 모드
+function toggleContrast(){
+  document.body.classList.toggle("high-contrast");
+}

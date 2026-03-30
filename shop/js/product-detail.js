@@ -3,8 +3,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // 로그인 확인
     const isLogin = localStorage.getItem("isLogin") === "true";
-    const userName = isLogin ? localStorage.getItem("username") : "익명";
-    const userEmail = localStorage.getItem("userEmail") || "guest";
+    const loginUser = JSON.parse(localStorage.getItem("loginUser")) || {};
+    const userName = isLogin 
+        ? (loginUser.name || loginUser.username || "알 수 없음") 
+        : "익명";
+    const userEmail = isLogin
+        ? (loginUser.username || loginUser.email || "guest")
+        : "guest";
 
     // productId 가져오기
     const productId = new URLSearchParams(location.search).get("id");
@@ -12,12 +17,26 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 데이터 가져오기 (data.json)
     let products = [];
     try {
-        const res = await fetch('../data.json');
-        if(!res.ok) throw new Error('Failed to fetch data.json');
-        products = await res.json();
+        const res = await fetch('http://localhost:8088/avw/api/product/list');
+        if (!res.ok) throw new Error('API 호출 실패');
+        const apiProducts = await res.json();
+
+        products = apiProducts.map(p => ({
+            id: String(p.id),
+            name: p.name,
+            price: p.price,
+            description: p.description,
+            category: p.category,
+            image: p.img1,
+            detailImages: [p.img2, p.img3, p.img4].filter(Boolean),
+            ingredients: []
+        }));
+
     } catch(e) {
+        // ✅ API 실패 시 에러 메시지만 표시 (data.json 백업 없음)
         console.error(e);
-        if(detailContainer) detailContainer.innerHTML = "<p>상품 데이터를 불러올 수 없습니다.</p>";
+        if(detailContainer)
+            detailContainer.innerHTML = "<p>서버에 연결할 수 없습니다. 서버가 켜져 있는지 확인해 주세요.</p>";
         return;
     }
 
