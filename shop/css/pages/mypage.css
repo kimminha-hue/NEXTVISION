@@ -257,12 +257,13 @@
 }
 
 .modal-content {
-    background-color: #000; /* 검정 배경 */
+    background-color: #1a1a2e;
     padding: 2rem;
     border-radius: 16px;
     width: 90%;
     max-width: 450px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    box-shadow: 0 5px 20px rgba(255, 214, 0, 0.15);  /* ✅ 노란 그림자 */
+    border: 1px solid var(--accent-color);            /* ✅ 노란 테두리 */
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
@@ -278,7 +279,12 @@
     right: 15px;
     font-size: 1.5rem;
     cursor: pointer;
-    color: #fff;
+    color: var(--accent-color);         /* ✅ 노란색 */
+    transition: opacity 0.2s;
+}
+
+.modal-content .close:hover {
+    opacity: 0.7;
 }
 
 /* 제목 */
@@ -287,6 +293,7 @@
     font-size: 1.3rem;
     text-align: center;
     font-weight: 600;
+    color: var(--accent-color);
 }
 
 /* 입력창 */
@@ -295,10 +302,16 @@
     padding: 1rem 1.2rem;       /* 높이 + 좌우 여백 증가 */
     font-size: 1rem;
     border-radius: 10px;
-    border: 1px solid #555;     /* 연한 회색 테두리 */
-    background-color: #ffffff;      /* 입력 칸 흰색 */
-    color: #000000;                 /* 글씨 검정 */
+    border: 1px solid #444;
+    background-color: #111827;          /* ✅ 어두운 입력창 */
+    color: #ffffff;                     /* ✅ 흰 텍스트 */
     box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.modal-content input:focus {
+    outline: none;
+    border-color: var(--accent-color);  /* ✅ 포커스 시 노란 테두리 */
 }
 
 /* 버튼 */
@@ -312,10 +325,10 @@
     color: #000;                            /* 글씨 검정 */
     border: none;
     cursor: pointer;
-    transition: background 0.2s, color 0.2s;
+    transition: background 0.2s;
 }
 
 .modal-content .btn-primary:hover {
-    background-color: #00e6b8; /* 호버 시 연한 민트 */
+    background-color: var(--accent-hover);
     color: #000;
 }
