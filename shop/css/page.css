@@ -756,3 +756,51 @@
         padding: 1.8rem;
     }
 }
+
+/* 접근성 컨트롤 */
+.accessibility-controls{
+  position: fixed;
+  left: 20px;
+  right: auto;
+  top: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 999;
+}
+
+.accessibility-controls button{
+  background: #FFD400;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* 🔍 확대 */
+.zoom-mode {
+  transform: scale(1.2);
+  transform-origin: top left;
+}
+
+/* 🔠 글씨 확대 */
+.large-text {
+  font-size: 120%;
+}
+
+.small-text {
+  font-size: 90%;
+}
+
+/* 🎨 고대비 */
+.high-contrast {
+  background: black !important;
+  color: yellow !important;
+}
+
+.high-contrast * {
+  background: black !important;
+  color: yellow !important;
+  border-color: yellow !important;
+}
