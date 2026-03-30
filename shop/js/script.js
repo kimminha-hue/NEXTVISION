@@ -464,7 +464,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const signupBtn = document.querySelector('a[href="signup.html"]');
     const nav = document.querySelector('.nav-links');
 
-    if (isLogin === "true") {
+    if (isLogin === "true" ) {
         // 기존 버튼 숨기기
         if (loginBtn) loginBtn.style.display = "none";
         if (signupBtn) signupBtn.style.display = "none";
@@ -476,9 +476,6 @@ document.addEventListener("DOMContentLoaded", () => {
         // 상단 네비게이션에 사용자 이름, 마이페이지, 장바구니, 로그아웃 버튼 추가
     const userLi = document.createElement("li");
     userLi.innerHTML = `<span>${username}님</span>`;
-
-    const introLi = document.createElement("li");
-    introLi.innerHTML = `<a href="../../audiview/index.html">소개페이지</a>`;
 
     const mypageLi = document.createElement("li");
     mypageLi.innerHTML = `<a href="mypage.html">👤마이페이지</a>`;
@@ -502,13 +499,12 @@ document.addEventListener("DOMContentLoaded", () => {
         if (shopLi) {
             // 👉 원하는 순서대로 삽입
             nav.insertBefore(userLi, shopLi);    // 김광훈님
-            nav.insertBefore(introLi, shopLi);   // 소개
             nav.insertBefore(mypageLi, shopLi);  // 마이페이지
             nav.insertBefore(cartLi, shopLi);    // 장바구니
             if (adminLi) nav.insertBefore(adminLi, shopLi);
             nav.insertBefore(logoutLi, shopLi);  // 로그아웃
         } else {
-            nav.append(userLi, introLi, mypageLi, cartLi);
+            nav.append(userLi, mypageLi, cartLi);
             if (adminLi) nav.append(adminLi);
             nav.append(logoutLi);
         }   
@@ -560,13 +556,15 @@ function zoomOut(){
 // 🔠 글씨 확대
 function increaseText(){
   fontSize += 10;
-  document.body.style.fontSize = fontSize + "%";
+  if (fontSize > 150) fontSize = 150;
+  document.documentElement.style.fontSize = fontSize + "%";
 }
 
 // 🔠 글씨 축소
 function decreaseText(){
   fontSize -= 10;
-  document.body.style.fontSize = fontSize + "%";
+  if (fontSize < 70) fontSize = 70; 
+  document.documentElement.style.fontSize = fontSize + "%";
 }
 
 // 🎨 고대비 모드
