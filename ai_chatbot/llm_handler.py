@@ -1,70 +1,37 @@
 import google.generativeai as genai
 import PIL.Image
-from openai import OpenAI
-import requests
-import uuid
-import base64
 import asyncio
 
 class VQAModelHandler:
     def __init__(self, keys: dict):
         self.keys = keys
-        # Gemini 설정
+
         if keys.get("GEMINI"):
             genai.configure(api_key=keys.get("GEMINI"))
-        # GPT 설정
-        if keys.get("GPT"):
-            self.gpt_client = OpenAI(api_key=keys.get("GPT"))
-
-    def _encode_image(self, image_file):
-        image_file.seek(0)
-        return base64.b64encode(image_file.read()).decode('utf-8')
-
+    
+    # 프론트엔드에서 넘어온 사진과 프롬프트(질문)를 처리하는 핵심 함수
     async def get_gemini_res(self, image_file, system_persona, prompt):
         try:
-            image_file.seek(0)
-            img = PIL.Image.open(image_file)
-            model = genai.GenerativeModel('gemini-1.5-flash', system_instruction=system_persona)
-            response = await asyncio.to_thread(model.generate_content, [img, prompt])
+            # system_instruction을 통해 시각장애인/일반 모드 페르소나를 모델에 주입
+            model = genai.GenerativeModel('gemini-2.5-flash', system_instruction=system_persona)
+
+            # 핵심 수정 사항 : NoneType 속성 에러(seek 에러)를 완벽하게 차단
+            if image_file is not None:
+                # 케이스1: 사진이 함께 들어온 경우 (멀티모달 가능)
+                image_file.seek(0) # 파일 읽기 위치를 처음으로 초기화
+                img = PIL.Image(image_file) # 파이썬이 이해할 수 있는 이미지 형태로 변환
+
+                # 이미지와 텍스트를 함께 묶어서 제미나이에게 분석 요청
+                response = await asyncio.to_thread(model.generate_content, [img, prompt])
+            
+            else:
+                # 케이스2: 사진 없이 텍스트(질문)만 들어온 경우
+                # 더 이상 없는 이미지에 대고 .seek()를 호출하지 않고, 텍스트만 던져서 대답을 받아옴
+                response = await asyncio.to_thread(model.generate_content, prompt)
+            
+            # 제미나이가 대답한 내용 중 텍스트 부분만 뽑아서 돌려보냄
             return response.text
-        except Exception as e:
-            return f"Gemini 에러: {str(e)}"
 
-    async def get_gpt_res(self, image_file, system_persona, prompt):
-        try:
-            image_file.seek(0)
-            base64_image = self._encode_image(image_file)
-            response = await asyncio.to_thread(
-                self.gpt_client.chat.completions.create,
-                model="gpt-4o",
-                messages=[
-                    {"role": "system", "content": system_persona},
-                    {"role": "user", "content": [
-                        {"type": "text", "text": prompt},
-                        {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"}}
-                    ]}
-                ]
-            )
-            return response.choices[0].message.content
         except Exception as e:
-            return f"GPT 에러: {str(e)}"
-
-    async def get_clova_res(self, system_persona, prompt):
-        try:
-            host = 'https://clovastudio.stream.ntruss.com'
-            headers = {
-                'Authorization': f'Bearer {self.keys.get("CLOVA")}',
-                'X-NCP-CLOVASTUDIO-REQUEST-ID': str(uuid.uuid4()),
-                'Content-Type': 'application/json'
-            }
-            payload = {
-                "messages": [
-                    {"role": "system", "content": system_persona},
-                    {"role": "user", "content": prompt}
-                ],
-                "temperature": 0.3
-            }
-            res = await asyncio.to_thread(requests.post, f"{host}/v3/chat-completions/HCX-005", headers=headers, json=payload)
-            return res.json()['result']['message']['content']
-        except Exception as e:
-            return f"Clova X 에러: {str(e)}"
+            # 혹시라도 에러가 발생하면 서버 뻗지 않고 에러 메시지를 프론트로 전달.
+            return f"Gemini 호출 중 에러가 발생했습니다: {str(e)}"

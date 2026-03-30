@@ -1,15 +1,17 @@
 import os
+import requests 
 from fastapi import FastAPI, UploadFile, File, Form
 import uvicorn
-import pandas as pd
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from llm_handler import VQAModelHandler
-import asyncio
-# NextVision AI Server - Final Update
+
+# 🚨 우리의 핵심 무기!
+from prompts import get_final_prompt 
+
 load_dotenv()
 
-app = FastAPI(title="AudiView Comparison Server")
+app = FastAPI(title="NextVision AI Server - 100% DB 연동")
 
 app.add_middleware(
     CORSMiddleware,
@@ -19,57 +21,133 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-# 데이터 로딩
-try:
-    product_db = pd.read_csv("test001.csv", encoding="utf-8")
-except:
-    product_db = pd.DataFrame(columns=['product_id', 'blind_desc', 'general_tips', 'essential_info'])
+# 💡 [핵심] pandas와 csv 코드는 영원히 삭제되었습니다!
 
-# 페르소나 설정 (생략 방지를 위해 이전 코드 유지)
-PERSONA_BLIND = "당신은 시각장애인을 위한 쇼핑 어시스턴트 'AudiView'입니다..."
-CATEGORY_TONE_GUIDE = {"주방용품": "살림 전문가처럼 꼼꼼하게 설명하세요."} # 실제 가이드 유지하세요
+PERSONA_NORMAL = """당신은 스마트한 쇼핑 어시스턴트입니다. 
+제공된 상품정보와 리뷰를 기반으로 사용자의 질문에 핵심 정보만 쏙 뽑아서 2문장 이내로 아주 간결하게 답변하세요. 
+장황한 인사말이나 미사여구는 모두 생략하세요."""
 
-# 3종 API 키 통합
 keys = {
-    "GEMINI": os.getenv("VQA_API_KEY"), # 기존 키 그대로 사용
-    "GPT": os.getenv("GPT_API_KEY"),   # .env에 추가 필요
-    "CLOVA": os.getenv("CLOVA_API_KEY") # .env에 추가 필요
+    "GEMINI": os.getenv("VQA_API_KEY")
 }
 vqa_handler = VQAModelHandler(keys=keys)
 
+# 스프링부트 백엔드 주소
+SPRING_BOOT_BASE_URL = "http://localhost:8088/avw/api"
+
 @app.get("/")
 def read_root():
-    return {"message": "비교 서버 작동 중!"}
+    return {"message": "NextVision 제미나이 전용 서버 작동 중! (100% DB 연동 완료)"}
 
-@app.post("/api/chat/compare")
-async def compare_models_api(
+
+@app.post("/api/chat/ask")
+async def chat_ask_api(
     session_id: str = Form(...),
     category: str = Form(...),
     user_type: str = Form(...),
     product_id: str = Form(...),
-    image: UploadFile = File(...)
+    user_message: str = Form(None), 
+    image: UploadFile = File(None)  
 ):
-    # 팩트 데이터 추출 로직
-    fact_text = "상품 정보 없음"
-    matched_row = product_db[product_db['product_id'].astype(str) == str(product_id)]
-    if not matched_row.empty:
-        fact_text = matched_row.iloc[0].get('blind_desc', '정보 없음')
+    # =========================================================================
+    # 💡 1. 스프링부트 DB에서 실시간 데이터 가져오기 (이제 무조건 DB만 봅니다!)
+    # =========================================================================
+    product_name = category 
+    fact_text_desc = "상세 설명 없음"
+    fact_text_price = "가격 정보 없음"
 
-    selected_persona = PERSONA_BLIND
-    initial_prompt = f"카테고리: {category}, 상품정보: {fact_text}. 이 상품을 설명해줘."
+    try:
+        # 스프링부트 상품 리스트 API 호출
+        prod_response = requests.get(f"{SPRING_BOOT_BASE_URL}/product/list", timeout=3)
+        if prod_response.ok:
+            products_data = prod_response.json()
+            
+            # DB의 p_idx(또는 pIdx, id)와 프론트엔드의 product_id(현재 2번)를 매칭합니다.
+            matched_product = next((p for p in products_data if str(p.get("pIdx", p.get("p_idx", p.get("id", "")))) == str(product_id)), None)
+            
+            if matched_product:
+                # 💡 DB 컬럼명(p_name, p_price, p_desc)에 맞게 쏙쏙 뽑아옵니다.
+                product_name = matched_product.get("pName", matched_product.get("p_name", matched_product.get("name", category)))
+                fact_text_desc = matched_product.get("pDesc", matched_product.get("p_desc", matched_product.get("description", "상세 설명 없음")))
+                
+                # 가격 포맷팅
+                p_price_val = matched_product.get("pPrice", matched_product.get("p_price", matched_product.get("price")))
+                if p_price_val is not None and isinstance(p_price_val, (int, float)):
+                    fact_text_price = f"{p_price_val:,}원"
 
-    # 🚀 3개 모델 동시 호출
-    gemini_task = vqa_handler.get_gemini_res(image.file, selected_persona, initial_prompt)
-    gpt_task = vqa_handler.get_gpt_res(image.file, selected_persona, initial_prompt)
-    clova_task = vqa_handler.get_clova_res(selected_persona, initial_prompt)
+    except Exception as e:
+        print(f"DEBUG: 상품 DB 연동 실패 - {e}")
 
-    g_res, p_res, c_res = await asyncio.gather(gemini_task, gpt_task, clova_task)
+    # 제미나이에게 넘겨줄 팩트 데이터 완성 (이제 2번은 무조건 스테이크 정보가 들어갑니다!)
+    fact_text = f"상품명: {product_name}, 가격: {fact_text_price}, 설명: {fact_text_desc}"
 
-    return {
-        "gemini": g_res,
-        "gpt": p_res,
-        "clova": c_res
-    }
+
+    # =========================================================================
+    # 💡 2. 스프링부트 DB에서 실시간 '리뷰' 가져오기 (이름표 완벽 매칭 및 디버깅 추가)
+    # =========================================================================
+    review_context = "현재 등록된 리뷰가 없습니다."
+    try:
+        # 스프링부트 리뷰 API 찌르기
+        review_response = requests.get(f"{SPRING_BOOT_BASE_URL}/review/list", params={"p_idx": product_id}, timeout=3)
+        
+        if review_response.ok:
+            reviews_data = review_response.json()
+            
+            # 만약 스프링부트가 데이터를 {"data": [...]} 처럼 딕셔너리로 감싸서 보냈을 경우를 대비
+            if isinstance(reviews_data, dict):
+                reviews_data = reviews_data.get("data", reviews_data.get("list", reviews_data.get("items", [])))
+
+            # 데이터가 리스트 형태로 잘 들어왔다면?
+            if reviews_data and isinstance(reviews_data, list) and len(reviews_data) > 0:
+                review_contents = []
+                for r in reviews_data:
+                    # 🚨 핵심! 호성님의 DB 컬럼(rev_content)이 스프링부트를 거쳐 나올 수 있는 모든 이름표를 검사합니다.
+                    rev_text = r.get("revContent", r.get("rev_content", r.get("reviewContent", r.get("content", ""))))
+                    if rev_text:
+                        review_contents.append(str(rev_text))
+                
+                # 하나라도 리뷰를 건졌다면 컨텍스트에 추가!
+                if review_contents:
+                    review_context = "실제 구매자들의 최신 리뷰 요약: " + " | ".join(review_contents)
+                    print(f"✅ [성공] 리뷰를 찾았습니다: {review_context}") # 터미널 확인용
+        else:
+            print(f"❌ [에러] 스프링부트가 응답하지 않습니다. 상태 코드: {review_response.status_code}")
+            
+    except Exception as e:
+        print(f"❌ [에러] 스프링부트 리뷰 서버와 통신 실패 - {e}")
+
+
+    # =========================================================================
+    # 💡 3. 프롬프트 조립
+    # =========================================================================
+    if user_type == "blind":
+        selected_persona = get_final_prompt(category)
+    else:
+        selected_persona = PERSONA_NORMAL
+
+    base_prompt = f"카테고리: {category}, {fact_text}. {review_context}. "
+    
+    if user_message:
+        if "리뷰" in user_message or "후기" in user_message:
+            initial_prompt = f"{base_prompt} 사용자의 질문: '{user_message}'. 제공된 '실제 구매자들의 최신 리뷰'를 바탕으로 답변해줘."
+        else:
+            initial_prompt = f"{base_prompt} 사용자의 질문: '{user_message}'. 이 질문에 정확하게 답변해줘."
+    else:
+        initial_prompt = f"{base_prompt} 이 상품의 디자인, 색상, 특징을 눈앞에 있는 것처럼 자세히 설명해줘."
+
+
+    # =========================================================================
+    # 💡 4. 제미나이 2.5 Flash 호출
+    # =========================================================================
+    image_data = image.file if (image and hasattr(image, 'file')) else None
+
+    try:
+        gemini_answer = await vqa_handler.get_gemini_res(image_data, selected_persona, initial_prompt)
+        return {"result": gemini_answer}
+    except Exception as e:
+        print(f"Gemini API 에러: {e}")
+        return {"result": "제미나이 연결 중 문제가 발생했습니다. 에러 로그를 확인해주세요."}
+
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
