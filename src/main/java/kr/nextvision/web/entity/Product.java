@@ -21,7 +21,7 @@ public class Product{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "p_idx")
 	// 💡 민하님의 백엔드 표준 세팅(Long)을 존중하면서, 충돌을 방지합니다.
-	private Long id;
+	private Integer id;
 	
 	// 💡 호성님이 에러를 잡기 위해 추가한 필수 외래키 방어 코드입니다!
 	@Column(name = "seller_idx", nullable = false)

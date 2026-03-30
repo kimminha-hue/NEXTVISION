@@ -1,38 +1,75 @@
 import os
-import google.generativeai as genai
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile, File, Form
+import uvicorn
+import pandas as pd
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from dotenv import load_dotenv
+from llm_handler import VQAModelHandler
+import asyncio
+# NextVision AI Server - Final Update
+load_dotenv()
 
-# 1. 환경 변수에서 API 키 읽기
-# 서버 시스템에 등록된 'GOOGLE_API_KEY'를 가져옵니다.
-api_key = os.getenv("GOOGLE_API_KEY")
-genai.configure(api_key=api_key)
-model = genai.GenerativeModel('gemini-2.5-flash')
+app = FastAPI(title="AudiView Comparison Server")
 
-app = FastAPI(title="NextVision Gemini Chatbot")
-
-# CORS 설정 (PUB 서버와 통신 허용) [cite: 16, 28]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["*"]
 )
 
-class ChatRequest(BaseModel):
-    message: str
+# 데이터 로딩
+try:
+    product_db = pd.read_csv("test001.csv", encoding="utf-8")
+except:
+    product_db = pd.DataFrame(columns=['product_id', 'blind_desc', 'general_tips', 'essential_info'])
 
-class ChatResponse(BaseModel):
-    reply: str
-    status: str
+# 페르소나 설정 (생략 방지를 위해 이전 코드 유지)
+PERSONA_BLIND = "당신은 시각장애인을 위한 쇼핑 어시스턴트 'AudiView'입니다..."
+CATEGORY_TONE_GUIDE = {"주방용품": "살림 전문가처럼 꼼꼼하게 설명하세요."} # 실제 가이드 유지하세요
 
-@app.post("/api/chat", response_model=ChatResponse)
-async def process_chat(request: ChatRequest):
-    try:
-        # 제미나이 호출
-        response = model.generate_content(request.message)
-        return ChatResponse(reply=response.text, status="success")
-    except Exception as e:
-        return ChatResponse(reply=f"AI 서버 에러: {str(e)}", status="error")
+# 3종 API 키 통합
+keys = {
+    "GEMINI": os.getenv("VQA_API_KEY"), # 기존 키 그대로 사용
+    "GPT": os.getenv("GPT_API_KEY"),   # .env에 추가 필요
+    "CLOVA": os.getenv("CLOVA_API_KEY") # .env에 추가 필요
+}
+vqa_handler = VQAModelHandler(keys=keys)
+
+@app.get("/")
+def read_root():
+    return {"message": "비교 서버 작동 중!"}
+
+@app.post("/api/chat/compare")
+async def compare_models_api(
+    session_id: str = Form(...),
+    category: str = Form(...),
+    user_type: str = Form(...),
+    product_id: str = Form(...),
+    image: UploadFile = File(...)
+):
+    # 팩트 데이터 추출 로직
+    fact_text = "상품 정보 없음"
+    matched_row = product_db[product_db['product_id'].astype(str) == str(product_id)]
+    if not matched_row.empty:
+        fact_text = matched_row.iloc[0].get('blind_desc', '정보 없음')
+
+    selected_persona = PERSONA_BLIND
+    initial_prompt = f"카테고리: {category}, 상품정보: {fact_text}. 이 상품을 설명해줘."
+
+    # 🚀 3개 모델 동시 호출
+    gemini_task = vqa_handler.get_gemini_res(image.file, selected_persona, initial_prompt)
+    gpt_task = vqa_handler.get_gpt_res(image.file, selected_persona, initial_prompt)
+    clova_task = vqa_handler.get_clova_res(selected_persona, initial_prompt)
+
+    g_res, p_res, c_res = await asyncio.gather(gemini_task, gpt_task, clova_task)
+
+    return {
+        "gemini": g_res,
+        "gpt": p_res,
+        "clova": c_res
+    }
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
