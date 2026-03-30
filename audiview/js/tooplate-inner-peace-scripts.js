@@ -128,151 +128,212 @@ Free HTML CSS Template
             }
         });
 
-function sendMessage(){
+// ===== 🔥 챗봇 기능 (진짜 AI 서버 연동 버전) =====
+document.addEventListener('DOMContentLoaded', async () => {
+    // 1. DOM 요소 가져오기
+    const toggleBtn = document.getElementById("chatbot-toggle");
+    const chatBox = document.getElementById("chatbot-box");
+    const closeBtn = document.getElementById("chat-close");
+    
+    if (!toggleBtn || !chatBox) return; // 요소가 없으면 안전하게 중단
 
-const input = document.getElementById("chatInput");
-const chatBody = document.getElementById("chatBody");
+    const sendBtn = document.getElementById("send-btn");
+    const input = document.getElementById("chat-input");
+    const messages = document.getElementById("chat-messages");
+    const voiceBtn = document.getElementById("voice-btn"); 
+    const fileInput = document.getElementById("chat-file-input"); 
+    // ✅ 여기 추가!!
+const imageBtn = document.getElementById("image-btn");
 
-const text = input.value.trim();
-
-if(text==="") return;
-
-// ⭐ welcome 숨기기
-const welcome = document.getElementById("welcome-message");
-if (welcome) {
-  welcome.style.display = "none";
-}
-
-// ⭐ innerHTML → appendChild로 변경
-const msg = document.createElement("div");
-msg.classList.add("message", "user-message"); 
-msg.innerHTML = text.replace(/\n/g, "<br>");
-
-chatBody.appendChild(msg);
-
-input.value="";
-input.style.height = "auto";
-
-chatBody.scrollTop = chatBody.scrollHeight;
-
-}
-
-
-
-function quickQuestion(text){
-
-const input = document.getElementById("chatInput");
-
-input.value = text;
-
-sendMessage();
-
-}
-
-
-
-function startVoice(){
-
-const recognition = new webkitSpeechRecognition();
-
-recognition.lang="ko-KR";
-
-recognition.start();
-
-recognition.onresult = function(event){
-
-const voice = event.results[0][0].transcript;
-
-document.getElementById("chatInput").value = voice;
-
-};
-
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-
-  const chatbotBtn = document.querySelector(".chatbot-toggle");
-
-  if(chatbotBtn){
-    chatbotBtn.addEventListener("keydown", function(e){
-      if(e.key==="Enter" || e.key===" "){
-        e.preventDefault();
-        toggleChat();
-      }
-    });
-  }
-
-  // 🔥 여기 추가
-  const chatInput = document.getElementById("chatInput");
-
-  if(chatInput){
-    chatInput.addEventListener("keydown", function(e){
-
-      // Enter → 전송
-      if(e.key === "Enter" && !e.shiftKey){
-        e.preventDefault();
-        sendMessage();
-      }
-
-      // Shift+Enter → 줄바꿈 (자동 허용)
-    });
-
-    // 🔥 자동 높이 조절 (선택 but 추천)
-    chatInput.addEventListener("input", function(){
-      this.style.height = "auto";
-      this.style.height = this.scrollHeight + "px";
-    });
-  }
-
-});
-
-
-// 음성 출력 효과
-document.addEventListener("DOMContentLoaded", () => {
-
-  let lastSpoken = "";
-
-  document.querySelectorAll('[tabindex="0"]').forEach(el => {
-
-    el.addEventListener("focus", () => {
-
-      const text = el.innerText || el.getAttribute("aria-label");
-
-      if(!text || text === lastSpoken) return;
-
-      lastSpoken = text;
-
-      window.speechSynthesis.cancel();
-
-      const speech = new SpeechSynthesisUtterance(text);
-      speech.lang = "ko-KR";
-
-      window.speechSynthesis.speak(speech);
-
-    });
-
+if (imageBtn && fileInput) {
+  imageBtn.addEventListener("click", () => {
+    fileInput.click();
   });
+}
+    // 대화 세션 관리
+    let isChatting = true; // 🚨 사진 없이도 바로 질문 가능하도록 무조건 true로 변경!
+    const sessionId = 'session_' + Date.now();
+    let userType = 'blind'; // 기본값: 시각장애인 모드
+    
+    const params = new URLSearchParams(window.location.search);
+    const currentProductId = params.get('id') || 'ITEM_001'; 
+    const currentCategory = '의류'; 
 
+    // 📢 TTS (읽어주기) 함수 - 위쪽으로 이동시켜서 어디서든 쓸 수 있게 배치
+    function readAloud(text) {
+        if (!window.speechSynthesis) return; 
+        if (window.speechSynthesis.isSpeaking) window.speechSynthesis.cancel();
+        if (userType !== 'blind') return; // 일반 모드일 때는 읽어주지 않음
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'ko-KR';
+        window.speechSynthesis.speak(utterance);
+    }
+
+    // 화면에 말풍선 그리기 함수
+    function addMessage(type, textOrImg) {
+        if (!messages) return;
+        const div = document.createElement("div");
+        div.classList.add("chat-message", type); 
+        
+        if (type === 'user-img') {
+            const img = document.createElement('img');
+            img.src = textOrImg;
+            img.style.maxWidth = '100%';
+            img.style.borderRadius = '8px';
+            div.appendChild(img);
+        } else {
+            div.textContent = textOrImg;
+        }
+        messages.appendChild(div);
+        messages.scrollTop = messages.scrollHeight;
+    }
+
+    // ================= 모드 변경 로직 =================
+    const modeBlindBtn = document.getElementById("mode-blind");
+    const modeNormalBtn = document.getElementById("mode-normal");
+
+    if (modeBlindBtn && modeNormalBtn) {
+        modeBlindBtn.addEventListener("click", () => {
+            userType = 'blind'; 
+            modeBlindBtn.style.background = '#eee'; 
+            modeNormalBtn.style.background = 'white'; 
+            const msg = '시각장애인 모드로 전환되었습니다. 상세한 음성 묘사를 제공합니다.';
+            addMessage('bot', msg);
+            readAloud(msg);
+        });
+
+        modeNormalBtn.addEventListener("click", () => {
+            userType = 'normal'; 
+            modeNormalBtn.style.background = '#eee'; 
+            modeBlindBtn.style.background = 'white'; 
+            addMessage('bot', '일반 사용자 모드로 전환되었습니다. 핵심 정보 위주로 안내합니다.');
+            if (window.speechSynthesis) window.speechSynthesis.cancel(); // 말하던 것 즉시 멈춤
+        });
+    }
+
+    // ✅ UI 토글 로직 (창 열 때 상황에 맞춰 자동 인사!)
+    toggleBtn.addEventListener("click", () => {
+        chatBox.classList.toggle("hidden");
+        chatBox.style.zIndex = "9999"; 
+        
+        // 창이 닫혀있다가 처음 열렸고, 대화 기록이 없을 때만 인사
+        if (!chatBox.classList.contains("hidden") && messages.children.length === 0) {
+            const isDetailPage = window.location.pathname.includes('product.html');
+            
+            if (isDetailPage) {
+                // 상세 페이지면 상품명을 화면에서 읽어와서 맞춤형 인사
+                const productNameElem = document.querySelector('.detail-name');
+                const productName = productNameElem ? productNameElem.innerText : '이 상품';
+                const greeting = `현재 보고 계신 상품은 ${productName}입니다. 무엇이든 물어보세요.`;
+                addMessage('bot', greeting);
+                readAloud(greeting);
+            } else {
+                // 메인 페이지면 기본 인사
+                const welcomeMsg = "안녕하세요! AUDIVIEW 챗봇입니다. 원하시는 상품을 말씀하시거나 사진을 올려주세요.";
+                addMessage('bot', welcomeMsg);
+                readAloud(welcomeMsg);
+            }
+        }
+    });
+    
+    if (closeBtn) {
+        closeBtn.addEventListener("click", () => {
+            chatBox.classList.add("hidden");
+            if (window.speechSynthesis) window.speechSynthesis.cancel(); // 창 닫으면 조용히
+        });
+    }
+
+    // 📷 1단계: 사진 업로드 시 서버로 발송
+    if(fileInput) {
+        fileInput.addEventListener('change', async (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => addMessage('user-img', e.target.result);
+            reader.readAsDataURL(file);
+
+            addMessage('bot', '사진을 분석 중입니다...');
+
+            const formData = new FormData();
+            formData.append('session_id', sessionId);
+            formData.append('category', currentCategory);
+            formData.append('user_type', userType);
+            formData.append('product_id', currentProductId); 
+            formData.append('image', file);
+
+            try {
+                const response = await fetch('http://223.130.161.162:8000/api/chat/start', {
+                    method: 'POST',
+                    body: formData
+                });
+                if (!response.ok) throw new Error("서버 응답 오류");
+                const data = await response.json();
+                
+                addMessage('bot', data.response);
+                readAloud(data.response); 
+            } catch (error) {
+                console.error("챗봇 통신 에러:", error);
+                addMessage('bot', '서버와 연결할 수 없습니다. 파이썬 서버가 켜져 있는지 확인해 주세요.');
+            }
+        });
+    }
+
+    // ⌨️ 2단계: 텍스트 발송 로직 (🚨 사진 업로드 강제 조건 삭제 완료)
+    async function sendQuestionToServer() {
+        if (!input || !sendBtn) return;
+        
+        const text = input.value.trim();
+        if (!text) return;
+
+        addMessage("user", text); 
+        input.value = "";
+
+        try {
+
+            const response = await fetch('http://localhost:8000/api/chat/ask', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ session_id: sessionId, user_message: text })
+            });
+            
+            if (!response.ok) throw new Error("서버 응답 오류");
+            
+            const data = await response.json();
+            addMessage('bot', data.response);
+            readAloud(data.response); 
+        } catch (error) {
+            console.error("질문 전송 에러:", error);
+            addMessage('bot', '답변을 받아오는 데 실패했습니다.');
+        }
+    }
+
+    if (sendBtn && input) {
+        sendBtn.addEventListener("click", sendQuestionToServer);
+        input.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") sendQuestionToServer();
+        });
+    }
+
+// 🎤 3단계: STT 로직
+    if (window.SpeechRecognition || window.webkitSpeechRecognition) {
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = "ko-KR";
+
+        if (voiceBtn) {
+            voiceBtn.addEventListener("click", () => {
+                recognition.start();
+                addMessage('bot', '🎙️ (말씀해 주세요...)');
+            });
+        }
+
+        recognition.onresult = (event) => {
+            const text = event.results[0][0].transcript;
+            if (input) input.value = text;
+            sendQuestionToServer(); 
+        };
+    }
 });
-
-function toggleChat(){
-
-const chat = document.getElementById("chatbot");
-
-if(chat.style.display==="flex"){
-chat.style.display="none";
-}else{
-chat.style.display="flex";
-
-setTimeout(()=>{
-document.getElementById("chatInput").focus();
-},100);
-
-}
-
-}
-
-
 // 페이지 로드시 로그인 상태 확인
 window.addEventListener("DOMContentLoaded", () => {
 
