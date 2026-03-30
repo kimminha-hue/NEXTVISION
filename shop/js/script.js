@@ -532,15 +532,8 @@ function addToCart(name, price, image) {
     if (existing) {
         existing.qty += 1;
     } else {
-        cart.push({
-            name: name,
-            price: price,
-            qty: 1,
-            image: image   // 👈 이거 꼭 있어야 함
-        });
+        cart.push({ name, price, qty: 1, image }); // image가 클라우드 URL로 저장됨 ✅
     }
-
     localStorage.setItem("cart", JSON.stringify(cart));
-
     alert("장바구니에 담겼습니다 🛒");
 }
