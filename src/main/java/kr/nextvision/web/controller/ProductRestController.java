@@ -18,17 +18,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@RestController 
-@RequestMapping("/api/product") 
-@RequiredArgsConstructor 
-@CrossOrigin(origins = "*") 
+@RestController // 이 클래스가 화면(HTML)을 반환하는 게 아니라, 데이터(JSON)를 반환하는 API 컨트롤러임을 선언합니다.
+@RequestMapping("/api/product") // 이 컨트롤러의 기본 URL 주소를 지정합니다.
+@RequiredArgsConstructor // final이 붙은 객체들을 자동으로 주입(생성)해 주는 롬복 어노테이션입니다.
+@CrossOrigin(origins = "*") // 프론트엔드와 백엔드 서버 주소가 다를 때 발생하는 CORS 에러를 막아주는 아주 중요한 설정입니다.
 public class ProductRestController {
 
+    // Repository를 불러와 DB와 통신할 준비를 합니다.
     private final ProductRepository productRepository;
+    
+    // 🌟 수정 포인트 1: @Autowired 대신 final을 사용하여 @RequiredArgsConstructor의 혜택을 받습니다.
     private final FileUploadService fileUploadService;
 
+    // 프론트엔드에서 상품 전체 목록을 요청할 때 타게 될 메서드입니다.
+    // 최종 접속 주소: /avw/api/product/list
     @GetMapping("/list")
     public List<Product> getProductList() {
+        // DB에 저장된 모든 Product 데이터를 리스트 형태로 싹 긁어와서 프론트엔드로 전달합니다.
         return productRepository.findAll();
     }
     
@@ -40,22 +46,18 @@ public class ProductRestController {
      * @param p_price 가격
      * @param p_desc 상세 설명 (RAG용)
      * @return 성공 여부 및 업로드된 이미지 URL 반환
-=======
-     * @param sellerIdx 프론트엔드에서 넘어온 판매자 고유 번호 (추가됨!)
-     * ... (생략) ...
      */
     @PostMapping("/register")
     public ResponseEntity<Map<String, Object>> registerProduct(
             @RequestParam("img1") MultipartFile img1,
+            // 👇 2, 3번 이미지를 받을 수 있도록 파라미터 추가!
             @RequestParam(value = "img2", required = false) MultipartFile img2,
             @RequestParam(value = "img3", required = false) MultipartFile img3,
             @RequestParam(value = "img4", required=false) MultipartFile img4 ,
             @RequestParam("p_name") String pName,
             @RequestParam("p_category") String pCategory,
             @RequestParam("p_price") int pPrice,
-            @RequestParam("p_desc") String pDesc,
-            // 🚨 핵심 수정 1: 프론트가 던진 seller_idx를 파라미터로 받습니다!
-            @RequestParam("seller_idx") Integer sellerIdx 
+            @RequestParam("p_desc") String pDesc
     ) {
         Map<String, Object> response = new HashMap<>();
 
@@ -64,9 +66,6 @@ public class ProductRestController {
             String img1Url = fileUploadService.uploadFile(img1, "products");
             
             Product product = new Product();
-            
-            // 🚨 핵심 수정 2: 받은 sellerIdx를 Product 엔티티에 세팅합니다!
-            product.setSellerIdx(sellerIdx); 
             product.setName(pName);       
             product.setCategory(pCategory); 
             product.setPrice(pPrice);
@@ -83,19 +82,13 @@ public class ProductRestController {
             // ⭐⭐⭐ 여기 추가 ⭐⭐⭐
             product.setSellerIdx(1);
             
-
-            
-            
-            // (안전 장치) 엔티티 설계에 따라 pStock이 필수일 경우를 대비해 기본값 세팅
-            product.setStock(100); 
-
-            // 2. 2번 이미지(선택)가 들어왔다면 업로드 후 세팅
-
+            // 2. 2번 이미지(선택)가 들어왔다면 업로드 후 세팅!
             if (img2 != null && !img2.isEmpty()) {
                 String img2Url = fileUploadService.uploadFile(img2, "products");
                 product.setImg2(img2Url);
             }
-            // 3. 3번 이미지(선택)가 들어왔다면 업로드 후 세팅
+
+            // 3. 3번 이미지(선택)가 들어왔다면 업로드 후 세팅!
             if (img3 != null && !img3.isEmpty()) {
                 String img3Url = fileUploadService.uploadFile(img3, "products");
                 product.setImg3(img3Url);
@@ -108,6 +101,7 @@ public class ProductRestController {
 
             // DB에 최종 저장!
             productRepository.save(product);
+
             response.put("status", "success");
             response.put("message", "상품과 모든 이미지가 성공적으로 등록되었습니다.");
             response.put("imageUrl", img1Url); 
@@ -121,4 +115,5 @@ public class ProductRestController {
             return ResponseEntity.internalServerError().body(response);
         }
     }
+    
 }
