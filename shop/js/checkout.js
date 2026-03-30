@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const div = document.createElement('div');
         div.className = "order-item";
         div.innerHTML = `
-            <img src="../${item.image}" alt="상품 이미지">
+            <img src="${item.image}" alt="상품 이미지">
             <div class="order-info">
                 <p class="order-name">${item.name}</p>
                 <p class="order-option">

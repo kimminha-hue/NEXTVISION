@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 로그인 확인
     const isLogin = localStorage.getItem("isLogin") === "true";
     const loginUser = JSON.parse(localStorage.getItem("loginUser")) || {};
-
     const userName = isLogin 
         ? (loginUser.name || loginUser.username || "알 수 없음") 
         : "익명";
@@ -12,57 +11,48 @@ document.addEventListener("DOMContentLoaded", async () => {
         ? (loginUser.username || loginUser.email || "guest")
         : "guest";
 
-
     // productId 가져오기
     const productId = new URLSearchParams(location.search).get("id");
 
     // 데이터 가져오기 (data.json)
     let products = [];
-try {
-    const res = await fetch('http://localhost:8088/avw/api/product/list');
-    if (!res.ok) throw new Error('API 호출 실패');
-    const apiProducts = await res.json();
-
-    // ✅ API 데이터를 기존 data.json 형식으로 변환
-    products = apiProducts.map(p => ({
-        id: String(p.id),
-        name: p.name,
-        price: p.price,
-        description: p.description,
-        category: p.category,
-        image: p.img1,
-        detailImages: [p.img2, p.img3, p.img4].filter(Boolean),
-        ingredients: []
-    }));
-
-} catch(e) {
-    console.error(e);
-    // ✅ API 실패 시 data.json 백업으로 사용
     try {
-        const res = await fetch('../data.json');
-        if (!res.ok) throw new Error('data.json 로드 실패');
-        products = await res.json();
-    } catch(e2) {
-        console.error(e2);
+        const res = await fetch('http://localhost:8088/avw/api/product/list');
+        if (!res.ok) throw new Error('API 호출 실패');
+        const apiProducts = await res.json();
+
+        products = apiProducts.map(p => ({
+            id: String(p.id),
+            name: p.name,
+            price: p.price,
+            description: p.description,
+            category: p.category,
+            image: p.img1,
+            detailImages: [p.img2, p.img3, p.img4].filter(Boolean),
+            ingredients: []
+        }));
+
+    } catch(e) {
+        // ✅ API 실패 시 에러 메시지만 표시 (data.json 백업 없음)
+        console.error(e);
         if(detailContainer)
-            detailContainer.innerHTML = "<p>상품 데이터를 불러올 수 없습니다.</p>";
+            detailContainer.innerHTML = "<p>서버에 연결할 수 없습니다. 서버가 켜져 있는지 확인해 주세요.</p>";
         return;
     }
-}
 
-const product = products.find(p => String(p.id) === String(productId));
-if(!product){
-    if(detailContainer) detailContainer.innerHTML = `<p>상품을 찾을 수 없습니다.</p>`;
-    return;
-}
+    const product = products.find(p => String(p.id) === String(productId));
+    if(!product){
+        if(detailContainer) detailContainer.innerHTML = `<p>상품을 찾을 수 없습니다.</p>`;
+        return;
+    }
 
-// 기존 그대로 유지
-function getReviews() {
-    return JSON.parse(localStorage.getItem("all_reviews")) || [];
-}
-function saveReviews(reviews) {
-    localStorage.setItem("all_reviews", JSON.stringify(reviews));
-}
+    // [수정] 통합 리뷰 저장소('all_reviews') 사용 함수
+    function getReviews() {
+        return JSON.parse(localStorage.getItem("all_reviews")) || [];
+    }
+    function saveReviews(reviews) {
+        localStorage.setItem("all_reviews", JSON.stringify(reviews));
+    }
 
     // =========================
     // 별점 선택
