@@ -147,36 +147,18 @@ const starEls = document.querySelectorAll("#edit-stars span");
 let editingReviewId = null;
 let editRating = 0;
 
-if (!localStorage.getItem("all_reviews")) {
-    const testReviews = [
-        {
-            id: Date.now(),
-            product: "테스트 상품 1",
-            rating: 5,
-            content: "보이면 성공 👍",
-            userEmail: email,
-            user: localStorage.getItem("username") || "testUser"
-        },
-        {
-            id: Date.now() + 1,
-            product: "테스트 상품 2",
-            rating: 3,
-            content: "두번째 리뷰예요",
-            userEmail: email,
-            user: localStorage.getItem("username") || "testUser"
-        }
-    ];
-    localStorage.setItem("all_reviews", JSON.stringify(testReviews));
-}
-
+const loginUser = JSON.parse(localStorage.getItem("loginUser")) || {};
+const currentUserEmail = loginUser.username || loginUser.email || email || "guest";
+const currentUserName = loginUser.name || loginUser.username || "알 수 없음";
 
 // 리뷰 렌더링 함수
 function renderMyReviews() {
     if (!reviewsList) return;
     reviewsList.innerHTML = "";
     const allReviews = JSON.parse(localStorage.getItem("all_reviews")) || [];
-    const myReviews = allReviews.filter(r => r.userEmail === email);
-
+    const myReviews = allReviews.filter(r => 
+        r.userEmail === currentUserEmail || r.userEmail === email
+    );
     if (myReviews.length === 0) {
         reviewsList.innerHTML = "<p>작성한 리뷰가 없습니다.</p>";
         return;
@@ -188,7 +170,7 @@ function renderMyReviews() {
         div.className = 'review-card';
         div.innerHTML = `
             <div class="review-content">
-                <strong>${review.product}</strong><br>
+                <strong>${review.product || "상품명 없음"}</strong><br>
                 ⭐ ${review.rating} / 5 <br>
                 <p>${review.content}</p>
             </div>

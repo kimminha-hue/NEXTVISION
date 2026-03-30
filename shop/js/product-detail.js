@@ -3,8 +3,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // 로그인 확인
     const isLogin = localStorage.getItem("isLogin") === "true";
-    const userName = isLogin ? localStorage.getItem("username") : "익명";
-    const userEmail = localStorage.getItem("userEmail") || "guest";
+    const loginUser = JSON.parse(localStorage.getItem("loginUser")) || {};
+
+    const userName = isLogin 
+        ? (loginUser.name || loginUser.username || "알 수 없음") 
+        : "익명";
+    const userEmail = isLogin
+        ? (loginUser.username || loginUser.email || "guest")
+        : "guest";
+
 
     // productId 가져오기
     const productId = new URLSearchParams(location.search).get("id");

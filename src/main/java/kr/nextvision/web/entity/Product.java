@@ -65,11 +65,6 @@ public class Product{
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
     
-    @Column(name = "p_stock")
-    private int stock;
-
-    @Column(name = "p_status")
-    private String status;
 	
     @Column(name = "seller_idx", nullable = false)
     private Integer sellerIdx;
