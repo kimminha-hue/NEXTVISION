@@ -147,6 +147,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             <button class="size-btn">M</button>
                             <button class="size-btn">L</button>
                             <button class="size-btn">XL</button>
+                            <button class="size-btn">FREE</button>
                         </div>
                         ` : ""}
 
@@ -536,4 +537,39 @@ function addToCart(name, price, image) {
     }
     localStorage.setItem("cart", JSON.stringify(cart));
     alert("장바구니에 담겼습니다 🛒");
+}
+
+// 🔥 전역 변수 (이게 핵심)
+let zoomLevel = 1;
+let fontSize = 100;
+
+// 🔍 확대 기능
+function zoomIn(){
+  zoomLevel += 0.1;
+  if(zoomLevel > 1.5) zoomLevel = 1;
+  document.body.style.zoom = zoomLevel;
+}
+// 🔍 화면 축소
+function zoomOut(){
+  zoomLevel -= 0.1;
+
+  if(zoomLevel < 0.7) zoomLevel = 0.7; // 최소 제한
+
+  document.body.style.zoom = zoomLevel;
+}
+// 🔠 글씨 확대
+function increaseText(){
+  fontSize += 10;
+  document.body.style.fontSize = fontSize + "%";
+}
+
+// 🔠 글씨 축소
+function decreaseText(){
+  fontSize -= 10;
+  document.body.style.fontSize = fontSize + "%";
+}
+
+// 🎨 고대비 모드
+function toggleContrast(){
+  document.body.classList.toggle("high-contrast");
 }

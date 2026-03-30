@@ -5,9 +5,13 @@ if (isLogin !== "true") {
     window.location.href = "login.html";
 }
 
+// ✅ loginUser에서 정보 가져오기
+const loginUser = JSON.parse(localStorage.getItem("loginUser")) || {};
+const currentUserName = loginUser.name || loginUser.username || "";
+
 document.addEventListener("DOMContentLoaded", () => {
     const isLogin = localStorage.getItem("isLogin");
-    const username = localStorage.getItem("username");
+    const username = loginUser.name || loginUser.username || "";
 
     const loginBtn = document.querySelector('a[href="login.html"]');
     const signupBtn = document.querySelector('a[href="signup.html"]');
