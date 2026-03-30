@@ -131,15 +131,24 @@ Free HTML CSS Template
 function sendMessage(){
 
 const input = document.getElementById("chatInput");
-
 const chatBody = document.getElementById("chatBody");
 
 const text = input.value.trim();
 
 if(text==="") return;
 
-chatBody.innerHTML +=
-'<div class="user-message">'+ text.replace(/\n/g, "<br>") +'</div>';
+// ⭐ welcome 숨기기
+const welcome = document.getElementById("welcome-message");
+if (welcome) {
+  welcome.style.display = "none";
+}
+
+// ⭐ innerHTML → appendChild로 변경
+const msg = document.createElement("div");
+msg.classList.add("message", "user-message"); 
+msg.innerHTML = text.replace(/\n/g, "<br>");
+
+chatBody.appendChild(msg);
 
 input.value="";
 input.style.height = "auto";
