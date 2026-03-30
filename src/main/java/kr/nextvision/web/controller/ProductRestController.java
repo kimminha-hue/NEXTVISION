@@ -49,6 +49,7 @@ public class ProductRestController {
             @RequestParam("img1") MultipartFile img1,
             @RequestParam(value = "img2", required = false) MultipartFile img2,
             @RequestParam(value = "img3", required = false) MultipartFile img3,
+            @RequestParam(value = "img4", required=false) MultipartFile img4 ,
             @RequestParam("p_name") String pName,
             @RequestParam("p_category") String pCategory,
             @RequestParam("p_price") int pPrice,
@@ -71,14 +72,25 @@ public class ProductRestController {
             product.setPrice(pPrice);
             product.setDescription(pDesc);
             product.setImg1(img1Url); 
+         // ⭐ 추가해야 하는 부분
+            product.setStock(0);
+            product.setStatus("판매중");
+            product.setSellerIdx(1);
+            
             product.setCreatedAt(java.time.LocalDateTime.now());
-            product.setUpdateAt(java.time.LocalDateTime.now());
+            product.setUpdatedAt(java.time.LocalDateTime.now());
+            
+            // ⭐⭐⭐ 여기 추가 ⭐⭐⭐
+            product.setSellerIdx(1);
+            
+
             
             
             // (안전 장치) 엔티티 설계에 따라 pStock이 필수일 경우를 대비해 기본값 세팅
             product.setStock(100); 
 
             // 2. 2번 이미지(선택)가 들어왔다면 업로드 후 세팅
+
             if (img2 != null && !img2.isEmpty()) {
                 String img2Url = fileUploadService.uploadFile(img2, "products");
                 product.setImg2(img2Url);
@@ -87,6 +99,11 @@ public class ProductRestController {
             if (img3 != null && !img3.isEmpty()) {
                 String img3Url = fileUploadService.uploadFile(img3, "products");
                 product.setImg3(img3Url);
+            }
+            // 4. 4번 이미지(선택)가 들어왔다면 업로드 후 세팅!
+            if (img4 != null && !img4.isEmpty()) {
+                String img4Url = fileUploadService.uploadFile(img4, "products");
+                product.setImg4(img4Url);
             }
 
             // DB에 최종 저장!

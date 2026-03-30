@@ -23,10 +23,7 @@ public class Product{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "p_idx")
 	private Integer id;
-	
-	@Column(name = "seller_idx", nullable = false)
-	private Integer sellerIdx;
-	
+
 	@Column(name = "p_name", nullable = false)
 	private String name; // DB의 p_name 연결
 	
@@ -56,12 +53,25 @@ public class Product{
     @Column(name = "img3")
     private String img3; // 상세 이미지 2
 
+    @Column(name = "img4")
+    private String img4; // 상세 이미지 3 (선택)
+
     // 생성 일자 (보통 팀 프로젝트 DB에 필수로 들어갑니다)
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
     
+
+    // 호성님이 추가한 업데이트 일자
     @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updateAt;
+    private LocalDateTime updatedAt;
+    
+    @Column(name = "p_stock")
+    private int stock;
+
+    @Column(name = "p_status")
+    private String status;
 	
+    @Column(name = "seller_idx", nullable = false)
+    private Integer sellerIdx;
 	
 }
