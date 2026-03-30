@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             description: item.description, // 상세 설명
             ingredients: [],           // (임시) 성분이나 특징 데이터가 비어있을 때 에러 방지용
             // 🌟 img2, img3가 존재할 경우에만 배열로 묶어서 상세 이미지 란에 넣어줍니다.
-            detailImages: [item.img2, item.img3].filter(img => img !== null && img !== undefined && img !== "")
+            detailImages: [item.img2, item.img3,item.img4].filter(Boolean)
         }));
 
         console.log("백엔드에서 가져온 진짜 데이터:", products); // 확인용 콘솔 로그
@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
 
             <div class="product-long-description">
-                <section class="detail-section" style="display: none;">
+                <section class="detail-section" >
                     <h2 class="section-title">상품 상세 설명</h2>
                     <p class="detail-description">${product.description}</p>
                 </section>
