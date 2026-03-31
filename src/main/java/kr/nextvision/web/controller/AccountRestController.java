@@ -84,7 +84,9 @@ public class AccountRestController {
             userInfo.put("id", account.getLoginId());
             userInfo.put("name", account.getName());
             userInfo.put("role", account.getRole());
-
+            userInfo.put("phone", account.getPhone());     
+            userInfo.put("address", account.getAddress());  
+            
             response.put("status", "success");
             response.put("message", "로그인 성공!");
             response.put("user", userInfo);
@@ -111,6 +113,8 @@ public class AccountRestController {
 
             if (body.get("name") != null) account.setName(body.get("name"));
             if (body.get("pw") != null) account.setPassword(body.get("pw"));
+            if (body.get("phone") != null) account.setPhone(body.get("phone"));   
+            if (body.get("address") != null) account.setAddress(body.get("address"));
 
             accountRepository.save(account);
 

@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         ? (loginUser.name || loginUser.username || "알 수 없음") 
         : "익명";
     const userEmail = isLogin
-        ? (loginUser.username || loginUser.email || "guest")
+        ? (loginUser.id || loginUser.username || loginUser.email || "guest")
         : "guest";
 
     // productId 가져오기

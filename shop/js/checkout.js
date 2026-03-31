@@ -8,10 +8,12 @@ if (isLogin !== "true") {
 // ✅ loginUser에서 정보 가져오기
 const loginUser = JSON.parse(localStorage.getItem("loginUser")) || {};
 const currentUserName = loginUser.name || loginUser.username || "";
+const userId = loginUser.id || loginUser.username || "guest";
+const cartKey = `cart_${userId}`;  // ✅ 사용자별 장바구니 키
 
 document.addEventListener("DOMContentLoaded", () => {
     const isLogin = localStorage.getItem("isLogin");
-    const username = loginUser.name || loginUser.username || "";
+    const username = loginUser.name || loginUser.id || "";
 
     const loginBtn = document.querySelector('a[href="login.html"]');
     const signupBtn = document.querySelector('a[href="signup.html"]');
@@ -31,7 +33,21 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
             nav.appendChild(userLi);
         }
+
     }
+
+    // ✅ 결제페이지 배송정보 자동입력
+    const buyerNameInput = document.querySelector('input[placeholder="이름"]');
+    const buyerTelInput = document.querySelector('input[placeholder="연락처"]');
+
+    if (buyerNameInput && loginUser.name) {
+        buyerNameInput.value = loginUser.name;
+    }
+    if (buyerTelInput && loginUser.phone) {
+        buyerTelInput.value = loginUser.phone;
+    }
+
+
 });
 
 
@@ -60,7 +76,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalPriceEl = document.getElementById("checkout-total-price");
     orderListEl.innerHTML = "";
 
-    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    // ✅ 사용자별 장바구니 키로 읽기
+    const cart = JSON.parse(localStorage.getItem(cartKey)) || [];
     const params = new URLSearchParams(window.location.search);
     const singleItemName = params.get('name');
 
@@ -171,7 +188,7 @@ function requestPay() {
             // [로직 추가] 장바구니 결제였을 때만 장바구니를 비움
             const params = new URLSearchParams(window.location.search);
             if (!params.get('name')) {
-                localStorage.removeItem("cart");
+                localStorage.removeItem(cartKey);
             }
             
             window.location.href = 'index.html';
