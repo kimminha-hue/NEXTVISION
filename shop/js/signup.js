@@ -47,12 +47,11 @@ async function validateForm() {
             })
         });
         const data = await response.json();
+        console.log("응답 데이터:", data);
 
         if (data.status === "success") {
-            alert("회원가입이 완료되었습니다!");
-            window.location.href = "login.html";
+            window.location.replace("login.html");
         } else {
-            alert(data.message);
         }
 
     } catch (err) {

@@ -38,20 +38,20 @@
             <h2 class="signup-title">회원가입</h2>
 
             <!-- 🔥 form -->
-            <form class="signup-form" onsubmit="return validateForm()" >
+            <form class="signup-form" onsubmit="return validateForm()" novalidate>
                 
                 <!-- ✅ required + id 유지 -->
                 <input type="text" placeholder="이름" class="input-field" id="name" required>
                 <input type="text" placeholder="아이디" class="input-field" id="username" required>
-                <input type="password" placeholder="비밀번호" class="input-field" id="password" required>
-                <input type="password" placeholder="비밀번호 확인" class="input-field" id="confirm-password" required>
+                <input type="password" placeholder="비밀번호" class="input-field" id="password" autocomplete="new-password" required>
+                <input type="password" placeholder="비밀번호 확인" class="input-field" id="confirm-password" autocomplete="new-password" required>
 
                 <select id="signup-role" class="input-field">
                     <option value="user">일반회원</option>
                     <option value="admin">판매자</option>
                 </select>
 
-                <button type="submit" class="btn btn-primary">가입하기</button>
+                <button type="button" class="btn btn-primary" onclick="validateForm()">가입하기</button>
 
                 <!-- 🔥 소셜 회원가입 -->
                 <div class="social-signup">
