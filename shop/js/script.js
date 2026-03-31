@@ -456,74 +456,7 @@ if (imageBtn && fileInput) {
 });
 
 
-// 🔥 로그인 상태 UI 변경
-document.addEventListener("DOMContentLoaded", () => {
-    const isLogin = localStorage.getItem("isLogin");
 
-    const loginBtn = document.querySelector('a[href="login.html"]');
-    const signupBtn = document.querySelector('a[href="signup.html"]');
-    const nav = document.querySelector('.nav-links');
-
-    if (isLogin === "true" ) {
-        // 기존 버튼 숨기기
-        if (loginBtn) loginBtn.style.display = "none";
-        if (signupBtn) signupBtn.style.display = "none";
-
-        // 사용자 이름 가져오기
-        const user = JSON.parse(localStorage.getItem("loginUser"));
-        const username = user?.name || "사용자";
-
-        // 상단 네비게이션에 사용자 이름, 마이페이지, 장바구니, 로그아웃 버튼 추가
-    const userLi = document.createElement("li");
-    userLi.innerHTML = `<span>${username}님</span>`;
-
-    const mypageLi = document.createElement("li");
-    mypageLi.innerHTML = `<a href="mypage.html">👤마이페이지</a>`;
-
-    const cartLi = document.createElement("li");
-    cartLi.innerHTML = `<a href="cart.html">🛒장바구니</a>`;
-
-    let adminLi = null;
-    let adminManageLi = null;
-        if (user && user.role === "admin") {
-            adminLi = document.createElement("li");
-            adminLi.innerHTML = `<a href="admin_test.html">🛠 상품등록</a>`;
-
-            adminManageLi = document.createElement("li");
-            adminManageLi.innerHTML = `<a href="admin_products.html">📦 상품관리</a>`;
-        }
-
-    const logoutLi = document.createElement("li");
-    logoutLi.innerHTML = `<a href="#" id="logout-btn">로그아웃</a>`;
-
-     // ===== 기준점 (쇼핑하기 버튼) =====
-        const shopLink = document.querySelector('a[href="index.html"]');
-        const shopLi = shopLink ? shopLink.closest('li') : null;
-
-        if (shopLi) {
-            // 👉 원하는 순서대로 삽입
-            nav.insertBefore(userLi, shopLi);    // 김광훈님
-            nav.insertBefore(mypageLi, shopLi);  // 마이페이지
-            nav.insertBefore(cartLi, shopLi);    // 장바구니
-            if (adminLi) nav.insertBefore(adminLi, shopLi);
-            if (adminManageLi) nav.insertBefore(adminManageLi, shopLi);
-            nav.insertBefore(logoutLi, shopLi);  // 로그아웃
-        } else {
-            nav.append(userLi, mypageLi, cartLi);
-            if (adminLi) nav.append(adminLi);
-            if (adminManageLi) nav.append(adminManageLi);
-            nav.append(logoutLi);
-        }   
-
-        // 로그아웃 기능
-        document.getElementById("logout-btn").addEventListener("click", () => {
-            localStorage.removeItem("isLogin");
-            localStorage.removeItem("loginUser");
-            alert("로그아웃 되었습니다.");
-            location.reload();
-        });
-    }
-});
 
 
 // ===== 장바구니 기능 =====
