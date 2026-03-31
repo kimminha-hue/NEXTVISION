@@ -163,6 +163,43 @@ document.addEventListener('DOMContentLoaded', async () => {
                 `).join('') : ''}
             </div>
         `;
+        // ==========================================
+        // 🔥 여기부터 복사해서 붙여넣으세요!
+        // ==========================================
+        async function fetchReviews() {
+            try {
+                // p_idx에 현재 상품의 ID를 넣어서 호출합니다.
+                const reviewRes = await fetch(`http://localhost:8088/avw/api/review/list?p_idx=${product.id}`);
+                if (!reviewRes.ok) throw new Error("리뷰 데이터를 불러올 수 없습니다.");
+                
+                const reviews = await reviewRes.json();
+                
+                // 위에서 만든 '빈 바구니'들을 찾아옵니다.
+                const ratingContainer = document.querySelector('.product-rating');
+                const reviewContainer = document.querySelector('.highlight-review');
+
+                if (reviews.length > 0) {
+                    // 리뷰가 있다면 별점 계산해서 넣기
+                    const avgRating = (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1);
+                    if (ratingContainer) {
+                        ratingContainer.innerHTML = `<span style="color:#FFD700; font-size: 1.2rem;">★</span> <strong>${avgRating}</strong> <span style="font-size: 0.9em; color: #ccc;">(${reviews.length}개의 리뷰)</span>`;
+                    }
+                    if (reviewContainer) {
+                        reviewContainer.innerHTML = `<p style="font-style: italic; margin-top: 10px;">"${reviews[0].revContent}"</p>`;
+                    }
+                } else {
+                    // 리뷰가 없을 때 문구
+                    if (ratingContainer) ratingContainer.innerHTML = "<span style='color: #888;'>아직 별점이 없습니다.</span>";
+                    if (reviewContainer) reviewContainer.innerHTML = "<span style='color: #888;'>대표 리뷰가 없습니다.</span>";
+                }
+            } catch (error) {
+                console.error("프론트엔드 리뷰 연동 에러:", error);
+            }
+        }
+        fetchReviews(); // 만든 함수를 바로 실행!
+        // ==========================================
+
+        // 이후 기존 코드 (voiceBtn 등...) 계속...
 
         // 🔥 호성님의 AI 음성 듣기 버튼 클릭 이벤트 연결
         const voiceBtn = document.getElementById('product-voice-btn');

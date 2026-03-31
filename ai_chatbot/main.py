@@ -49,6 +49,8 @@ async def chat_ask_api(
     user_message: str = Form(None), 
     image: UploadFile = File(None)  
 ):
+    # 1. 통신 시작점 확인 (가장중요함)
+    print(f"🔥 [DEBUG 1] 프론트 요청 도착! 질문: {user_message}, 상품ID: {product_id}")
     # =========================================================================
     # 💡 1. 스프링부트 DB에서 실시간 데이터 가져오기 (이제 무조건 DB만 봅니다!)
     # =========================================================================
@@ -89,7 +91,6 @@ async def chat_ask_api(
     # 🔥 복구된 핵심 코드! (이 줄이 없으면 에러가 납니다)
     fact_text = f"상품명: {product_name}, 가격: {fact_text_price}, 설명: {fact_text_desc}"
 
-
     # =========================================================================
     # 💡 2. 스프링부트 DB에서 실시간 '리뷰' 가져오기 (이름표 완벽 매칭 및 디버깅 추가)
     # =========================================================================
@@ -123,7 +124,9 @@ async def chat_ask_api(
             
     except Exception as e:
         print(f"❌ [에러] 스프링부트 리뷰 서버와 통신 실패 - {e}")
-
+    
+    # 2. 스프링부트 응답 확인
+    print(f"🔥 [DEBUG 2] 스프링부트 DB 팩트 세팅 완료")
 
     # =========================================================================
     # 💡 3. 프롬프트 조립
@@ -144,10 +147,14 @@ async def chat_ask_api(
         initial_prompt = f"{base_prompt} 이 상품의 디자인, 색상, 특징을 눈앞에 있는 것처럼 자세히 설명해줘."
 
 
+    
     # =========================================================================
     # 💡 4. 제미나이 2.5 Flash 호출
     # =========================================================================
     image_data = image.file if (image and hasattr(image, 'file')) else None
+
+    # 3. 제미나이 호출 직전 확인
+    print("🔥 [DEBUG 3] 제미나이 API 호출 시작...")
 
     try:
         gemini_answer = await vqa_handler.get_gemini_res(image_data, selected_persona, initial_prompt)
