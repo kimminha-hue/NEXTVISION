@@ -484,6 +484,7 @@ document.addEventListener("DOMContentLoaded", () => {
     cartLi.innerHTML = `<a href="cart.html">🛒장바구니</a>`;
 
     let adminLi = null;
+    let adminManageLi = null;
         if (user && user.role === "admin") {
             adminLi = document.createElement("li");
             adminLi.innerHTML = `<a href="admin_test.html">🛠 상품등록</a>`;

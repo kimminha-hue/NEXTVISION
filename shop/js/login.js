@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////
 // 🔐 일반 로그인
 //////////////////////////////////////////////////////
-function handleLogin() {
+async function handleLogin() {
     const username = document.getElementById("login-username").value.trim();
     const password = document.getElementById("login-password").value.trim();
 
@@ -11,34 +11,30 @@ function handleLogin() {
         return;
     }
 
-    // user_아이디로 가져오기
-    const savedUser = localStorage.getItem("user_" + username);
+    try {
+        // ✅ localStorage 대신 DB API 호출
+        const response = await fetch("http://localhost:8088/avw/api/account/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: username, pw: password })
+        });
 
-    if (!savedUser) {
-        alert("존재하지 않는 계정입니다.");
-        return;
+        const data = await response.json();
+
+        if (data.status === "success") {
+            // ✅ DB에서 받은 정보 localStorage에 저장
+            localStorage.setItem("isLogin", "true");
+            localStorage.setItem("loginUser", JSON.stringify(data.user));
+            alert(data.user.name + "님 로그인 성공!");
+            window.location.href = "index.html";
+        } else {
+            alert(data.message);
+        }
+
+    } catch (err) {
+        console.error(err);
+        alert("서버 연결 오류가 발생했습니다.");
     }
-
-    let user = JSON.parse(savedUser);
-
-    // 🔥 비밀번호 비교
-    if (user.password !== password) {
-        alert("비밀번호가 틀렸습니다.");
-        return;
-    }
-
-    // 🔥 name 없을 경우 보정 (⭐ 핵심)
-    if (!user.name) {
-        user.name = user.username || username;
-    }
-
-    // 🔥 로그인 성공
-    alert("로그인 되었습니다.");
-
-    localStorage.setItem("isLogin", "true");
-    localStorage.setItem("loginUser", JSON.stringify(user));
-
-    window.location.href = "index.html";
 }
 
 //////////////////////////////////////////////////////
@@ -71,50 +67,32 @@ function kakaoLogin() {
 
             fetch("http://localhost:8081/kakao/auth", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    access_token: authObj.access_token
-                })
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ access_token: authObj.access_token })
             })
             .then(res => res.json())
-            .then(data => {
-
+            .then(async data => {
                 const email = data.email;
                 const name = data.name;
 
-                let savedUser = localStorage.getItem("user_" + email);
-                let user;
+                // ✅ DB에서 카카오 계정 확인
+                const loginRes = await fetch("http://localhost:8088/avw/api/account/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ id: email, pw: "kakao_" + email })
+                });
+                const loginData = await loginRes.json();
 
-                if (savedUser) {
-                    user = JSON.parse(savedUser);
+                if (loginData.status === "success") {
+                    localStorage.setItem("isLogin", "true");
+                    localStorage.setItem("loginUser", JSON.stringify(loginData.user));
+                    alert(loginData.user.name + "님 로그인 성공!");
+                    window.location.href = "../index.html";
                 } else {
-                    // 자동 회원가입
-                    user = {
-                        name: name,
-                        username: email,
-                        password: null,
-                        role: "user"
-                    };
-
-                    localStorage.setItem("user_" + email, JSON.stringify(user));
+                    alert("가입되지 않은 계정입니다. 회원가입을 먼저 해주세요.");
                 }
-
-                // 🔥 name 보정
-                if (!user.name) {
-                    user.name = name || email;
-                }
-
-                localStorage.setItem("loginUser", JSON.stringify(user));
-                localStorage.setItem("isLogin", "true");
-
-                alert(user.name + "님 로그인 성공!");
-                window.location.href = "../index.html";
             })
-            .catch(() => {
-                alert("카카오 로그인 실패");
-            });
+            .catch(() => alert("카카오 로그인 실패"));
         },
         fail: function(err) {
             console.error(err);
@@ -125,46 +103,45 @@ function kakaoLogin() {
 //////////////////////////////////////////////////////
 // 🔥 구글 로그인 처리
 //////////////////////////////////////////////////////
-window.onload = () => {
-
+window.onload = async () => {
     const hash = window.location.hash;
+    if (!hash.includes("access_token")) return;
 
-    if(hash.includes("access_token")){
+    const token = new URLSearchParams(hash.substring(1)).get("access_token");
 
-        const token = new URLSearchParams(hash.substring(1)).get("access_token");
-
-        fetch("https://www.googleapis.com/oauth2/v1/userinfo?alt=json", {
-            headers: {
-                Authorization: "Bearer " + token
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
-
-            const email = data.email;
-            const name = data.name;
-
-            let savedUser = localStorage.getItem("user_" + email);
-            let user;
-
-            if (savedUser) {
-                user = JSON.parse(savedUser);
-            } else {
-                alert("가입되지 않은 계정입니다. 회원가입을 먼저 해주세요.");
-                return;
-            }
-
-            // 🔥 name 보정
-            if (!user.name) {
-                user.name = name || email;
-            }
-
-            localStorage.setItem("loginUser", JSON.stringify(user));
-            localStorage.setItem("isLogin", "true");
-
-            alert(user.name + "님 로그인 성공!");
-
-            window.location.href = "../html/index.html";
+    try {
+        const res = await fetch("https://www.googleapis.com/oauth2/v1/userinfo?alt=json", {
+            headers: { Authorization: "Bearer " + token }
         });
+        const data = await res.json();
+
+        const email = data.email;
+        const name = data.name;
+
+        // ✅ DB에서 구글 계정 확인
+        const loginRes = await fetch("http://localhost:8088/avw/api/account/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: email, pw: "google_" + email })
+        });
+        const loginData = await loginRes.json();
+
+        if (loginData.status === "success") {
+            localStorage.setItem("isLogin", "true");
+            localStorage.setItem("loginUser", JSON.stringify(loginData.user));
+
+            // ✅ URL 해시 제거 (보안)
+            history.replaceState(null, "", window.location.pathname);
+
+            alert(loginData.user.name + "님 로그인 성공!");
+            window.location.href = "index.html";
+        } else {
+            alert("가입되지 않은 계정입니다. 회원가입을 먼저 해주세요.");
+            window.location.href = "signup.html";
+        }
+
+    } catch (err) {
+        console.error(err);
+        alert("구글 로그인 중 오류가 발생했습니다.");
     }
 };
