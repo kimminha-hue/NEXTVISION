@@ -487,6 +487,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (user && user.role === "admin") {
             adminLi = document.createElement("li");
             adminLi.innerHTML = `<a href="admin_test.html">🛠 상품등록</a>`;
+
+            adminManageLi = document.createElement("li");
+            adminManageLi.innerHTML = `<a href="admin_products.html">📦 상품관리</a>`;
         }
 
     const logoutLi = document.createElement("li");
@@ -502,10 +505,12 @@ document.addEventListener("DOMContentLoaded", () => {
             nav.insertBefore(mypageLi, shopLi);  // 마이페이지
             nav.insertBefore(cartLi, shopLi);    // 장바구니
             if (adminLi) nav.insertBefore(adminLi, shopLi);
+            if (adminManageLi) nav.insertBefore(adminManageLi, shopLi);
             nav.insertBefore(logoutLi, shopLi);  // 로그아웃
         } else {
             nav.append(userLi, mypageLi, cartLi);
             if (adminLi) nav.append(adminLi);
+            if (adminManageLi) nav.append(adminManageLi);
             nav.append(logoutLi);
         }   
 
