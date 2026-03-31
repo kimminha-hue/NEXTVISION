@@ -260,7 +260,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const messages = document.getElementById("chat-messages");
     const voiceBtn = document.getElementById("voice-btn"); 
     const fileInput = document.getElementById("chat-file-input"); 
-    const closeBtn = document.querySelector(".chatbot-close-btn"); // closeBtn 변수 추가
+    // 메인 홈페이지의 클래스(.)와 상세 페이지의 아이디(#)를 둘 다 찾도록 콤마(,)로 연결!
+    const closeBtn = document.querySelector(".chatbot-close-btn, #chat-close");
     const imageBtn = document.getElementById("image-btn");
 
     if (imageBtn && fileInput) {
