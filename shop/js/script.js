@@ -500,16 +500,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // ===== 장바구니 기능 =====
 function addToCart(name, price, image) {
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    // ✅ 사용자별 장바구니 키 사용
+    const loginUser = JSON.parse(localStorage.getItem("loginUser")) || {};
+    const userId = loginUser.id || loginUser.username || "guest";
+    const cartKey = `cart_${userId}`;
+
+    let cart = JSON.parse(localStorage.getItem(cartKey)) || [];
 
     const existing = cart.find(item => item.name === name);
 
     if (existing) {
         existing.qty += 1;
     } else {
-        cart.push({ name, price, qty: 1, image }); // image가 클라우드 URL로 저장됨 ✅
+        cart.push({ name, price, qty: 1, image });
     }
-    localStorage.setItem("cart", JSON.stringify(cart));
+
+    localStorage.setItem(cartKey, JSON.stringify(cart));
     alert("장바구니에 담겼습니다 🛒");
 }
 
