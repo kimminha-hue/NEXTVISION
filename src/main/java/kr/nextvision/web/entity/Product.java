@@ -11,57 +11,58 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-
-
 @Entity
 @Table(name = "tb_product")
 @Getter
 @Setter
-public class Product{
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "p_idx")
-	private Integer id;
-	
-	@Column(name = "seller_idx", nullable = false)
-	private Integer sellerIdx;
-	
-	@Column(name = "p_name", nullable = false)
-	private String name; // DB의 p_name 연결
-	
-	@Column(name = "p_category")
-    private String category; // DB의 p_category 연결
+public class Product {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "p_idx")
+    private Integer id;
+
+    @Column(name = "seller_idx", nullable = false)
+    private Integer sellerIdx;
+
+    @Column(name = "p_name", nullable = false)
+    private String name;
+
+    @Column(name = "p_category")
+    private String category;
 
     @Column(name = "p_price")
-    private Integer price; // DB의 p_price 연결
+    private Integer price;
 
-    // RAG 성능을 위한 긴 텍스트
-    @Column(name = "p_desc", nullable = false ,columnDefinition = "TEXT")
-    private String description; // DB의 p_desc 연결
-    
+    // RAG용 설명 텍스트
+    @Column(name = "p_desc", nullable = false, columnDefinition = "TEXT")
+    private String description;
+
     @Column(name = "p_stock", nullable = false)
     private Integer stock;
-    
+
     @Column(name = "p_status", nullable = false)
     private String status = "COMMON";
-    
-    // 팀원이 만들어둔 상세 이미지 컬럼 3개 연결
+
+    // 이미지들
     @Column(name = "img1")
-    private String img1; // 메인 썸네일 역할
+    private String img1;
 
     @Column(name = "img2")
-    private String img2; // 상세 이미지 1
+    private String img2;
 
     @Column(name = "img3")
-    private String img3; // 상세 이미지 2
+    private String img3;
 
-    // 생성 일자 (보통 팀 프로젝트 DB에 필수로 들어갑니다)
+    // 👉 추가된 부분
+    @Column(name = "img4")
+    private String img4;
+
+    // 생성일
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
-    
+
+    // 👉 오타 수정 (updateAt → updatedAt)
     @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updateAt;
-	
-	
+    private LocalDateTime updatedAt;
 }
