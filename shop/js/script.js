@@ -411,7 +411,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const signupBtn = document.querySelector('a[href="signup.html"]');
     const nav = document.querySelector('.nav-links');
 
-    if (isLogin === "true") {
+    if (isLogin === "true" ) {
+        // 기존 버튼 숨기기
         if (loginBtn) loginBtn.style.display = "none";
         if (signupBtn) signupBtn.style.display = "none";
 
@@ -431,9 +432,13 @@ document.addEventListener("DOMContentLoaded", () => {
         cartLi.innerHTML = `<a href="cart.html">🛒장바구니</a>`;
 
         let adminLi = null;
+        let adminManageLi = null;
         if (user && user.role === "admin") {
             adminLi = document.createElement("li");
             adminLi.innerHTML = `<a href="admin_test.html">🛠 상품등록</a>`;
+
+            adminManageLi = document.createElement("li");
+            adminManageLi.innerHTML = `<a href="admin_products.html">📦 상품관리</a>`;
         }
 
         const logoutLi = document.createElement("li");
@@ -443,15 +448,17 @@ document.addEventListener("DOMContentLoaded", () => {
         const shopLi = shopLink ? shopLink.closest('li') : null;
 
         if (shopLi) {
-            nav.insertBefore(userLi, shopLi);    
-            nav.insertBefore(introLi, shopLi);   
-            nav.insertBefore(mypageLi, shopLi);  
-            nav.insertBefore(cartLi, shopLi);    
+            // 👉 원하는 순서대로 삽입
+            nav.insertBefore(userLi, shopLi);    // 김광훈님
+            nav.insertBefore(mypageLi, shopLi);  // 마이페이지
+            nav.insertBefore(cartLi, shopLi);    // 장바구니
             if (adminLi) nav.insertBefore(adminLi, shopLi);
-            nav.insertBefore(logoutLi, shopLi);  
+            if (adminManageLi) nav.insertBefore(adminManageLi, shopLi);
+            nav.insertBefore(logoutLi, shopLi);  // 로그아웃
         } else {
-            nav.append(userLi, introLi, mypageLi, cartLi);
+            nav.append(userLi, mypageLi, cartLi);
             if (adminLi) nav.append(adminLi);
+            if (adminManageLi) nav.append(adminManageLi);
             nav.append(logoutLi);
         }   
 
@@ -501,13 +508,15 @@ function zoomOut(){
 // 🔠 글씨 확대
 function increaseText(){
   fontSize += 10;
-  document.body.style.fontSize = fontSize + "%";
+  if (fontSize > 150) fontSize = 150;
+  document.documentElement.style.fontSize = fontSize + "%";
 }
 
 // 🔠 글씨 축소
 function decreaseText(){
   fontSize -= 10;
-  document.body.style.fontSize = fontSize + "%";
+  if (fontSize < 70) fontSize = 70; 
+  document.documentElement.style.fontSize = fontSize + "%";
 }
 
 // 🎨 고대비 모드

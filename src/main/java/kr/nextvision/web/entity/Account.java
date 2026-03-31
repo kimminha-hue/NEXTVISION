@@ -36,6 +36,12 @@ public class Account {
     @Column(name = "role", nullable = false, length = 30)
     private String role;
 
+    @Column(name = "login_fail_count")
+    private Integer loginFailCount = 0;
+
+    @Column(name = "lock_until")
+    private LocalDateTime lockUntil;
+    
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 }

@@ -15,7 +15,14 @@
 <body>
     <header class="site-header">
         <div class="container">
-            <h1 class="logo"><a href="index.html">AUDI MALL</a></h1>
+            <h1 class="logo">
+                <a href="index.html" style="display:flex; align-items:center; gap:10px; text-decoration:none;">
+                    <img src="../images/audiview.png" alt="AudiMall 로고" class="logo-img">
+                    <span class="logo-text">
+                        <span class="logo-audi">AUDI</span><span class="logo-view">MALL</span>
+                    </span>
+                </a>
+            </h1>
             <nav>
                 <ul class="nav-links">
                     <li><a href="index.html">쇼핑하기</a></li>
@@ -31,6 +38,7 @@
             <h2 class="signup-title">회원가입</h2>
 
             <!-- 🔥 form -->
+<<<<<<< HEAD
             <div class="form-group" style="margin-bottom: 25px; text-align: center;">
                 <label style="display: block; margin-bottom: 12px; font-weight: 600; color: #fff; font-size: 1.1rem;">가입 유형</label>
                 <div style="display: flex; gap: 30px; align-items: center; justify-content: center;">
@@ -42,6 +50,10 @@
                     </label>
                 </div>
             </div>
+=======
+            <form class="signup-form" onsubmit="return validateForm()" novalidate>
+                
+>>>>>>> 136c6f6e58a62a1fc79237e56bdd835857c86758
                 <!-- ✅ required + id 유지 -->
                 <input type="text" placeholder="이름" class="input-field" id="name" required>
                 <input type="text" placeholder="아이디" class="input-field" id="username" required>
