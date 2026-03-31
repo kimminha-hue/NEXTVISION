@@ -4,14 +4,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     let products = [];
     try {
-        // 1. 호성 님의 찐 백엔드 서버 주소로 요청을 보냅니다!
+        // 호성님의 스프링부트 DB 데이터 연동
         const response = await fetch('http://localhost:8088/avw/api/product/list');
         if (!response.ok) throw new Error('백엔드 서버 응답 오류');
         
-        // 2. 백엔드에서 받아온 날것의 데이터를 가져옵니다.
         const backendData = await response.json();
         
-        // 3. 프론트엔드 화면이 이해할 수 있는 이름표로 싹 바꿔줍니다. (데이터 매핑)
+        // 프론트엔드 UI와 백엔드 데이터 매핑 (둘의 장점 결합)
         products = backendData.map(item => ({
             id: item.id || item.p_idx, // 백엔드의 식별자 (엔티티 설정에 따라 id 또는 p_idx)
             name: item.name,           // 상품명
@@ -24,7 +23,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             detailImages: [item.img2, item.img3,item.img4].filter(Boolean)
         }));
 
-        console.log("백엔드에서 가져온 진짜 데이터:", products); // 확인용 콘솔 로그
+        console.log("백엔드에서 가져온 진짜 데이터:", products); 
         
     } catch (error) {
         console.error("데이터 연동 실패:", error);
@@ -33,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         else if (detailContainer) detailContainer.innerHTML = errMsg;
         return;
     }
- 
+
     // --- [1] Index Page Logic (메인 페이지) ---
     if (grid) {
         const renderProducts = (category) => {
@@ -75,20 +74,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // --- [2] Detail Page Logic (상세 페이지) ---
+    // --- [2] Detail Page Logic ---
     if (detailContainer) {
         const params = new URLSearchParams(window.location.search);
         const productId = params.get('id');
         const product = products.find(p => String(p.id) === String(productId));
-        // 🔥 여기부터 추가
         const category = params.get('category');
-
-        const breadcrumbCategory = document.getElementById('breadcrumb-category');
-
-        if (breadcrumbCategory && category) {
-            breadcrumbCategory.textContent = category;
-        }
-        // 🔥 여기까지 추가
 
         if (!product) {
             detailContainer.innerHTML = `
@@ -100,15 +91,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        document.title = `${product.name} | AURA`;
+        document.title = `${product.name} | NextVision`;
         
-        // 🚨 안전 장치: 요소가 있을 때만 텍스트 넣기
+        const breadcrumbCategory = document.getElementById('breadcrumb-category');
+        if (breadcrumbCategory) breadcrumbCategory.textContent = category;
         const breadcrumbCurrent = document.getElementById('breadcrumb-current');
         if (breadcrumbCurrent) breadcrumbCurrent.textContent = product.name;
 
         const ingredientsList = product.ingredients.map(i => `<li>${i}</li>`).join('');
 
-        // 클래스 기반의 깨끗한 HTML 구조
+        // 프론트엔드의 세련된 HTML 구조 유지
         detailContainer.innerHTML = `
             <div class="product-summary">
                 <div class="detail-image-wrapper">
@@ -120,7 +112,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <h1 class="detail-name">${product.name}</h1>
                         <p class="detail-price">₩${product.price.toLocaleString()}</p>
 
-                        <!-- 평균 별점 + 대표 리뷰 -->
                         <div class="review-summary">
                             <div class="product-rating"></div>
                             <div class="highlight-review"></div>
@@ -132,14 +123,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 <span class="voice-icon">🔊</span>
                                 <span class="voice-text">상품 음성 설명 듣기</span>
                             </button>
-
                         </div>
-                    
                     </div>
 
-
                     <div class="purchase-actions actions-compact">
-                    <!-- ⭐ 여기 사이즈 들어감 -->
                         ${product.category === "의류" ? `
                         <div class="size-options">
                             <span class="size-label">사이즈 선택:</span>
@@ -159,20 +146,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 <button type="button" class="qty-ctrl-btn" onclick="const input=document.getElementById('qty'); if(input.value<99) { input.value++; document.getElementById('total-price').innerText='₩'+(${product.price} * input.value).toLocaleString(); }">+</button>
                             </div>
                         </div>
-
-                        <div class="total-price-wrapper">
-                            <span>총 상품 금액</span>
-                            <span id="total-price" class="total-price-value">₩${product.price.toLocaleString()}</span>
-                        </div>
-
-                        <div class="btn-group">
-                            <button class="btn btn-outline" onclick="addToCart('${product.name}', ${product.price}, '${product.image}')">장바구니</button>
-                             <button class="btn btn-primary" id="buy-btn">구매하기</button>
-                        </div>
                     </div>
                 </div>
             </div>
-
             <div class="product-long-description">
                 <section class="detail-section" >
                     <h2 class="section-title">상품 상세 설명</h2>
@@ -187,24 +163,59 @@ document.addEventListener('DOMContentLoaded', async () => {
                 `).join('') : ''}
             </div>
         `;
+        // ==========================================
+        // 🔥 여기부터 복사해서 붙여넣으세요!
+        // ==========================================
+        async function fetchReviews() {
+            try {
+                // p_idx에 현재 상품의 ID를 넣어서 호출합니다.
+                const reviewRes = await fetch(`http://localhost:8088/avw/api/review/list?p_idx=${product.id}`);
+                if (!reviewRes.ok) throw new Error("리뷰 데이터를 불러올 수 없습니다.");
+                
+                const reviews = await reviewRes.json();
+                
+                // 위에서 만든 '빈 바구니'들을 찾아옵니다.
+                const ratingContainer = document.querySelector('.product-rating');
+                const reviewContainer = document.querySelector('.highlight-review');
 
-        // 🚨 [매우 중요] innerHTML 주입 바로 다음에 클릭 이벤트를 연결해야 작동합니다!
+                if (reviews.length > 0) {
+                    // 리뷰가 있다면 별점 계산해서 넣기
+                    const avgRating = (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1);
+                    if (ratingContainer) {
+                        ratingContainer.innerHTML = `<span style="color:#FFD700; font-size: 1.2rem;">★</span> <strong>${avgRating}</strong> <span style="font-size: 0.9em; color: #ccc;">(${reviews.length}개의 리뷰)</span>`;
+                    }
+                    if (reviewContainer) {
+                        reviewContainer.innerHTML = `<p style="font-style: italic; margin-top: 10px;">"${reviews[0].revContent}"</p>`;
+                    }
+                } else {
+                    // 리뷰가 없을 때 문구
+                    if (ratingContainer) ratingContainer.innerHTML = "<span style='color: #888;'>아직 별점이 없습니다.</span>";
+                    if (reviewContainer) reviewContainer.innerHTML = "<span style='color: #888;'>대표 리뷰가 없습니다.</span>";
+                }
+            } catch (error) {
+                console.error("프론트엔드 리뷰 연동 에러:", error);
+            }
+        }
+        fetchReviews(); // 만든 함수를 바로 실행!
+        // ==========================================
+
+        // 이후 기존 코드 (voiceBtn 등...) 계속...
+
+        // 🔥 호성님의 AI 음성 듣기 버튼 클릭 이벤트 연결
         const voiceBtn = document.getElementById('product-voice-btn');
         if (voiceBtn) {
             voiceBtn.addEventListener('click', () => {
-                // 음성 설명 함수 실행 (이전에 만든 함수 이름 확인 필요)
-                if (typeof speakProductDescription === 'function') {
-                    speakProductDescription();
-                } else {
-                    console.log("음성 출력 함수를 찾을 수 없습니다.");
-                }
+                if (!window.speechSynthesis) return;
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(product.description);
+                utterance.lang = 'ko-KR';
+                window.speechSynthesis.speak(utterance);
             });
         }
 
-        // ⭐ 사이즈 선택 이벤트
+        // 사이즈 선택 이벤트
         if (product.category === "의류") {
             const sizeButtons = document.querySelectorAll(".size-btn");
-
             sizeButtons.forEach(btn => {
                 btn.addEventListener("click", () => {
                     sizeButtons.forEach(b => b.classList.remove("active"));
@@ -213,93 +224,77 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
 
-        // ⭐ 구매 버튼 (사이즈 체크 포함)
+        // 구매 버튼 이벤트
         const buyBtn = document.getElementById("buy-btn");
-
         if (buyBtn) {
             buyBtn.addEventListener("click", () => {
                 const qty = document.getElementById('qty').value;
-
                 let selectedSize = "";
 
-                // 의류일 경우 사이즈 체크
                 if (product.category === "의류") {
                     const activeBtn = document.querySelector(".size-options .size-btn.active");
-
                     if (!activeBtn) {
                         alert("사이즈를 선택해주세요");
                         return;
                     }
-
-                    selectedSize = activeBtn.textContent; // ✅ 정상
+                    selectedSize = activeBtn.textContent; 
                 }
 
                 const totalPrice = product.price * qty;
-
                 location.href = `checkout.html?price=${totalPrice}&name=${encodeURIComponent(product.name)}&qty=${qty}&size=${selectedSize}&image=${product.image}`;
             });
         }
 
-            // 데이터 로드 후 product-detail.js의 함수를 이용해 별점 및 리뷰 렌더링 업데이트
-            if (typeof window.updateProductReviews === 'function') {
-                window.updateProductReviews();
-            }
-
+        if (typeof window.updateProductReviews === 'function') {
+            window.updateProductReviews();
+        }
     }
 });
 
-// ===== 🔥 챗봇 기능 (진짜 AI 서버 연동 버전) =====
-document.addEventListener('DOMContentLoaded', async () => {
-    // 1. DOM 요소 가져오기
+// ===== 🔥 챗봇 기능 (진짜 AI 서버 연동 및 통합 버전) =====
+document.addEventListener('DOMContentLoaded', () => {
     const toggleBtn = document.getElementById("chatbot-toggle");
     const chatBox = document.getElementById("chatbot-box");
-    const closeBtn = document.getElementById("chat-close");
-    
-    if (!toggleBtn || !chatBox) return; // 요소가 없으면 안전하게 중단
-
-    const sendBtn = document.getElementById("send-btn");
     const input = document.getElementById("chat-input");
+    const sendBtn = document.getElementById("send-btn"); 
     const messages = document.getElementById("chat-messages");
     const voiceBtn = document.getElementById("voice-btn"); 
     const fileInput = document.getElementById("chat-file-input"); 
-    // ✅ 여기 추가!!
-const imageBtn = document.getElementById("image-btn");
+    const closeBtn = document.querySelector(".chatbot-close-btn"); // closeBtn 변수 추가
+    const imageBtn = document.getElementById("image-btn");
 
-if (imageBtn && fileInput) {
-  imageBtn.addEventListener("click", () => {
-    fileInput.click();
-  });
-}
-    // 대화 세션 관리
-    let isChatting = true; // 🚨 사진 없이도 바로 질문 가능하도록 무조건 true로 변경!
+    if (imageBtn && fileInput) {
+        imageBtn.addEventListener("click", () => {
+            fileInput.click();
+        });
+    }
+
+    let isChatting = true; 
     const sessionId = 'session_' + Date.now();
-    let userType = 'blind'; // 기본값: 시각장애인 모드
-    
-    const params = new URLSearchParams(window.location.search);
-    const currentProductId = params.get('id') || 'ITEM_001'; 
-    const currentCategory = '의류'; 
+    let userType = 'blind'; 
 
-    // 📢 TTS (읽어주기) 함수 - 위쪽으로 이동시켜서 어디서든 쓸 수 있게 배치
+    const params = new URLSearchParams(window.location.search);
+    const isDetailPage = window.location.pathname.includes('product.html');
+    
+    // 🌟 메인 페이지면 'main', 상세 페이지면 해당 상품 id를 보냄
+    const currentProductId = isDetailPage ? params.get('id') : 'main'; 
+    const currentCategory = isDetailPage ? params.get('category') : '전체';
+
     function readAloud(text) {
-        if (!window.speechSynthesis) return; 
-        if (window.speechSynthesis.isSpeaking) window.speechSynthesis.cancel();
-        if (userType !== 'blind') return; // 일반 모드일 때는 읽어주지 않음
+        if (!window.speechSynthesis) return;
+        window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'ko-KR';
         window.speechSynthesis.speak(utterance);
     }
 
-    // 화면에 말풍선 그리기 함수
     function addMessage(type, textOrImg) {
-        if (!messages) return;
         const div = document.createElement("div");
-        div.classList.add("chat-message", type); 
-        
+        div.classList.add("chat-message", type);
         if (type === 'user-img') {
             const img = document.createElement('img');
             img.src = textOrImg;
             img.style.maxWidth = '100%';
-            img.style.borderRadius = '8px';
             div.appendChild(img);
         } else {
             div.textContent = textOrImg;
@@ -308,7 +303,7 @@ if (imageBtn && fileInput) {
         messages.scrollTop = messages.scrollHeight;
     }
 
-    // ================= 모드 변경 로직 =================
+    // 모드 변경 로직
     const modeBlindBtn = document.getElementById("mode-blind");
     const modeNormalBtn = document.getElementById("mode-normal");
 
@@ -327,29 +322,26 @@ if (imageBtn && fileInput) {
             modeNormalBtn.style.background = '#eee'; 
             modeBlindBtn.style.background = 'white'; 
             addMessage('bot', '일반 사용자 모드로 전환되었습니다. 핵심 정보 위주로 안내합니다.');
-            if (window.speechSynthesis) window.speechSynthesis.cancel(); // 말하던 것 즉시 멈춤
+            if (window.speechSynthesis) window.speechSynthesis.cancel(); 
         });
     }
 
-    // ✅ UI 토글 로직 (창 열 때 상황에 맞춰 자동 인사!)
+    // UI 토글 (호성님 첫 인사 로직 결합)
     toggleBtn.addEventListener("click", () => {
         chatBox.classList.toggle("hidden");
         chatBox.style.zIndex = "9999"; 
         
-        // 창이 닫혀있다가 처음 열렸고, 대화 기록이 없을 때만 인사
         if (!chatBox.classList.contains("hidden") && messages.children.length === 0) {
             const isDetailPage = window.location.pathname.includes('product.html');
             
             if (isDetailPage) {
-                // 상세 페이지면 상품명을 화면에서 읽어와서 맞춤형 인사
                 const productNameElem = document.querySelector('.detail-name');
                 const productName = productNameElem ? productNameElem.innerText : '이 상품';
-                const greeting = `현재 보고 계신 상품은 ${productName}입니다. 무엇이든 물어보세요.`;
+                const greeting = `현재 보고 계신 상품은 ${productName}입니다. 무엇이든 물어보시거나 사진을 올려주세요.`;
                 addMessage('bot', greeting);
                 readAloud(greeting);
             } else {
-                // 메인 페이지면 기본 인사
-                const welcomeMsg = "안녕하세요! AUDIVIEW 챗봇입니다. 원하시는 상품을 말씀하시거나 사진을 올려주세요.";
+                const welcomeMsg = "안녕하세요! NextVision 챗봇입니다. 원하시는 상품을 말씀하시거나 사진을 올려주세요.";
                 addMessage('bot', welcomeMsg);
                 readAloud(welcomeMsg);
             }
@@ -359,102 +351,121 @@ if (imageBtn && fileInput) {
     if (closeBtn) {
         closeBtn.addEventListener("click", () => {
             chatBox.classList.add("hidden");
-            if (window.speechSynthesis) window.speechSynthesis.cancel(); // 창 닫으면 조용히
+            if (window.speechSynthesis) window.speechSynthesis.cancel(); 
         });
     }
 
-    // 📷 1단계: 사진 업로드 시 서버로 발송
-    if(fileInput) {
-        fileInput.addEventListener('change', async (event) => {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = (e) => addMessage('user-img', e.target.result);
-            reader.readAsDataURL(file);
-
-            addMessage('bot', '사진을 분석 중입니다...');
-
-            const formData = new FormData();
-            formData.append('session_id', sessionId);
-            formData.append('category', currentCategory);
-            formData.append('user_type', userType);
-            formData.append('product_id', currentProductId); 
-            formData.append('image', file);
-
-            try {
-                const response = await fetch('http://223.130.161.162:8000/api/chat/start', {
-                    method: 'POST',
-                    body: formData
-                });
-                if (!response.ok) throw new Error("서버 응답 오류");
-                const data = await response.json();
-                
-                addMessage('bot', data.response);
-                readAloud(data.response); 
-            } catch (error) {
-                console.error("챗봇 통신 에러:", error);
-                addMessage('bot', '서버와 연결할 수 없습니다. 파이썬 서버가 켜져 있는지 확인해 주세요.');
-            }
-        });
-    }
-
-    // ⌨️ 2단계: 텍스트 발송 로직 (🚨 사진 업로드 강제 조건 삭제 완료)
+    // ⌨️ 텍스트 전송 로직
     async function sendQuestionToServer() {
-        if (!input || !sendBtn) return;
-        
         const text = input.value.trim();
         if (!text) return;
 
-        addMessage("user", text); 
-        input.value = "";
+        addMessage("user", text);
+        input.value = ""; 
+
+        const formData = new FormData();
+        formData.append('session_id', sessionId);
+        formData.append('category', currentCategory);
+        formData.append('user_type', userType);
+        formData.append('product_id', currentProductId);
+        formData.append('user_message', text); 
 
         try {
-
             const response = await fetch('http://localhost:8000/api/chat/ask', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ session_id: sessionId, user_message: text })
+                body: formData
             });
             
             if (!response.ok) throw new Error("서버 응답 오류");
-            
             const data = await response.json();
-            addMessage('bot', data.response);
-            readAloud(data.response); 
+            
+            addMessage('bot', data.result);
+            readAloud(data.result);
         } catch (error) {
             console.error("질문 전송 에러:", error);
             addMessage('bot', '답변을 받아오는 데 실패했습니다.');
         }
     }
 
-    if (sendBtn && input) {
+    if (sendBtn) {
         sendBtn.addEventListener("click", sendQuestionToServer);
+    }
+    if (input) {
         input.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") sendQuestionToServer();
+            if (e.key === "Enter") {
+                e.preventDefault(); 
+                sendQuestionToServer();
+            }
         });
     }
 
-// 🎤 3단계: STT 로직
-    if (window.SpeechRecognition || window.webkitSpeechRecognition) {
-        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-        recognition.lang = "ko-KR";
+    // 📷 사진 업로드 로직
+    if (fileInput) {
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (ev) => addMessage('user-img', ev.target.result);
+            reader.readAsDataURL(file);
 
-        if (voiceBtn) {
-            voiceBtn.addEventListener("click", () => {
-                recognition.start();
-                addMessage('bot', '🎙️ (말씀해 주세요...)');
-            });
-        }
+            const formData = new FormData();
+            formData.append('session_id', sessionId);
+            formData.append('category', currentCategory);
+            formData.append('user_type', userType);
+            formData.append('product_id', currentProductId);
+            formData.append('image', file);
 
-        recognition.onresult = (event) => {
-            const text = event.results[0][0].transcript;
-            if (input) input.value = text;
-            sendQuestionToServer(); 
-        };
+            addMessage('bot', '사진을 분석 중입니다...');
+            try {
+                // 호성님의 로컬 파이썬 AI 서버 주소 사용
+                const res = await fetch('http://localhost:8000/api/chat/ask', { method: 'POST', body: formData });
+                const data = await res.json();
+                addMessage('bot', data.result);
+                readAloud(data.result);
+            } catch (err) { 
+                addMessage('bot', '서버 연결 실패. 파이썬 서버가 켜져 있는지 확인해주세요.'); 
+            }
+        });
     }
-});
 
+    // 🎤 STT 로직
+    // 🎤 STT 로직 (음성 인식 완벽 적용)
+    if (window.SpeechRecognition || window.webkitSpeechRecognition) {
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = "ko-KR";
+        recognition.interimResults = false; // 말이 끝날 때까지 기다렸다가 한 번에 텍스트로 변환
+
+        if (voiceBtn) {
+            // 1. 마이크 버튼을 눌렀을 때
+            voiceBtn.addEventListener("click", () => {
+                recognition.start();
+                input.placeholder = "🎙️ 듣고 있습니다..."; // 입력창 힌트 변경
+                addMessage('bot', '🎙️ (말씀해 주세요...)');
+            });
+
+            // 2. 🌟 핵심: 음성 인식이 완료되어 텍스트가 나왔을 때
+            recognition.addEventListener("result", (e) => {
+                const transcript = e.results[0][0].transcript; // 인식된 텍스트 추출
+                input.value = transcript; // 채팅 입력창에 텍스트 쏙 넣기
+                
+                // 시각장애인 플랫폼이므로, 텍스트 변환 후 자동으로 전송버튼을 눌러주면 훨씬 편합니다!
+                sendQuestionToServer(); 
+            });
+
+            // 3. 마이크가 꺼졌을 때 (정상 종료든 에러든) 원래대로 복구
+            recognition.addEventListener("end", () => {
+                input.placeholder = "상품에 대해 자유롭게 질문해 주세요";
+            });
+
+            // 4. 혹시라도 에러가 났을 때
+            recognition.addEventListener("error", (e) => {
+                console.error("음성 인식 에러:", e.error);
+                addMessage('bot', '음성을 인식하지 못했습니다. 마이크 권한을 확인하고 다시 시도해 주세요.');
+            });
+        }
+    }
+});
 
 
 

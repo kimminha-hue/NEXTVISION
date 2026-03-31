@@ -47,16 +47,32 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
     }
 
-    // 통합 리뷰 저장소('all_reviews') 사용 함수
-    function getReviews() {
-        return JSON.parse(localStorage.getItem("all_reviews")) || [];
-    }
-    function saveReviews(reviews) {
-        localStorage.setItem("all_reviews", JSON.stringify(reviews));
+    // =========================================================================
+    // 🔥 1. 백엔드(스프링부트)에서 찐 리뷰 데이터를 가져오는 함수 (비동기)
+    // =========================================================================
+    async function getReviews() {
+        try {
+            const res = await fetch(`http://localhost:8088/avw/api/review/list?p_idx=${productId}`);
+            if (!res.ok) throw new Error("리뷰 API 호출 실패");
+            const dbReviews = await res.json();
+            
+            return dbReviews.map(r => ({
+                id: r.revIdx,
+                productId: String(r.pIdx),
+                rating: r.rating || 5,
+                content: r.revContent,
+                user: "구매자", // 아직 DB에 유저 이름이 없으므로 통일
+                date: r.createdAt ? new Date(r.createdAt).toLocaleDateString() : "최근",
+                images: [r.revImg1, r.revImg2, r.revImg3].filter(Boolean)
+            }));
+        } catch (error) {
+            console.error("DB 리뷰 로드 실패:", error);
+            return [];
+        }
     }
 
     // =========================
-    // 별점 선택
+    // 별점 선택 및 이미지 업로드 UI (프론트 팀원 로직 유지)
     // =========================
     let selectedRating = 0;
     const stars = document.querySelectorAll('#review-rating span');
@@ -74,213 +90,109 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     });
 
-    // =========================
-    // 📷 이미지 업로드
-    // =========================
     const imageInput = document.getElementById("review-image");
-
-    imageDataList = [];
-
-    imageInput.addEventListener("change", () => {
-        const files = Array.from(imageInput.files);
-        const previewWrap = document.getElementById("preview-wrap");
-
-        imageDataList = [];
-        previewWrap.innerHTML = "";
-
-        files.forEach(file => {
-            const reader = new FileReader();
-
-            reader.onload = (e) => {
-                imageDataList.push(e.target.result);
-
-                const img = document.createElement("img");
-                img.src = e.target.result;
-                img.style.width = "60px";
-                img.style.marginRight = "5px";
-
-                previewWrap.appendChild(img);
-            };
-
-            reader.readAsDataURL(file);
+    let imageDataList = [];
+    if(imageInput){
+        imageInput.addEventListener("change", () => {
+            const files = Array.from(imageInput.files);
+            const previewWrap = document.getElementById("preview-wrap");
+            imageDataList = [];
+            previewWrap.innerHTML = "";
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    imageDataList.push(e.target.result);
+                    const img = document.createElement("img");
+                    img.src = e.target.result;
+                    img.style.width = "60px";
+                    img.style.marginRight = "5px";
+                    previewWrap.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
         });
-    });
-
-
-    // =========================
-    // 평균 별점 계산 (통합 저장소 기준)
-    // =========================
-    function calculateAverageRating() {
-        const reviews = getReviews().filter(r => String(r.productId) === String(productId));
-        if(reviews.length === 0) return 0;
-        const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
-        return (sum / reviews.length).toFixed(1);
     }
 
-    function renderStarsHTML(avgRating) {
+    // =========================================================================
+    // 🔥 2. 상/하단 리뷰 UI를 한 번에 렌더링하는 통합 함수
+    // =========================================================================
+    function renderAverageRating(reviews) {
+        let avgRating = 0;
+        if(reviews.length > 0) {
+            const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
+            avgRating = (sum / reviews.length).toFixed(1);
+        }
+
         const fullStars = Math.floor(avgRating);
         const halfStar = avgRating - fullStars >= 0.5 ? 1 : 0;
         const emptyStars = 5 - fullStars - halfStar;
-        return '★'.repeat(fullStars) + (halfStar ? '⯨' : '') + '☆'.repeat(emptyStars);
-    }
+        const starsHTML = '★'.repeat(fullStars) + (halfStar ? '⯨' : '') + '☆'.repeat(emptyStars);
 
-    function renderAverageRating() {
-        const avgRating = calculateAverageRating();
         const containers = document.querySelectorAll('.product-rating');
         containers.forEach(c => {
-            c.innerHTML = avgRating == 0 ? "아직 별점이 없습니다." : `${renderStarsHTML(avgRating)} (평균: ${avgRating})`;
+            c.innerHTML = avgRating == 0 ? "아직 별점이 없습니다." : `${starsHTML} <strong style="color:#333;">${avgRating}</strong> <span style="font-size: 0.9em; color: #ccc;">(${reviews.length}개의 리뷰)</span>`;
         });
     }
 
-    // =========================
-    // 대표 리뷰 (통합 저장소 기준)
-    // =========================
-    function renderHighlightReview() {
-        const reviews = getReviews().filter(r => String(r.productId) === String(productId));
+    function renderHighlightReview(reviews) {
         const containers = document.querySelectorAll('.highlight-review');
         containers.forEach(c => {
             if(reviews.length === 0){
                 c.innerHTML = "<p>대표 리뷰가 없습니다.</p>";
                 return;
             }
-            const best = reviews.reduce((best, r) => {
-                if(r.rating > best.rating) return r;
-                if(r.rating === best.rating && r.id > best.id) return r;
-                return best;
-            }, reviews[0]);
+            const best = reviews.reduce((best, r) => (r.rating > best.rating ? r : best), reviews[0]);
             const starsHtml = Array.from({length:5}, (_, i) => `<span class="review-star ${i < best.rating ? 'active' : ''}">★</span>`).join('');
-            c.innerHTML = `<div class="review-header"><strong>${best.user || best.name}</strong> ${starsHtml}</div><p>${best.content}</p>`;
+            c.innerHTML = `<div class="review-header"><strong>${best.user}</strong> ${starsHtml}</div><p style="font-style: italic;">"${best.content}"</p>`;
         });
     }
 
-    // =========================
-    // 리뷰 렌더링 (통합 저장소 기준)
-    // =========================
-    function renderReviews() {
+    function renderReviews(reviews) {
         const list = document.querySelector('.review-list');
         if(!list) return;
-        
-        // 현재 상품 아이디와 일치하는 리뷰만 필터링
-        const reviews = getReviews().filter(r => String(r.productId) === String(productId));
-        list.innerHTML = "";
 
+        list.innerHTML = "";
         if(reviews.length === 0){
-            list.innerHTML = "<p>아직 리뷰가 없습니다.</p>";
+            list.innerHTML = "<p style='color:#888; padding: 20px 0;'>아직 작성된 리뷰가 없습니다.</p>";
             return;
         }
 
-        reviews.sort((a,b) => b.id - a.id);
         reviews.forEach(r => {
             const div = document.createElement('div');
             div.className = "review-item";
-
-            const imagesHTML = (r.images || []).map(img => 
-                `<img src="${img}" class="review-img">`
-            ).join('');
-
+            const imagesHTML = (r.images || []).map(img => `<img src="${img}" class="review-img">`).join('');
             const starsHtml = Array.from({length:5}, (_, i) => `<span class="review-star ${i < r.rating ? 'active' : ''}">★</span>`).join('');
             
-            // 본인 확인 (이름 또는 이메일)
-            let deleteBtn = "";
-            if (isLogin && userEmail && r.userEmail === userEmail) {
-                deleteBtn = `<button class="delete-review" data-id="${r.id}">삭제</button>`;
-            }
-
             div.innerHTML = `
                 <div class="review-header">
-                    <strong>${r.user || r.name}</strong> ${starsHtml} ${deleteBtn}
+                    <strong>${r.user}</strong> ${starsHtml}
                 </div>
                 <p>${r.content}</p>
-
-                <div class="review-images">
-                    ${imagesHTML}
-                </div>
-
-                <small style="color:#999;">${r.date || ""}</small>
+                <div class="review-images">${imagesHTML}</div>
+                <small style="color:#999;">${r.date}</small>
             `;
             list.appendChild(div);
         });
-
-        // 삭제 버튼 이벤트 연결
-        document.querySelectorAll('.delete-review').forEach(btn => {
-            btn.addEventListener('click', () => {
-                if (!isLogin || !userEmail) {
-                    alert("로그인이 필요합니다.");
-                    return;
-                }
-
-                const id = Number(btn.dataset.id);
-                const reviews = getReviews();
-                const review = reviews.find(r => r.id === id);
-
-                // ✅ 본인 리뷰인지 한번 더 확인
-                if (review && review.userEmail !== userEmail) {
-                    alert("본인 리뷰만 삭제할 수 있습니다.");
-                    return;
-                }
-
-                if(confirm("리뷰를 삭제하시겠습니까?")) {
-                    const updated = reviews.filter(r => r.id !== id);
-                    saveReviews(updated);
-                    window.updateProductReviews();
-                }
-            });
-        });
     }
 
-
-    // =========================
-    // 리뷰 작성 (통합 저장소로 저장)
-    // =========================
+    // =========================================================================
+    // 🔥 3. 백엔드 등록/삭제 API가 만들어지기 전 임시 알림 처리
+    // =========================================================================
     const submitBtn = document.getElementById('submit-review');
     if(submitBtn){
         submitBtn.addEventListener('click', () => {
-            if (!isLogin) {
-                alert("리뷰 작성은 회원만 가능합니다. 로그인해주세요.");
-                return;
-            }
-            const content = document.getElementById('review-content').value.trim();
-            if(!content){ alert("리뷰를 입력하세요"); return; }
-            if(selectedRating === 0){ alert("별점을 선택하세요"); return; }
-
-            const allReviews = getReviews();
-            
-            const newReview = {
-                id: Date.now(),
-                productId: productId,
-                product: document.getElementById('product-name')?.textContent || product.name, 
-                rating: selectedRating,
-                content: content,
-                user: userName,
-                userEmail: userEmail,
-                date: new Date().toLocaleDateString(),
-                images: imageDataList
-
-            };
-
-            allReviews.push(newReview);
-            saveReviews(allReviews);
-
-            // 입력창 초기화
-            document.getElementById('review-content').value = "";
-            selectedRating = 0;
-            stars.forEach(s => s.classList.remove('active'));
-
-            imageData = [];
-            if(imageInput) imageInput.value = "";
-
-            window.updateProductReviews();
-            alert("리뷰가 등록되었습니다!");
+            alert("리뷰 조회가 DB와 성공적으로 연동되었습니다! (작성 및 삭제 기능은 추후 백엔드 API 추가 시 연동 예정입니다.)");
         });
     }
 
-    // =========================
-    // 전역 함수 및 초기화
-    // =========================
-    window.updateProductReviews = function() {
-        renderReviews();
-        renderAverageRating();
-        renderHighlightReview();
+    // =========================================================================
+    // 🔥 4. 최종 실행 (DB에서 한 번만 가져와서 상,하단에 싹 뿌리기)
+    // =========================================================================
+    window.updateProductReviews = async function() {
+        const allReviews = await getReviews(); // DB에서 딱 한 번 호출!
+        renderReviews(allReviews);
+        renderAverageRating(allReviews);
+        renderHighlightReview(allReviews);
     };
 
     window.updateProductReviews();
