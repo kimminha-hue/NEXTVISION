@@ -135,23 +135,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     const chatBox = document.getElementById("chatbot-box");
     const closeBtn = document.getElementById("chat-close");
     
-    if (!toggleBtn || !chatBox) return; // 요소가 없으면 안전하게 중단
+    if (!toggleBtn || !chatBox) return;
 
     const sendBtn = document.getElementById("send-btn");
     const input = document.getElementById("chat-input");
     const messages = document.getElementById("chat-messages");
     const voiceBtn = document.getElementById("voice-btn"); 
     const fileInput = document.getElementById("chat-file-input"); 
-    // ✅ 여기 추가!!
-const imageBtn = document.getElementById("image-btn");
+    const imageBtn = document.getElementById("image-btn");
 
-if (imageBtn && fileInput) {
-  imageBtn.addEventListener("click", () => {
-    fileInput.click();
-  });
-}
+    if (imageBtn && fileInput) {
+        imageBtn.addEventListener("click", () => {
+            fileInput.click();
+        });
+    }
+
     // 대화 세션 관리
-    let isChatting = true; // 🚨 사진 없이도 바로 질문 가능하도록 무조건 true로 변경!
+    // [수정됨] 사용하지 않는 isChatting 변수 삭제
     const sessionId = 'session_' + Date.now();
     let userType = 'blind'; // 기본값: 시각장애인 모드
     
@@ -159,11 +159,11 @@ if (imageBtn && fileInput) {
     const currentProductId = params.get('id') || 'ITEM_001'; 
     const currentCategory = '의류'; 
 
-    // 📢 TTS (읽어주기) 함수 - 위쪽으로 이동시켜서 어디서든 쓸 수 있게 배치
+    // 📢 TTS (읽어주기) 함수
     function readAloud(text) {
         if (!window.speechSynthesis) return; 
         if (window.speechSynthesis.isSpeaking) window.speechSynthesis.cancel();
-        if (userType !== 'blind') return; // 일반 모드일 때는 읽어주지 않음
+        if (userType !== 'blind') return; 
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'ko-KR';
         window.speechSynthesis.speak(utterance);
@@ -187,6 +187,10 @@ if (imageBtn && fileInput) {
         messages.appendChild(div);
         messages.scrollTop = messages.scrollHeight;
     }
+    function botReply(text) {
+    addMessage('bot', text);
+    readAloud(text);
+}
 
     // ================= 모드 변경 로직 =================
     const modeBlindBtn = document.getElementById("mode-blind");
@@ -198,8 +202,7 @@ if (imageBtn && fileInput) {
             modeBlindBtn.style.background = '#eee'; 
             modeNormalBtn.style.background = 'white'; 
             const msg = '시각장애인 모드로 전환되었습니다. 상세한 음성 묘사를 제공합니다.';
-            addMessage('bot', msg);
-            readAloud(msg);
+            botReply(msg);
         });
 
         modeNormalBtn.addEventListener("click", () => {
@@ -207,31 +210,26 @@ if (imageBtn && fileInput) {
             modeNormalBtn.style.background = '#eee'; 
             modeBlindBtn.style.background = 'white'; 
             addMessage('bot', '일반 사용자 모드로 전환되었습니다. 핵심 정보 위주로 안내합니다.');
-            if (window.speechSynthesis) window.speechSynthesis.cancel(); // 말하던 것 즉시 멈춤
+            if (window.speechSynthesis) window.speechSynthesis.cancel(); 
         });
     }
 
-    // ✅ UI 토글 로직 (창 열 때 상황에 맞춰 자동 인사!)
+    // ✅ UI 토글 로직
     toggleBtn.addEventListener("click", () => {
         chatBox.classList.toggle("hidden");
-        chatBox.style.zIndex = "9999"; 
+        // [수정됨] 매번 클릭할 때마다 불필요하게 스타일을 덮어씌우는 로직 삭제 (CSS에서 처리 권장)
         
-        // 창이 닫혀있다가 처음 열렸고, 대화 기록이 없을 때만 인사
         if (!chatBox.classList.contains("hidden") && messages.children.length === 0) {
             const isDetailPage = window.location.pathname.includes('product.html');
             
             if (isDetailPage) {
-                // 상세 페이지면 상품명을 화면에서 읽어와서 맞춤형 인사
                 const productNameElem = document.querySelector('.detail-name');
                 const productName = productNameElem ? productNameElem.innerText : '이 상품';
                 const greeting = `현재 보고 계신 상품은 ${productName}입니다. 무엇이든 물어보세요.`;
-                addMessage('bot', greeting);
-                readAloud(greeting);
+                botReply(greeting);
             } else {
-                // 메인 페이지면 기본 인사
                 const welcomeMsg = "안녕하세요! AUDIVIEW 챗봇입니다. 원하시는 상품을 말씀하시거나 사진을 올려주세요.";
-                addMessage('bot', welcomeMsg);
-                readAloud(welcomeMsg);
+                botReply(welcomeMsg);
             }
         }
     });
@@ -239,7 +237,7 @@ if (imageBtn && fileInput) {
     if (closeBtn) {
         closeBtn.addEventListener("click", () => {
             chatBox.classList.add("hidden");
-            if (window.speechSynthesis) window.speechSynthesis.cancel(); // 창 닫으면 조용히
+            if (window.speechSynthesis) window.speechSynthesis.cancel(); 
         });
     }
 
@@ -263,6 +261,7 @@ if (imageBtn && fileInput) {
             formData.append('image', file);
 
             try {
+                // [수정됨] API 서버 주소 확인 (텍스트 전송과 동일한 서버인지 확인 필요)
                 const response = await fetch('http://223.130.161.162:8000/api/chat/start', {
                     method: 'POST',
                     body: formData
@@ -270,18 +269,20 @@ if (imageBtn && fileInput) {
                 if (!response.ok) throw new Error("서버 응답 오류");
                 const data = await response.json();
                 
-                addMessage('bot', data.response);
-                readAloud(data.response); 
+                botReply(data.response); 
             } catch (error) {
                 console.error("챗봇 통신 에러:", error);
                 addMessage('bot', '서버와 연결할 수 없습니다. 파이썬 서버가 켜져 있는지 확인해 주세요.');
+            } finally {
+                // [추가됨] 같은 사진을 연속으로 올릴 수 있도록 input 초기화
+                event.target.value = '';
             }
         });
     }
 
-    // ⌨️ 2단계: 텍스트 발송 로직 (🚨 사진 업로드 강제 조건 삭제 완료)
+    // ⌨️ 2단계: 텍스트 발송 로직
     async function sendQuestionToServer() {
-        if (!input || !sendBtn) return;
+        if (!input) return;
         
         const text = input.value.trim();
         if (!text) return;
@@ -290,8 +291,8 @@ if (imageBtn && fileInput) {
         input.value = "";
 
         try {
-
-            const response = await fetch('http://localhost:8000/api/chat/ask', {
+            // [수정됨] 사진 업로드 API와 서버 주소(IP) 일치화 (localhost -> 실제 IP)
+            const response = await fetch('http://223.130.161.162:8000/api/chat/ask', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ session_id: sessionId, user_message: text })
@@ -300,8 +301,7 @@ if (imageBtn && fileInput) {
             if (!response.ok) throw new Error("서버 응답 오류");
             
             const data = await response.json();
-            addMessage('bot', data.response);
-            readAloud(data.response); 
+            botReply(data.response); 
         } catch (error) {
             console.error("질문 전송 에러:", error);
             addMessage('bot', '답변을 받아오는 데 실패했습니다.');
@@ -310,12 +310,15 @@ if (imageBtn && fileInput) {
 
     if (sendBtn && input) {
         sendBtn.addEventListener("click", sendQuestionToServer);
-        input.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") sendQuestionToServer();
-        });
+        input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendQuestionToServer();
+    }
+});
     }
 
-// 🎤 3단계: STT 로직
+    // 🎤 3단계: STT 로직
     if (window.SpeechRecognition || window.webkitSpeechRecognition) {
         const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
         recognition.lang = "ko-KR";
@@ -323,8 +326,11 @@ if (imageBtn && fileInput) {
         if (voiceBtn) {
             voiceBtn.addEventListener("click", () => {
                 recognition.start();
-                addMessage('bot', '🎙️ (말씀해 주세요...)');
+                botReply('🎙️ (말씀해 주세요...)');
             });
+            recognition.onend = () => {
+            voiceBtn.classList.remove("recording");
+            };
         }
 
         recognition.onresult = (event) => {

@@ -237,8 +237,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let userType = 'blind'; 
 
     const params = new URLSearchParams(window.location.search);
-    const currentProductId = params.get('id') || '1';
-    const currentCategory = params.get('category') || '기타';
+    const isDetailPage = window.location.pathname.includes('product.html');
+    
+    // 🌟 메인 페이지면 'main', 상세 페이지면 해당 상품 id를 보냄
+    const currentProductId = isDetailPage ? params.get('id') : 'main'; 
+    const currentCategory = isDetailPage ? params.get('category') : '전체';
 
     function readAloud(text) {
         if (!window.speechSynthesis) return;
@@ -390,18 +393,41 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 🎤 STT 로직
-    if (window.SpeechRecognition || window.webkitSpeechRecognition) {
-        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-        recognition.lang = "ko-KR";
+    // 🎤 STT 로직 (음성 인식 완벽 적용)
+    if (window.SpeechRecognition || window.webkitSpeechRecognition) {
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = "ko-KR";
+        recognition.interimResults = false; // 말이 끝날 때까지 기다렸다가 한 번에 텍스트로 변환
 
-        if (voiceBtn) {
-            voiceBtn.addEventListener("click", () => {
-                recognition.start();
-                addMessage('bot', '🎙️ (말씀해 주세요...)');
-            });
-            // 인식 완료 시 자동 전송 로직이 필요하다면 여기에 추가
-        }
-    }
+        if (voiceBtn) {
+            // 1. 마이크 버튼을 눌렀을 때
+            voiceBtn.addEventListener("click", () => {
+                recognition.start();
+                input.placeholder = "🎙️ 듣고 있습니다..."; // 입력창 힌트 변경
+                addMessage('bot', '🎙️ (말씀해 주세요...)');
+            });
+
+            // 2. 🌟 핵심: 음성 인식이 완료되어 텍스트가 나왔을 때
+            recognition.addEventListener("result", (e) => {
+                const transcript = e.results[0][0].transcript; // 인식된 텍스트 추출
+                input.value = transcript; // 채팅 입력창에 텍스트 쏙 넣기
+                
+                // 시각장애인 플랫폼이므로, 텍스트 변환 후 자동으로 전송버튼을 눌러주면 훨씬 편합니다!
+                sendQuestionToServer(); 
+            });
+
+            // 3. 마이크가 꺼졌을 때 (정상 종료든 에러든) 원래대로 복구
+            recognition.addEventListener("end", () => {
+                input.placeholder = "상품에 대해 자유롭게 질문해 주세요";
+            });
+
+            // 4. 혹시라도 에러가 났을 때
+            recognition.addEventListener("error", (e) => {
+                console.error("음성 인식 에러:", e.error);
+                addMessage('bot', '음성을 인식하지 못했습니다. 마이크 권한을 확인하고 다시 시도해 주세요.');
+            });
+        }
+    }
 });
 
 // 🔥 로그인 상태 UI 변경 (프론트 팀원 로직 유지)

@@ -62,23 +62,31 @@ async def chat_ask_api(
         if prod_response.ok:
             products_data = prod_response.json()
             
-            # DB의 p_idx(또는 pIdx, id)와 프론트엔드의 product_id(현재 2번)를 매칭합니다.
-            matched_product = next((p for p in products_data if str(p.get("pIdx", p.get("p_idx", p.get("id", "")))) == str(product_id)), None)
-            
-            if matched_product:
-                # 💡 DB 컬럼명(p_name, p_price, p_desc)에 맞게 쏙쏙 뽑아옵니다.
-                product_name = matched_product.get("pName", matched_product.get("p_name", matched_product.get("name", category)))
-                fact_text_desc = matched_product.get("pDesc", matched_product.get("p_desc", matched_product.get("description", "상세 설명 없음")))
+            # 🌟 1. 메인 페이지에서 질문이 들어온 경우 (전체 요약)
+            if product_id == 'main':
+                categories = list(set([p.get("category", p.get("pCategory", "기타")) for p in products_data]))
+                item_names = [p.get("name", p.get("pName", "상품")) for p in products_data][:7] # 대표상품 7개만
                 
-                # 가격 포맷팅
-                p_price_val = matched_product.get("pPrice", matched_product.get("p_price", matched_product.get("price")))
-                if p_price_val is not None and isinstance(p_price_val, (int, float)):
-                    fact_text_price = f"{p_price_val:,}원"
+                product_name = "쇼핑몰 메인 안내"
+                fact_text_price = "다양함"
+                fact_text_desc = f"이 쇼핑몰은 {', '.join(categories)} 카테고리를 취급합니다. 대표 상품으로 {', '.join(item_names)} 등이 있습니다. 원하시는 상품을 말씀하시면 안내해 드리겠습니다."
+                
+            # 🌟 2. 특정 상품 상세 페이지에서 질문이 들어온 경우 (기존 로직 유지)
+            else:
+                matched_product = next((p for p in products_data if str(p.get("pIdx", p.get("p_idx", p.get("id", "")))) == str(product_id)), None)
+                
+                if matched_product:
+                    product_name = matched_product.get("pName", matched_product.get("p_name", matched_product.get("name", category)))
+                    fact_text_desc = matched_product.get("pDesc", matched_product.get("p_desc", matched_product.get("description", "상세 설명 없음")))
+                    
+                    p_price_val = matched_product.get("pPrice", matched_product.get("p_price", matched_product.get("price")))
+                    if p_price_val is not None and isinstance(p_price_val, (int, float)):
+                        fact_text_price = f"{p_price_val:,}원"
 
     except Exception as e:
         print(f"DEBUG: 상품 DB 연동 실패 - {e}")
 
-    # 제미나이에게 넘겨줄 팩트 데이터 완성 (이제 2번은 무조건 스테이크 정보가 들어갑니다!)
+    # 🔥 복구된 핵심 코드! (이 줄이 없으면 에러가 납니다)
     fact_text = f"상품명: {product_name}, 가격: {fact_text_price}, 설명: {fact_text_desc}"
 
 
@@ -101,7 +109,7 @@ async def chat_ask_api(
             if reviews_data and isinstance(reviews_data, list) and len(reviews_data) > 0:
                 review_contents = []
                 for r in reviews_data:
-                    # 🚨 핵심! 호성님의 DB 컬럼(rev_content)이 스프링부트를 거쳐 나올 수 있는 모든 이름표를 검사합니다.
+                    # 🚨 핵심! DB 컬럼(rev_content)이 스프링부트를 거쳐 나올 수 있는 모든 이름표를 검사합니다.
                     rev_text = r.get("revContent", r.get("rev_content", r.get("reviewContent", r.get("content", ""))))
                     if rev_text:
                         review_contents.append(str(rev_text))
