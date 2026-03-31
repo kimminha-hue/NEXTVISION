@@ -175,13 +175,56 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
-    // =========================================================================
-    // 🔥 3. 백엔드 등록/삭제 API가 만들어지기 전 임시 알림 처리
+// =========================================================================
+    // 🔥 3. 진짜 스프링부트 DB에 리뷰와 이미지를 쾅! 저장하는 기능
     // =========================================================================
     const submitBtn = document.getElementById('submit-review');
     if(submitBtn){
-        submitBtn.addEventListener('click', () => {
-            alert("리뷰 조회가 DB와 성공적으로 연동되었습니다! (작성 및 삭제 기능은 추후 백엔드 API 추가 시 연동 예정입니다.)");
+        submitBtn.addEventListener('click', async () => {
+            const content = document.getElementById('review-content').value.trim();
+            if(!content){ alert("리뷰 내용을 입력해주세요!"); return; }
+            if(selectedRating === 0){ alert("별점을 선택해주세요!"); return; }
+
+            // 폼 데이터 생성 (텍스트와 이미지 파일을 한 번에 묶어서 보내는 마법의 객체)
+            const formData = new FormData();
+            formData.append('p_idx', productId);
+            formData.append('rating', selectedRating);
+            formData.append('rev_content', content);
+
+            // 파일이 있다면 최대 3개까지 첨부
+            const imageInput = document.getElementById("review-image");
+            if (imageInput && imageInput.files.length > 0) {
+                const files = imageInput.files;
+                if(files[0]) formData.append('img1', files[0]);
+                if(files[1]) formData.append('img2', files[1]);
+                if(files[2]) formData.append('img3', files[2]);
+            }
+
+            try {
+                // 🌟 스프링부트에 방금 뚫어놓은 '/register' 주소로 데이터 쏘기!
+                const res = await fetch('http://localhost:8088/avw/api/review/register', {
+                    method: 'POST',
+                    body: formData // 파일 전송 시 headers에 Content-Type을 적지 않아야 브라우저가 알아서 Boundary를 세팅합니다.
+                });
+
+                if (!res.ok) throw new Error("서버 응답 오류");
+                
+                alert("리뷰가 DB에 성공적으로 저장되었습니다! 🎉");
+
+                // 등록 성공했으니 작성 칸 깔끔하게 비워주기
+                document.getElementById('review-content').value = "";
+                selectedRating = 0;
+                document.querySelectorAll('#review-rating span').forEach(s => s.classList.remove('active'));
+                if(imageInput) imageInput.value = "";
+                document.getElementById("preview-wrap").innerHTML = "";
+
+                // 🌟 새로고침 없이 즉시 하단 리뷰 리스트 갱신 (DB에서 최신 데이터 다시 긁어오기)
+                window.updateProductReviews();
+
+            } catch (error) {
+                console.error("리뷰 등록 실패:", error);
+                alert("리뷰 등록에 실패했습니다. 서버가 켜져 있는지 확인해 주세요.");
+            }
         });
     }
 
