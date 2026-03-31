@@ -4,12 +4,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 로그인 확인
     const isLogin = localStorage.getItem("isLogin") === "true";
     const loginUser = JSON.parse(localStorage.getItem("loginUser")) || {};
-    const userName = isLogin 
-        ? (loginUser.name || loginUser.username || "알 수 없음") 
-        : "익명";
+    // ✅ 로그인 상태에서만 값 설정
+    const userName = isLogin
+        ? (loginUser.name || loginUser.id || "알 수 없음")
+        : "";
     const userEmail = isLogin
-        ? (loginUser.id || loginUser.username || loginUser.email || "guest")
-        : "guest";
+        ? (loginUser.id || "")
+        : "";
 
     // productId 가져오기
     const productId = new URLSearchParams(location.search).get("id");
@@ -46,7 +47,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
     }
 
-    // [수정] 통합 리뷰 저장소('all_reviews') 사용 함수
+    // 통합 리뷰 저장소('all_reviews') 사용 함수
     function getReviews() {
         return JSON.parse(localStorage.getItem("all_reviews")) || [];
     }
@@ -181,7 +182,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             
             // 본인 확인 (이름 또는 이메일)
             let deleteBtn = "";
-            if(r.user === userName || r.userEmail === userEmail){
+            if (isLogin && userEmail && r.userEmail === userEmail) {
                 deleteBtn = `<button class="delete-review" data-id="${r.id}">삭제</button>`;
             }
 
@@ -203,18 +204,30 @@ document.addEventListener("DOMContentLoaded", async () => {
         // 삭제 버튼 이벤트 연결
         document.querySelectorAll('.delete-review').forEach(btn => {
             btn.addEventListener('click', () => {
+                if (!isLogin || !userEmail) {
+                    alert("로그인이 필요합니다.");
+                    return;
+                }
+
                 const id = Number(btn.dataset.id);
+                const reviews = getReviews();
+                const review = reviews.find(r => r.id === id);
+
+                // ✅ 본인 리뷰인지 한번 더 확인
+                if (review && review.userEmail !== userEmail) {
+                    alert("본인 리뷰만 삭제할 수 있습니다.");
+                    return;
+                }
+
                 if(confirm("리뷰를 삭제하시겠습니까?")) {
-                    let reviews = getReviews();
-                    reviews = reviews.filter(r => r.id !== id);
-                    saveReviews(reviews);
+                    const updated = reviews.filter(r => r.id !== id);
+                    saveReviews(updated);
                     window.updateProductReviews();
                 }
             });
         });
-
-
     }
+
 
     // =========================
     // 리뷰 작성 (통합 저장소로 저장)

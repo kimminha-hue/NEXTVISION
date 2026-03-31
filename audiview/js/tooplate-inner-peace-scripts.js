@@ -328,9 +328,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 recognition.start();
                 botReply('🎙️ (말씀해 주세요...)');
             });
-            recognition.onend = () => {
-            voiceBtn.classList.remove("recording");
-            };
+            
         }
 
         recognition.onresult = (event) => {
