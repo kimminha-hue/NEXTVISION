@@ -146,6 +146,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 <button type="button" class="qty-ctrl-btn" onclick="const input=document.getElementById('qty'); if(input.value<99) { input.value++; document.getElementById('total-price').innerText='₩'+(${product.price} * input.value).toLocaleString(); }">+</button>
                             </div>
                         </div>
+
+                        <div class="total-price-wrapper">
+                            <span>총 상품 금액</span>
+                            <span id="total-price" class="total-price-value">₩${product.price.toLocaleString()}</span>
+                        </div>
+
+                        <div class="btn-group">
+                            <button class="btn btn-outline" onclick="addToCart('${product.name}', ${product.price}, '${product.image}')">장바구니</button>
+                             <button class="btn btn-primary" id="buy-btn">구매하기</button>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -260,7 +271,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const messages = document.getElementById("chat-messages");
     const voiceBtn = document.getElementById("voice-btn"); 
     const fileInput = document.getElementById("chat-file-input"); 
-    const closeBtn = document.querySelector(".chatbot-close-btn"); // closeBtn 변수 추가
+    // 메인 홈페이지의 클래스(.)와 상세 페이지의 아이디(#)를 둘 다 찾도록 콤마(,)로 연결!
+    const closeBtn = document.querySelector(".chatbot-close-btn, #chat-close");
     const imageBtn = document.getElementById("image-btn");
 
     if (imageBtn && fileInput) {
