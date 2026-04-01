@@ -146,6 +146,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 <button type="button" class="qty-ctrl-btn" onclick="const input=document.getElementById('qty'); if(input.value<99) { input.value++; document.getElementById('total-price').innerText='₩'+(${product.price} * input.value).toLocaleString(); }">+</button>
                             </div>
                         </div>
+
+                        <div class="total-price-wrapper">
+                            <span>총 상품 금액</span>
+                            <span id="total-price" class="total-price-value">₩${product.price.toLocaleString()}</span>
+                        </div>
+
+                        <div class="btn-group">
+                            <button class="btn btn-outline" onclick="addToCart('${product.name}', ${product.price}, '${product.image}')">장바구니</button>
+                             <button class="btn btn-primary" id="buy-btn">구매하기</button>
+                        </div>
+
                     </div>
                 </div>
             </div>

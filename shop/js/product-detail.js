@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 productId: String(r.pIdx),
                 rating: r.rating || 5,
                 content: r.revContent,
-                user: "구매자", // 아직 DB에 유저 이름이 없으므로 통일
+                user: r.userName || "알 수 없음", 
                 date: r.createdAt ? new Date(r.createdAt).toLocaleDateString() : "최근",
                 images: [r.revImg1, r.revImg2, r.revImg3].filter(Boolean)
             }));
@@ -198,6 +198,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             formData.append('p_idx', productId);
             formData.append('rating', selectedRating);
             formData.append('rev_content', content);
+            formData.append('user_idx', loginUser.userIdx || "");  
+            formData.append('user_name', loginUser.name || "");    
 
             // 파일이 있다면 최대 3개까지 첨부
             const imageInput = document.getElementById("review-image");

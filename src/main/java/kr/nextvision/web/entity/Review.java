@@ -27,6 +27,9 @@ public class Review {
 
     @Column(name = "user_idx")
     private Integer userIdx; // 리뷰 작성자 번호
+    
+    @Column(name = "user_name")
+    private String userName;
 
     @Column(name = "rating")
     private Integer rating; // 별점 (1~5)
