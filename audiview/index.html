@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inner Peace - Mindfulness & Mental Wellness</title>
+    
+    <link rel="stylesheet" href="../shop/css/base.css">
+    <link rel="stylesheet" href="../shop/css/layout.css">
+    <link rel="stylesheet" href="../shop/css/components.css">
+    <link rel="stylesheet" href="../css/page.css">
+    <link rel="stylesheet" href="../shop/css/chatbot.css">
+    <link href="./css/tooplate-inner-peace.css" rel="stylesheet">
+<!--
+
+Tooplate 2143 Inner Peace
+
+https://www.tooplate.com/view/2143-inner-peace
+
+Free HTML CSS Template
+
+-->
+</head>
+
+<body>
+    <a href="#hero" class="skip-link">본문 바로가기</a>
+    <div class="geometric-bg"></div>
+
+    <!-- Header -->
+    <header class="site-header">
+        <div class="container">
+            <h1 class="logo" aria-label="AUDI MALL homepage">
+    <a href="../shop/html/index.html" style="display:flex; align-items:center; gap:10px; text-decoration:none;">
+        <img src="../audiview/images/audiview.png" alt="AudiMall 로고" class="logo-img">
+        <span class="logo-text">
+            <span class="logo-audi">AUDI</span><span class="logo-view">MALL</span>
+        </span>
+    </a>
+</h1>
+            <nav aria-label="메인 내비게이션">
+                <ul class="nav-links">
+                    <li><a href="../shop/html/index.html" aria-current="page">쇼핑하기</a></li>
+                    <li><a href="../shop/html/login.html">로그인</a></li>
+                    <li><a href="../shop/html/signup.html">회원가입</a></li>
+                    <li id="nav-user" style="display:none;"></li>
+                </ul>
+            </nav>
+
+             <div class="accessibility-controls">
+                <button onclick="zoomIn()" aria-label="화면 확대">🔍 확대</button>
+                <button onclick="zoomOut()" aria-label="화면 축소">🔎 축소</button>
+                <button onclick="increaseText()" aria-label="글씨 크게">A+</button>
+                <button onclick="decreaseText()" aria-label="글씨 작게">A-</button>
+                <button onclick="toggleContrast()" aria-label="고대비 모드">🎨 고대비</button>
+            </div>
+
+        </div>
+    </header>
+
+
+
+        </nav>
+    </header>
+    <main id="main-content">
+    <!-- Hero Section with Enhanced Background -->
+    <section id="hero">
+
+<div class="hero-container">
+
+<div class="hero-left"
+     tabindex="0"
+     role="region"
+     aria-label="메인 서비스 소개">
+
+<p class="hero-subtitle">AUDIMALL – 쇼핑의 눈이 되어드립니다</p>
+
+<h1>
+AI 기반 멀티모달 쇼핑 어시스턴트
+</h1>
+
+<p class="hero-description">
+모두를 위한 새로운 쇼핑 경험<br>
+음성과 AI로 더 쉽고, 더 편리하게<br>
+완전히 새롭게 제공합니다.
+</p>
+
+<ul class="hero-features">
+<li>✔ 즉각적인 이미지 분석 + 음성 설명</li>
+<li>✔ 음성 기반 쇼핑 어시스턴트</li>
+<li>✔ 지금 바로 경험해보세요</li>
+</ul>
+<button class="cta-button" type="button"  onclick="goService()"">
+    서비스 체험하기
+</button>
+</div>
+
+<div class="hero-right">
+
+<img src="./images/audiviewmain.png"
+alt="시각장애인을 위한 쇼핑 지원 서비스 이미지"
+class="hero-image"
+tabindex="0">
+
+</div>
+
+</div>
+
+</section>
+
+    <!-- About Section - Complete Redesign -->
+    <section id="about"
+         aria-labelledby="about-title"
+         role="region"
+         aria-describedby="about-desc">
+    <div class="mall-hero">
+        <img src="./images/audimall.png" alt="AUDIMALL 쇼핑몰 화면">
+    </div>
+    <h2 id="about-title" class="section-title" tabindex="0">AUDIMALL 이란?</h2>
+
+    <p id="about-desc" class="section-subtitle"  tabindex="0">
+        누구나 쉽고 편리하게 쇼핑할 수 있도록
+        음성과 AI 기술을 결합한 새로운 쇼핑 경험을 제공합니다.
+    </p>
+        
+        <!-- Floating Cards Design -->
+        <div class="about-floating-cards">
+            <div class="floating-card" tabindex="0" role="group" aria-label="AI 상품 인식 설명 카드">
+                <div class="card-icon">
+                    <div class="icon-wrapper">🤖</div>
+                </div>
+                <h3>AI 상품 인식</h3>
+                <p>AI가 상품 이미지와 텍스트 정보를 분석하여
+상품의 종류, 색상, 스타일을 설명합니다.</p>
+            </div>
+            
+            <div class="floating-card" tabindex="0" role="group" aria-label="음성 안내 카드">
+                <div class="card-icon">
+                    <div class="icon-wrapper">🔊</div>
+                </div>
+                <h3>듣는 쇼핑 경험</h3>
+                <p>상품 정보를 음성으로 안내하여 누구나 쉽게 이해할 수 있습니다.</p>
+            </div>
+            
+            <div class="floating-card" tabindex="0" role="group" aria-label="AI 챗봇 카드">
+                <div class="card-icon">
+                    <div class="icon-wrapper">🎁</div>
+                </div>
+                <h3>AI 쇼핑 도우미</h3>
+                <p>궁금한 점을 물어보면 AI가 상품 추천과 구매를 도와줍니다.</p>
+            </div>
+        </div>
+    </section>
+       
+
+        <!-- Feature Showcase -->
+    <section id="why"
+        role="region"
+        aria-label="서비스 필요성 설명">
+        <div class="feature-showcase" >
+            <div class="showcase-content">
+                <h3>왜 새로운 쇼핑 경험이 필요할까요?</h3>
+                <ul class="feature-list" role="list">
+                    <li tabindex="0">
+                        <span class="feature-check">✓</span>
+                        <span>많은 쇼핑몰은 이미지 중심으로 구성되어 정보를 빠르게 이해하기 어렵습니다.</span>
+                    </li>
+                    <li tabindex="0">
+                        <span class="feature-check">✓</span>
+                        <span>상품의 색상, 디자인, 특징을 한눈에 파악하기 어려운 경우가 많습니다.</span>
+                    </li>
+                    <li tabindex="0">
+                        <span class="feature-check">✓</span>
+                        <span>원하는 정보를 찾기 위해 여러 페이지를 반복해서 확인해야 합니다.</span>
+                    </li>
+                    <li tabindex="0">
+                        <span class="feature-check">✓</span>
+                        <span>쇼핑 중 궁금한 점이 생겨도 즉시 해결하기 어렵습니다.</span>
+                    </li>
+                    <li tabindex="0">
+                        <span class="feature-check">✓</span>
+                        <span>누구나 쉽게 사용할 수 있는 더 직관적인 쇼핑 방식이 필요합니다.</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Practices Section - Enhanced Timeline Design -->
+    <section id="how"
+         role="region"
+         aria-label="서비스 작동 방식 설명">
+        <div class="practices-container">
+            <h2 class="section-title">간단한 3단계 쇼핑 경험</h2>
+            <p class="section-subtitle" tabindex="0">누구나 간단한 단계로 쉽고 빠르게 쇼핑을 즐길 수 있습니다.</p>
+            
+            <div class="practice-layout">
+                <!-- Futuristic Left Timeline -->
+                <div class="timeline-track">
+                    <div class="timeline-progress"></div>
+                    <div class="timeline-points">
+     
+                        <div class="timeline-point">
+                            <div class="futuristic-label">
+                                <span class="label-text">STEP1</span>
+                            </div>
+                            <div class="timeline-indicator"></div>
+                        </div>
+                        <div class="timeline-point">
+                            <div class="futuristic-label">
+                                <span class="label-text">STEP2</span>
+                            </div>
+                            <div class="timeline-indicator"></div>
+                        </div>
+                        <div class="timeline-point">
+                            <div class="futuristic-label">
+                                <span class="label-text">STEP3</span>
+                            </div>
+                            <div class="timeline-indicator"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Content Area -->
+                <div class="practice-content-area">
+                   
+
+                    <div class="practice-card-new" tabindex="0" role="group" aria-label="AI 이미지 분석 단계">
+                        <div class="practice-header">
+                            <div class="practice-icon-new" aria-hidden="true">🔍</div>
+                            <div class="practice-info">
+                                <h3>원하는 상품 찾기</h3>
+                            </div>
+                        </div>
+                        <p class="practice-description">
+                            음성 또는 검색으로 원하는 상품을 쉽게 찾아보세요.
+                        </p>
+                        
+                    </div>
+
+                    <div class="practice-card-new" tabindex="0" role="group" aria-label="음성 정보 안내 단계">
+                        <div class="practice-header">
+                            <div class="practice-icon-new" aria-hidden="true">🔊</div>
+                            <div class="practice-info">
+                                <h3>상품 정보 듣기</h3>
+                            </div>
+                        </div>
+                        <p class="practice-description">
+                            상품의 특징과 정보를 음성으로 편하게 확인할 수 있습니다.
+                        </p>
+                        
+                    </div>
+
+                    <div class="practice-card-new" tabindex="0" role="group" aria-label="AI 챗봇 상담 단계">
+                        <div class="practice-header">
+                            <div class="practice-icon-new" aria-hidden="true">🚶</div>
+                            <div class="practice-info">
+                                <h3>AI와 함께 쇼핑하기</h3>
+                            </div>
+                        </div>
+                        <p class="practice-description">
+                           궁금한 점을 물어보고 추천을 받으며 구매까지 이어집니다.
+                        </p>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- Contact Section - Two Columns -->
+    <section id="contact"
+         role="region"
+         aria-label="문의하기">
+        <div class="contact-container">
+            <h2 class="section-title">문의사항</h2>
+            
+            <div class="contact-wrapper">
+                <div class="contact-info">
+                    <h3>Get in Touch</h3>
+                    
+                    <div class="info-item"  tabindex="0">
+                        <div class="info-icon" aria-hidden="true">📍</div>
+                        <div class="info-text">
+                            <h4>Visit Us</h4>
+                            <p>광주 동구 중앙로 196<br>스마트인재개발원</p>
+                        </div>
+                    </div>
+
+                    <div class="info-item" tabindex="0">
+                        <div class="info-icon" aria-hidden="true">📧</div>
+                        <div class="info-text">
+                            <h4>Email</h4>
+                            <p>goldminha@gmail.com<br>wldb789@gmail.com</p>
+                        </div>
+                    </div>
+
+                    <div class="info-item" tabindex="0">
+                        <div class="info-icon" aria-hidden="true">📞</div>
+                        <div class="info-text">
+                            <h4>Phone</h4>
+                            <p>+82 10-3252-1242<br>Mon-Fri, 9am-6pm </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contact-form">
+                    <h3 style="color: #FCE444; font-size: 1.8rem; margin-bottom: 2rem;">Send a Message</h3>
+                    <form>
+                        <div class="form-group">
+                            <label for="name">Your Name</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="subject">Subject</label>
+                            <input type="text" id="subject" name="subject" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Message</label>
+                            <textarea id="message" name="message" rows="4" required></textarea>
+                        </div>
+                        <button type="submit" class="submit-btn">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    </main>
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content" tabindex="0" role="contentinfo">
+            <div class="footer-links">
+                <a href="#privacy">Privacy Policy</a>
+                <a href="#terms">Terms of Service</a>
+                <a href="#support">Support</a>
+            </div>
+            <div class="copyright">
+                <p>&copy; team NEXTVISION. All rights reserved. 
+                Designed by <a rel="nofollow noopener" href="https://www.tooplate.com" target="_blank" style="color: var(--accent); text-decoration: none; transition: color 0.3s ease;">nextvision</a></p>
+            </div>
+        </div>
+    
+
+
+    </footer>
+
+<!-- 💬 챗봇 버튼 -->
+<button id="chatbot-toggle" aria-label="챗봇 열기">
+  <img src="../audiview/images/audiview.png" alt="">
+</button>
+
+<!-- 💬 챗봇 창 -->
+<div id="chatbot-box" class="hidden">
+  <div class="chat-header">
+    <span>AUDIVIEW 챗봇</span>
+    <button id="chat-close">✖</button>
+  </div>
+
+  <div id="chat-mode-menu" class="chat-mode-menu" style="display: flex; border-bottom: 1px solid #ddd;">
+    <button id="mode-blind" class="mode-btn active" style="flex: 1; padding: 10px; border: none; background: #eee; cursor: pointer;">시각장애인 모드</button>
+    <button id="mode-normal" class="mode-btn" style="flex: 1; padding: 10px; border: none; background: white; cursor: pointer;">일반 모드</button>
+  </div>
+
+  <div id="chat-messages"></div>
+
+  <div class="chat-input">
+  <button id="voice-btn" aria-label="음성 입력">
+  <span class="mic-icon">🎤</span>
+  <div class="wave">
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</button>
+
+  <!-- ✅ 수정 -->
+  <button id="image-btn" aria-label="이미지 업로드">📷</button>
+  <input type="file" id="chat-file-input" style="display:none;" accept="image/*" />
+
+  <input type="text" id="chat-input" placeholder="상품에 대해 자유롭게 질문해 주세요" />
+  <button id="send-btn">전송</button>
+</div>
+</div>
+
+
+
+
+<script src="./js/tooplate-inner-peace-scripts.js"></script>
+<script src="../common/auth.js"></script>
+</body>
+</html>

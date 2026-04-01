@@ -1,0 +1,334 @@
+/* ---------------------------
+   마이페이지 전체 레이아웃
+---------------------------- */
+.mypage-container {
+    display: flex;
+    gap: 2rem;
+    padding: 2rem;
+    background: var(--bg-color);
+    color: var(--text-primary);
+    justify-content: flex-start; /* 좌측 정렬 */
+    align-items: flex-start;
+}
+
+/* ---------------------------
+   사이드바
+---------------------------- */
+.mypage-sidebar {
+    width: 250px;
+    height: 300px;
+    background: var(--surface-color);
+    border-radius: 12px;
+    padding: 1rem;
+}
+
+.mypage-sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.mypage-sidebar .menu-item {
+    padding: 0.8rem 1rem;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.mypage-sidebar .menu-item.active,
+.mypage-sidebar .menu-item:hover {
+    background: var(--accent-color);
+    color: #000000;
+}
+
+/* ---------------------------
+   메인 콘텐츠
+---------------------------- */
+.mypage-content {
+    flex: 1;
+    max-width: 850px; /* 중앙 박스 최대 폭 */
+    background: var(--surface-color);
+    border-radius: 12px;
+    padding: 2rem;
+    padding-top: 1rem; /* 기존보다 줄여서 위로 당김 */
+    box-sizing: border-box;
+    margin-left: auto; /* 우측 여백 확보 */
+    margin-right: auto; /* 콘텐츠 자체 중앙 배치 */
+}
+
+/* 탭 콘텐츠 기본 */
+.tab-panel {
+    display: none;
+}
+
+.tab-panel.active {
+    display: block;
+    padding: 1rem 0;
+}
+
+/* ---------------------------
+   회원정보 폼
+---------------------------- */
+#profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 500px; /* 폼 폭 제한 */
+    margin: 0 auto;   /* 중앙 정렬 */
+    margin-top: 1rem; /* 제목과 폼 사이 간격 */
+
+}
+
+#profile-form label {
+    display: block;
+    font-weight: 500;
+}
+
+#profile-form input {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-top: 0.3rem;
+    font-family: inherit;
+}
+
+/* 회원정보 액션 버튼 */
+.profile-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: center; /* 버튼 중앙 정렬 */
+}
+
+/* ---------------------------
+   주문/리뷰/쿠폰 리스트
+---------------------------- */
+.orders-list, .reviews-list, .coupon-list {
+    margin-top: 1rem;
+    display: grid;
+    gap: 1rem;
+}
+
+.order-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+/* 주문 필터 버튼 */
+.order-filters {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    margin-top: 1rem; /* h2와 간격 */
+}
+
+.filter-btn {
+    background: black;                  /* 배경 검정 */
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--accent-color); /* 테두리 민트 */
+    background: var(--bg-color);
+    cursor: pointer;
+    color: var(--accent-color);         /* 글씨 민트 */
+    transition: background 0.2s, color 0.2s;
+}
+
+.filter-btn.active {
+    background: var(--accent-color);
+    color: #000000;
+}
+
+/* ---------------------------
+   버튼 공통
+---------------------------- */
+.btn {
+    cursor: pointer;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    font-weight: 500;
+    border: none;
+    transition: background 0.2s, color 0.2s;
+}
+
+/* 민트 배경 버튼 + 글씨 검정 */
+.btn-primary {
+    background: var(--accent-color);
+    color: black; /* 글씨 검정으로 변경 */
+}
+
+.btn-outline {
+    background: black;                  /* 배경 검정 */
+    border: 1px solid var(--accent-color); /* 테두리 민트 */
+    color: var(--accent-color);         /* 글씨 민트 */
+    transition: background 0.2s, color 0.2s;
+}
+
+/* 마우스 오버 시 반전 효과 (선택 사항) */
+.btn-outline:hover {
+    background: var(--accent-color);    /* 배경 민트 */
+    color: black;                       /* 글씨 검정 */
+}
+
+/* ---------------------------
+   추가 스타일
+---------------------------- */
+.coupon-add {
+    margin-top: 1rem;
+}
+
+/* wrapper */
+.coupon-input-wrap {
+    position: relative;
+    width: 100%;
+}
+
+/* input */
+.coupon-input-wrap input {
+    width: 100%;
+    padding: 0.8rem 70px 0.8rem 1rem; /* 버튼 자리 확보 */
+    font-size: 1rem;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    box-sizing: border-box;
+}
+
+/* button */
+.coupon-input-wrap button {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+
+    width: 50px;        /* 🔥 고정폭 줘야 안 깨짐 */
+    height: 30px;
+
+    padding: 0;
+    font-size: 0.8rem;
+    border-radius: 6px;
+}
+
+.coupon-input-wrap button {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+
+    transform: translateY(-50%);
+}
+
+.coupon-input-wrap .btn:active {
+    transform: translateY(calc(-50% + 1px)) !important;
+}
+
+/* ---------------------------
+   리뷰 스타일 부분
+---------------------------- */
+.review-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--surface-color);
+}
+
+.review-card .review-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* 모달 백그라운드 */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7); /* 반투명 검정 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #1a1a2e;
+    padding: 2rem;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 450px;
+    box-shadow: 0 5px 20px rgba(255, 214, 0, 0.15);  /* ✅ 노란 그림자 */
+    border: 1px solid var(--accent-color);            /* ✅ 노란 테두리 */
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    position: relative;
+    color: #fff; /* 글씨 흰색 */
+    font-family: inherit;
+}
+
+/* 닫기 버튼 */
+.modal-content .close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--accent-color);         /* ✅ 노란색 */
+    transition: opacity 0.2s;
+}
+
+.modal-content .close:hover {
+    opacity: 0.7;
+}
+
+/* 제목 */
+.modal-content h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    text-align: center;
+    font-weight: 600;
+    color: var(--accent-color);
+}
+
+/* 입력창 */
+.modal-content input {
+    width: 100%;
+    padding: 1rem 1.2rem;       /* 높이 + 좌우 여백 증가 */
+    font-size: 1rem;
+    border-radius: 10px;
+    border: 1px solid #444;
+    background-color: #111827;          /* ✅ 어두운 입력창 */
+    color: #ffffff;                     /* ✅ 흰 텍스트 */
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.modal-content input:focus {
+    outline: none;
+    border-color: var(--accent-color);  /* ✅ 포커스 시 노란 테두리 */
+}
+
+/* 버튼 */
+.modal-content .btn-primary {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 10px;
+    background-color: var(--accent-color); /* 기존 민트 색 */
+    color: #000;                            /* 글씨 검정 */
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.modal-content .btn-primary:hover {
+    background-color: var(--accent-hover);
+    color: #000;
+}

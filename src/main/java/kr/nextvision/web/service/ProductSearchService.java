@@ -30,6 +30,6 @@ public class ProductSearchService {
                 .map(Integer::valueOf)
                 .toList();
 
-        return productRepository.findByPIdxIn(ids);
+        return productRepository.findAllById(ids);
     }
 }

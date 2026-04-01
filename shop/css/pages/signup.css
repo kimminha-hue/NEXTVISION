@@ -1,0 +1,16 @@
+/* 회원가입 하단 안내 */
+.signup-footer {
+  margin-top: 2rem;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.link-accent {
+  color: var(--accent-color);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.link-accent:hover {
+  color: var(--accent-hover);
+}
