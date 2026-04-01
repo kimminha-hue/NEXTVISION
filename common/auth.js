@@ -41,25 +41,13 @@ document.addEventListener("DOMContentLoaded", () => {
     adminManageLi.innerHTML = `<a href="/shop/html/admin_products.html">📦 상품관리</a>`;
   }
 
-  // 기준 위치
-  const shopLink = document.querySelector('a[href*="index.html"]');
-  const shopLi = shopLink?.closest("li");
+// ⭐ 항상 맨 뒤에 추가
+if (adminLi) nav.append(adminLi);
+if (adminManageLi) nav.append(adminManageLi);
 
-  if (shopLi) {
-    nav.insertBefore(userLi, shopLi.nextSibling);
-    nav.insertBefore(mypageLi, userLi.nextSibling);
-    nav.insertBefore(cartLi, mypageLi.nextSibling);
-
-    if (adminLi) nav.insertBefore(adminLi, cartLi.nextSibling);
-    if (adminManageLi) nav.insertBefore(adminManageLi, adminLi?.nextSibling || cartLi.nextSibling);
-
-    nav.insertBefore(logoutLi, adminManageLi?.nextSibling || cartLi.nextSibling);
-  } else {
-    nav.append(userLi, mypageLi, cartLi);
-    if (adminLi) nav.append(adminLi);
-    if (adminManageLi) nav.append(adminManageLi);
-    nav.append(logoutLi);
-  }
+nav.append(userLi);
+nav.append(mypageLi);
+nav.append(logoutLi);
 
   // 로그아웃
   document.getElementById("logout-btn").addEventListener("click", () => {
