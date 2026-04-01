@@ -6,52 +6,49 @@ async function validateForm() {
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value;
     const confirmPassword = document.getElementById("confirm-password").value;
-    const role = document.getElementById("signup-role").value;
     const errorMessage = document.getElementById("error-message");
 
-    // 1. 빈값 체크
     if (!name || !username || !password || !confirmPassword) {
         alert("모든 항목을 입력해주세요.");
         return false;
     }
 
-    // 2. 아이디 길이 체크
     if (username.length < 4) {
         alert("아이디는 4자 이상 입력해주세요.");
         return false;
     }
 
-    // 3. 비밀번호 길이 체크
     if (password.length < 6) {
         alert("비밀번호는 6자 이상 입력해주세요.");
         return false;
     }
 
-    // 4. 비밀번호 확인
     if (password !== confirmPassword) {
         errorMessage.style.display = "block";
         return false;
     }
+
     errorMessage.style.display = "none";
 
     try {
-        // ✅ localStorage 대신 DB API 호출
-        const response = await fetch("/api/account/signup", {
+        const response = await fetch("/api/account/join", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                id: username,
-                pw: password,
-                name: name,
-                role: role
+                loginId: username,
+                password: password,
+                name: name
             })
         });
-        const data = await response.json();
-        console.log("응답 데이터:", data);
 
-        if (data.status === "success") {
+        const data = await response.json();
+        console.log("회원가입 응답:", data);
+
+        if (data.success) {
+            alert("회원가입 성공!");
             window.location.replace("login.html");
         } else {
+            alert(data.message || "회원가입 실패");
         }
 
     } catch (err) {
@@ -66,9 +63,6 @@ async function validateForm() {
 // 🔵 구글 회원가입
 //////////////////////////////////////////////////////
 function googleLogin() {
-    const role = document.getElementById("signup-role").value;
-    localStorage.setItem("tempRole", role);
-
     const clientId = "622053074582-mul8bneofj0v5d7qsd8m4o3rullbp1sp.apps.googleusercontent.com";
     const redirectUri = "http://223.130.161.162/shop/html/signup.html";
 
@@ -101,51 +95,56 @@ window.onload = async () => {
 
         const email = data.email;
         const name = data.name;
-        const role = localStorage.getItem("tempRole") || "user";
 
-        // ✅ DB API로 회원가입 시도
-        const signupRes = await fetch("/api/account/signup", {
+        const signupRes = await fetch("/api/account/join", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                id: email,
-                pw: "google_" + email,  // ✅ 구글 계정 비밀번호 고정
-                name: name,
-                role: role
+                loginId: email,
+                password: "google_" + email,
+                name: name
             })
         });
-        const signupData = await signupRes.json();
 
-        if (signupData.status === "success") {
+        const signupData = await signupRes.json();
+        console.log("구글 회원가입 응답:", signupData);
+
+        if (signupData.success) {
             alert("회원가입 완료!");
         } else {
-            // 이미 가입된 계정이면 로그인 처리
-            alert("이미 가입된 계정입니다. 로그인됩니다!");
+            alert(signupData.message || "이미 가입된 계정입니다. 로그인됩니다!");
         }
 
-        // ✅ 바로 로그인 처리
         const loginRes = await fetch("/api/account/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                id: email,
-                pw: "google_" + email
+                loginId: email,
+                password: "google_" + email
             })
         });
+
         const loginData = await loginRes.json();
+        console.log("구글 로그인 응답:", loginData);
 
-        if (loginData.status === "success") {
+        if (loginData.success) {
+            const loginUser = {
+                userIdx: loginData.userIdx,
+                id: loginData.loginId,
+                loginId: loginData.loginId,
+                name: loginData.name,
+                role: loginData.role
+            };
+
             localStorage.setItem("isLogin", "true");
-            localStorage.setItem("loginUser", JSON.stringify(loginData.user));
-            localStorage.removeItem("tempRole");
+            localStorage.setItem("loginUser", JSON.stringify(loginUser));
 
-            // ✅ URL 해시 제거 (보안)
             history.replaceState(null, "", window.location.pathname);
 
-            alert(loginData.user.name + "님 환영합니다!");
+            alert(loginData.name + "님 환영합니다!");
             location.href = "index.html";
         } else {
-            alert("로그인 처리 중 오류가 발생했습니다.");
+            alert(loginData.message || "로그인 처리 중 오류가 발생했습니다.");
         }
 
     } catch (err) {
