@@ -383,7 +383,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('user_message', text); 
 
         try {
-            const response = await fetch('http://localhost:8000/api/chat/ask', {
+            const response = await fetch('/api/chat/ask', {
                 method: 'POST',
                 body: formData
             });
@@ -431,7 +431,7 @@ document.addEventListener('DOMContentLoaded', () => {
             addMessage('bot', '사진을 분석 중입니다...');
             try {
                 // 호성님의 로컬 파이썬 AI 서버 주소 사용
-                const res = await fetch('http://localhost:8000/api/chat/ask', { method: 'POST', body: formData });
+                const res = await fetch('/api/chat/ask', { method: 'POST', body: formData });
                 const data = await res.json();
                 addMessage('bot', data.result);
                 readAloud(data.result);

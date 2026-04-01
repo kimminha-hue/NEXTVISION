@@ -43,7 +43,7 @@ async function handleLogin() {
 function googleLogin() {
     const clientId = "622053074582-mul8bneofj0v5d7qsd8m4o3rullbp1sp.apps.googleusercontent.com";
 
-    const redirectUri = "http://127.0.0.1:5500/shop/html/login.html";
+    const redirectUri = "http://223.130.161.162/shop/html/login.html";
 
     const params = new URLSearchParams({
         client_id: clientId,
