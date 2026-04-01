@@ -13,7 +13,7 @@ async function handleLogin() {
 
     try {
         // ✅ localStorage 대신 DB API 호출
-        const response = await fetch("http://localhost:8088/avw/api/account/login", {
+        const response = await fetch("/api/account/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ id: username, pw: password })
@@ -76,7 +76,7 @@ function kakaoLogin() {
                 const name = data.name;
 
                 // ✅ DB에서 카카오 계정 확인
-                const loginRes = await fetch("http://localhost:8088/avw/api/account/login", {
+                const loginRes = await fetch("/api/account/login", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ id: email, pw: "kakao_" + email })
@@ -119,7 +119,7 @@ window.onload = async () => {
         const name = data.name;
 
         // ✅ DB에서 구글 계정 확인
-        const loginRes = await fetch("http://localhost:8088/avw/api/account/login", {
+        const loginRes = await fetch("/api/account/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ id: email, pw: "google_" + email })

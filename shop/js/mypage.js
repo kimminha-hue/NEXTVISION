@@ -21,12 +21,28 @@ if (isLogin !== "true") {
     location.href = "index.html";
 }
 
-const API = "http://localhost:8088/avw/api/account";
+const API = "/api/account";
 
 // ===== 회원정보 초기값 불러오기 =====
 document.getElementById('name').value = loginUser.name || "";
 document.getElementById('phone').value = loginUser.phone || "";    
 document.getElementById('address').value = loginUser.address || "";
+document.getElementById('postcode').value = loginUser.postcode || "";
+document.getElementById('detail-address').value = loginUser.detailAddress || "";
+
+// ===== 주소 검색 =====
+function execDaumPostcode() {
+    new daum.Postcode({
+        oncomplete: function(data) {
+            const addr = data.userSelectedType === 'R' 
+                ? data.roadAddress 
+                : data.jibunAddress;
+            document.getElementById('postcode').value = data.zonecode;
+            document.getElementById('address').value = addr;
+            document.getElementById('detail-address').focus();
+        }
+    }).open();
+}
 
 // ===== 회원정보 저장 =====
 document.getElementById('profile-form').addEventListener('submit', async e => {
@@ -35,13 +51,21 @@ document.getElementById('profile-form').addEventListener('submit', async e => {
     const name = document.getElementById('name').value.trim()
     const phone = document.getElementById('phone').value.trim();    
     const address = document.getElementById('address').value.trim(); 
+    const postcode = document.getElementById('postcode').value.trim();
+    const detailAddress = document.getElementById('detail-address').value.trim();
 
     try {
         // ✅ DB API 호출
         const response = await fetch(`${API}/update/${loginUser.userIdx}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name, phone, address })
+            body: JSON.stringify({
+                name: name,
+                phone: phone,
+                postcode: postcode,
+                address: address,
+                detailAddress: detailAddress
+            })
         });
         const data = await response.json();
 
@@ -50,6 +74,8 @@ document.getElementById('profile-form').addEventListener('submit', async e => {
             loginUser.name = name;
             loginUser.phone = phone;
             loginUser.address = address;
+            loginUser.postcode = postcode;
+            loginUser.detailAddress = detailAddress;
             localStorage.setItem("loginUser", JSON.stringify(loginUser));
             alert("회원정보가 저장되었습니다!");
         } else {

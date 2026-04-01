@@ -36,7 +36,7 @@ async function validateForm() {
 
     try {
         // ✅ localStorage 대신 DB API 호출
-        const response = await fetch("http://localhost:8088/avw/api/account/signup", {
+        const response = await fetch("/api/account/signup", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -104,7 +104,7 @@ window.onload = async () => {
         const role = localStorage.getItem("tempRole") || "user";
 
         // ✅ DB API로 회원가입 시도
-        const signupRes = await fetch("http://localhost:8088/avw/api/account/signup", {
+        const signupRes = await fetch("/api/account/signup", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -124,7 +124,7 @@ window.onload = async () => {
         }
 
         // ✅ 바로 로그인 처리
-        const loginRes = await fetch("http://localhost:8088/avw/api/account/login", {
+        const loginRes = await fetch("/api/account/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({

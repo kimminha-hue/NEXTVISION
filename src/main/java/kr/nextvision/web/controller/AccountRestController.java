@@ -86,6 +86,8 @@ public class AccountRestController {
             userInfo.put("role", account.getRole());
             userInfo.put("phone", account.getPhone());     
             userInfo.put("address", account.getAddress());  
+            userInfo.put("postcode", account.getPostcode());
+            userInfo.put("detailAddress", account.getDetailAddress());
             
             response.put("status", "success");
             response.put("message", "로그인 성공!");
@@ -115,6 +117,8 @@ public class AccountRestController {
             if (body.get("pw") != null) account.setPassword(body.get("pw"));
             if (body.get("phone") != null) account.setPhone(body.get("phone"));   
             if (body.get("address") != null) account.setAddress(body.get("address"));
+            if (body.get("postcode") != null) account.setPostcode(body.get("postcode"));
+            if (body.get("detailAddress") != null) account.setDetailAddress(body.get("detailAddress"));
 
             accountRepository.save(account);
 

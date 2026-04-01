@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 데이터 가져오기 (data.json)
     let products = [];
     try {
-        const res = await fetch('http://localhost:8088/avw/api/product/list');
+        const res = await fetch('/api/product/list');
         if (!res.ok) throw new Error('API 호출 실패');
         const apiProducts = await res.json();
 
@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // =========================================================================
     async function getReviews() {
         try {
-            const res = await fetch(`http://localhost:8088/avw/api/review/list?p_idx=${productId}`);
+            const res = await fetch(`/api/review/list?p_idx=${productId}`);
             if (!res.ok) throw new Error("리뷰 API 호출 실패");
             const dbReviews = await res.json();
             
@@ -212,7 +212,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             try {
                 // 스프링부트로 데이터 쏘기!
-                const res = await fetch('http://localhost:8088/avw/api/review/register', {
+                const res = await fetch('/api/review/register', {
                     method: 'POST',
                     body: formData 
                 });
