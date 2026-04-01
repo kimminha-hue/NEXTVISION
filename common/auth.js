@@ -49,6 +49,11 @@ nav.append(userLi);
 nav.append(mypageLi);
 nav.append(logoutLi);
 
+  // 동적으로 메뉴가 추가된 뒤 현재 페이지 밑줄(aria-current) 갱신
+  if (typeof window.updateActiveNav === "function") {
+    window.updateActiveNav();
+  }
+
   // 로그아웃
   document.getElementById("logout-btn").addEventListener("click", () => {
     localStorage.removeItem("isLogin");
