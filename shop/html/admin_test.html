@@ -109,7 +109,7 @@ body { font-family: 'Malgun Gothic', sans-serif; background-color: #0A0A0A; padd
 
             
             // 호성님의 Spring Boot 서버(컨트롤러)로 전송!
-            const response = await fetch('http://localhost:8088/avw/api/product/register', {
+            const response = await fetch('/api/product/register', {
                 method: 'POST',
                 body: formData
                 

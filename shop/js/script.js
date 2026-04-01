@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let products = [];
     try {
         // 호성님의 스프링부트 DB 데이터 연동
-        const response = await fetch('http://localhost:8088/avw/api/product/list');
+        const response = await fetch('/api/product/list');
         if (!response.ok) throw new Error('백엔드 서버 응답 오류');
         
         const backendData = await response.json();
@@ -180,7 +180,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         async function fetchReviews() {
             try {
                 // p_idx에 현재 상품의 ID를 넣어서 호출합니다.
-                const reviewRes = await fetch(`http://localhost:8088/avw/api/review/list?p_idx=${product.id}`);
+                const reviewRes = await fetch(`/api/review/list?p_idx=${product.id}`);
                 if (!reviewRes.ok) throw new Error("리뷰 데이터를 불러올 수 없습니다.");
                 
                 const reviews = await reviewRes.json();

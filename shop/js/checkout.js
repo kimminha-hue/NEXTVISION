@@ -57,6 +57,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalPriceEl = document.getElementById("checkout-total-price");
     orderListEl.innerHTML = "";
 
+    if (loginUser.name) {
+        document.querySelector('input[placeholder="이름"]').value = loginUser.name;
+    }
+    if (loginUser.phone) {
+        document.querySelector('input[placeholder="연락처"]').value = loginUser.phone;
+    }
+    if (loginUser.postcode) {
+        document.getElementById("postcode").value = loginUser.postcode;
+    }
+    if (loginUser.address) {
+        document.getElementById("address").value = loginUser.address;
+    }
+    if (loginUser.detailAddress) {
+        document.getElementById("detailAddress").value = loginUser.detailAddress;
+    }
+
     // ✅ 사용자별 장바구니 키로 읽기
     const cart = JSON.parse(localStorage.getItem(cartKey)) || [];
     const params = new URLSearchParams(window.location.search);
