@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>STT 녹음 테스트</title>
+</head>
+<body>
+
+<h2>STT 녹음 테스트</h2>
+
+<button id="startBtn">녹음 시작</button>
+<button id="stopBtn" disabled>녹음 종료</button>
+
+<p id="status">대기 중...</p>
+<audio id="audioPlayer" controls></audio>
+
+<pre id="result">변환 결과가 여기에 표시됩니다.</pre>
+
+<script>
+let mediaRecorder;
+let audioChunks = [];
+
+const startBtn = document.getElementById("startBtn");
+const stopBtn = document.getElementById("stopBtn");
+const statusText = document.getElementById("status");
+const result = document.getElementById("result");
+const audioPlayer = document.getElementById("audioPlayer");
+
+startBtn.addEventListener("click", async () => {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+    audioChunks = [];
+    mediaRecorder = new MediaRecorder(stream);
+
+    mediaRecorder.ondataavailable = (event) => {
+      if (event.data.size > 0) {
+        audioChunks.push(event.data);
+      }
+    };
+
+    mediaRecorder.onstart = () => {
+      statusText.textContent = "녹음 중...";
+      result.textContent = "녹음 시작";
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+    };
+
+    mediaRecorder.onstop = async () => {
+      statusText.textContent = "녹음 완료, STT 요청 중...";
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+
+      const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
+      const audioUrl = URL.createObjectURL(audioBlob);
+      audioPlayer.src = audioUrl;
+
+      const formData = new FormData();
+      formData.append("file", audioBlob, "recording.webm");
+
+      try {
+        const res = await fetch("http://localhost:8081/api/stt", {
+          method: "POST",
+          body: formData
+        });
+
+        result.textContent = "응답 상태: " + res.status;
+
+        if (!res.ok) {
+          const errorText = await res.text();
+          result.textContent += "\n실패: " + errorText;
+          statusText.textContent = "STT 실패";
+          return;
+        }
+
+        const data = await res.json();
+        result.textContent += "\n변환 결과:\n" + data.text;
+        statusText.textContent = "STT 완료";
+      } catch (e) {
+        result.textContent += "\n에러: " + e.message;
+        statusText.textContent = "요청 에러";
+      }
+    };
+
+    mediaRecorder.start();
+
+  } catch (e) {
+    statusText.textContent = "마이크 권한이 필요합니다.";
+    result.textContent = "에러: " + e.message;
+  }
+});
+
+stopBtn.addEventListener("click", () => {
+  if (mediaRecorder && mediaRecorder.state !== "inactive") {
+    mediaRecorder.stop();
+  }
+});
+</script>
+
+</body>
+</html>

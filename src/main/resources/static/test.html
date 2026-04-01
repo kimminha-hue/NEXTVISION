@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>TTS Test</title>
+</head>
+<body>
+
+<h2>TTS 테스트</h2>
+
+<label for="voice">목소리 선택:</label>
+<select id="voice">
+  <option value="voice_01">젊은 남성</option>
+  <option value="voice_02">중년 남성</option>
+  <option value="voice_03">젊은 여성</option>
+  <option value="voice_04">중년 여성</option>
+  <option value="voice_05">설명 목소리 남</option>
+  <option value="voice_06">설명 목소리 여</option>
+</select>
+
+<br><br>
+
+<label for="text">텍스트 입력:</label><br>
+<textarea id="text" rows="5" cols="50">안녕하세요 테스트입니다</textarea>
+
+<br><br>
+
+<button onclick="requestTTS()">음성 재생</button>
+<pre id="result">대기 중...</pre>
+
+<script>
+async function requestTTS() {
+  const result = document.getElementById("result");
+  const voiceId = document.getElementById("voice").value;
+  const text = document.getElementById("text").value;
+
+  result.textContent = "요청 시작";
+
+  try {
+    const res = await fetch("http://localhost:8081/api/tts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        text: text,
+        voiceId: voiceId
+      })
+    });
+
+    result.textContent += "\n상태: " + res.status;
+    result.textContent += "\n선택한 목소리: " + voiceId;
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      result.textContent += "\n실패: " + errorText;
+      return;
+    }
+
+    const blob = await res.blob();
+    result.textContent += "\n오디오 받음";
+
+    const url = URL.createObjectURL(blob);
+    const audio = new Audio(url);
+    await audio.play();
+
+    result.textContent += "\n재생 성공";
+  } catch (e) {
+    result.textContent += "\n에러: " + e.message;
+  }
+}
+</script>
+
+</body>
+</html>
