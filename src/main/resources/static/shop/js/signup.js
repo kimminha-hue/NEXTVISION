@@ -20,27 +20,29 @@ async function validateForm(event) {
     const role = document.getElementById("signup-role").value;
     const errorMessage = document.getElementById("error-message");
 
+    // 에러 초기화
+    errorMessage.style.display = "none";
+    errorMessage.textContent = "";
+
     if (!name || !username || !password || !confirmPassword) {
-        alert("모든 항목을 입력해주세요.");
+        showError("모든 항목을 입력해주세요.");
         return;
     }
 
     if (username.length < 4) {
-        alert("아이디는 4자 이상 입력해주세요.");
+        showError("아이디는 4자 이상 입력해주세요.");
         return;
     }
 
     if (password.length < 8) {
-        alert("비밀번호는 8자 이상 입력해주세요.");
+        showError("비밀번호는 8자 이상 입력해주세요.");
         return;
     }
 
     if (password !== confirmPassword) {
-        errorMessage.style.display = "block";
+        showError("비밀번호가 일치하지 않습니다.");
         return;
     }
-
-    errorMessage.style.display = "none";
 
     try {
         const response = await fetch("/api/account/signup", {
@@ -51,24 +53,30 @@ async function validateForm(event) {
             body: JSON.stringify({
                 loginId: username,
                 password: password,
+                confirmPassword: confirmPassword, // ⭐ 추가
                 name: name,
                 role: role
             })
         });
 
         const data = await response.json();
-        console.log("회원가입 응답:", data);
 
         if (data.status === "success") {
             alert("회원가입이 완료되었습니다.");
             window.location.href = "login.html";
         } else {
-            alert(data.message || "회원가입에 실패했습니다.");
+            showError(data.message || "회원가입에 실패했습니다.");
         }
     } catch (err) {
-        console.error("회원가입 오류:", err);
-        alert("서버 연결 오류가 발생했습니다.");
+        console.error(err);
+        showError("서버 연결 오류가 발생했습니다.");
     }
+}
+
+function showError(message) {
+    const errorMessage = document.getElementById("error-message");
+    errorMessage.textContent = message;
+    errorMessage.style.display = "block";
 }
 
 //////////////////////////////////////////////////////
