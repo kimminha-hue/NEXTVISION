@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AUDI MALL</title>
+    <meta name="description" content="Discover premium lifestyle and home products.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/page.css">
+    <link rel="stylesheet" href="../css/chatbot.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <h1 class="logo" aria-label="AUDI MALL homepage">
+    <a href="index.html" style="display:flex; align-items:center; gap:10px; text-decoration:none;">
+        <img src="../images/audiview.png" alt="AudiMall 로고" class="logo-img">
+        <span class="logo-text">
+            <span class="logo-audi">AUDI</span><span class="logo-view">MALL</span>
+        </span>
+    </a>
+</h1>
+            <nav aria-label="메인 내비게이션">
+                <ul class="nav-links">
+                    <li id="nav-intro"><a href="../../audiview/index.html">소개페이지</a></li>
+                    <li><a href="index.html" aria-current="page">쇼핑하기</a></li>
+                    <li><a href="login.html">로그인</a></li>
+                    <li><a href="signup.html">회원가입</a></li>
+                    <li id="nav-user" style="display:none;"></li>
+                </ul>
+            </nav>
+
+             <div class="accessibility-controls">
+                <button onclick="zoomIn()" aria-label="화면 확대">🔍 확대</button>
+                <button onclick="zoomOut()" aria-label="화면 축소">🔎 축소</button>
+                <button onclick="increaseText()" aria-label="글씨 크게">A+</button>
+                <button onclick="decreaseText()" aria-label="글씨 작게">A-</button>
+                <button onclick="toggleContrast()" aria-label="고대비 모드">🎨 고대비</button>
+            </div>
+
+        </div>
+    </header>
+ 
+    <main class="container" id="main-content">
+        <section class="hero" aria-labelledby="hero-title">
+            <div class="hero-content">
+                <h2 id="hero-title">매일을 특별하게 만드는 선택.</h2>
+                <p>의류부터 가전까지, 프리미엄 라이프스타일 컬렉션.</p>
+            </div>
+        </section>
+
+        <section class="category-nav" aria-label="상품 카테고리">
+            <ul class="category-list" id="category-list">
+                <li><button class="category-btn active" data-category="all">전체보기</button></li>
+                <li><button class="category-btn" data-category="의류">의류</button></li>
+                <li><button class="category-btn" data-category="생활용품">생활용품</button></li>
+                <li><button class="category-btn" data-category="주방용품">주방용품</button></li>
+                <li><button class="category-btn" data-category="식품">식품</button></li>
+                <li><button class="category-btn" data-category="가전디지털">가전/디지털</button></li>
+            </ul>
+        </section>
+
+        <section class="product-catalog" aria-label="상품 목록">
+            <h2 class="sr-only">전체 상품</h2>
+            <div class="grid" id="product-grid" role="list">
+                <!-- Products dynamically inserted here -->
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>&copy; 2026 AUDI MALL. All rights reserved.</p>
+        </div>
+    </footer>
+
+
+<!-- 💬 챗봇 버튼 -->
+<button id="chatbot-toggle" aria-label="챗봇 열기">
+  <img src="../images/audiview.png" alt="">
+</button>
+
+<!-- 💬 챗봇 창 -->
+<div id="chatbot-box" class="hidden">
+  <div class="chat-header">
+    <span>AUDIVIEW 챗봇</span>
+    <button id="chat-close" class="chatbot-close-btn">✖</button>
+  </div>
+
+  <div id="chat-mode-menu" class="chat-mode-menu" style="display: flex; border-bottom: 1px solid #ddd;">
+    <button id="mode-blind" class="mode-btn active" style="flex: 1; padding: 10px; border: none; background: #eee; cursor: pointer;">시각장애인 모드</button>
+    <button id="mode-normal" class="mode-btn" style="flex: 1; padding: 10px; border: none; background: white; cursor: pointer;">일반 모드</button>
+  </div>
+
+  <div id="chat-messages"></div>
+
+  <div class="chat-input">
+  <button id="voice-btn" aria-label="음성 입력">
+  <span class="mic-icon">🎤</span>
+  <div class="wave">
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</button>
+
+  <!-- ✅ 수정 -->
+  <button id="image-btn" aria-label="이미지 업로드">📷</button>
+  <input type="file" id="chat-file-input" style="display:none;" accept="image/*" />
+
+  <input type="text" id="chat-input" placeholder="상품에 대해 자유롭게 질문해 주세요" />
+  <button id="send-btn">전송</button>
+</div>
+</div>
+
+<script src="../js/script.js"></script>
+<script src="../../common/auth.js"></script>
+
+
+</body>
+</html>

@@ -4,8 +4,10 @@ import kr.nextvision.web.dto.TtsRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,8 +27,16 @@ public class TtsService {
     public byte[] generateSpeech(TtsRequest request) {
         validateRequest(request);
 
+        System.out.println("===== TTS 요청 시작 =====");
+        System.out.println("text = " + request.getText());
+        System.out.println("voiceId = " + request.getVoiceId());
+        System.out.println("ttsApiKey 존재 여부 = " + (ttsApiKey != null && !ttsApiKey.isBlank()));
+
         String actualVoiceId = mapVoiceId(request.getVoiceId());
+        System.out.println("actualVoiceId = " + actualVoiceId);
+
         String url = "https://api.elevenlabs.io/v1/text-to-speech/" + actualVoiceId;
+        System.out.println("url = " + url);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -43,14 +53,29 @@ public class TtsService {
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
 
-        ResponseEntity<byte[]> response = restTemplate.exchange(
-                url,
-                HttpMethod.POST,
-                entity,
-                byte[].class
-        );
+        try {
+            ResponseEntity<byte[]> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    entity,
+                    byte[].class
+            );
 
-        return response.getBody();
+            System.out.println("TTS 응답 status = " + response.getStatusCode());
+            System.out.println("TTS 응답 body null 여부 = " + (response.getBody() == null));
+
+            return response.getBody();
+
+        } catch (HttpStatusCodeException e) {
+            System.out.println("===== ElevenLabs 호출 실패 =====");
+            System.out.println("status = " + e.getStatusCode());
+            System.out.println("response body = " + e.getResponseBodyAsString(StandardCharsets.UTF_8));
+            throw new RuntimeException("외부 TTS API 호출 실패: " + e.getStatusCode(), e);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("TTS 생성 중 서버 오류", e);
+        }
     }
 
     private void validateRequest(TtsRequest request) {
@@ -67,12 +92,12 @@ public class TtsService {
 
     private String mapVoiceId(String voiceId) {
         return switch (voiceId) {
-            case "voice_01" -> "Mx48CWClvl522or3Frvp"; // 젊은 남성
-            case "voice_02" -> "3MTvEr8xCMCC2mL9ujrI"; // 중년 남성
-            case "voice_03" -> "KlstlYt9VVf3zgie2Oht"; // 젊은 여성
-            case "voice_04" -> "6yp5xWNuHEXOVkwW5Ghz"; // 중년 여성
-            case "voice_05" -> "PDoCXqBQFGsvfO0hNkEs"; // 설명 목소리 남
-            case "voice_06" -> "uyVNoMrnUku1dZyVEXwD"; // 설명 목소리 여
+            case "voice_01" -> "Mx48CWClvl522or3Frvp";
+            case "voice_02" -> "3MTvEr8xCMCC2mL9ujrI";
+            case "voice_03" -> "KlstlYt9VVf3zgie2Oht";
+            case "voice_04" -> "6yp5xWNuHEXOVkwW5Ghz";
+            case "voice_05" -> "PDoCXqBQFGsvfO0hNkEs";
+            case "voice_06" -> "uyVNoMrnUku1dZyVEXwD";
             default -> throw new IllegalArgumentException("유효하지 않은 voiceId입니다.");
         };
     }
