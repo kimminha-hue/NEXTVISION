@@ -25,6 +25,7 @@ if (isLogin !== "true") {
 }
 
 const API = "/api/account";
+const REVIEW_API = "/api/review";
 
 // ===== 회원정보 초기값 불러오기 =====
 document.getElementById("name").value = loginUser.name || "";
@@ -271,10 +272,18 @@ renderOrders();
 
 // ===== 리뷰관리: 내가 쓴 리뷰 조회 =====
 const reviewsList = document.querySelector(".reviews-list");
+const editModal = document.getElementById("edit-modal");
+const editContent = document.getElementById("edit-content");
+const editProductName = document.getElementById("edit-product-name");
+const saveEditBtn = document.getElementById("save-edit");
+const cancelEditBtn = document.getElementById("cancel-edit");
+const starEls = document.querySelectorAll("#edit-stars span");
+
+let editingReviewIdx = null;
+let editRating = 0;
 
 async function renderMyReviews() {
     if (!reviewsList) return;
-
     reviewsList.innerHTML = "<p>리뷰를 불러오는 중입니다...</p>";
 
     if (!loginUser.userIdx) {
@@ -313,44 +322,101 @@ async function renderMyReviews() {
                 ? new Date(review.createdAt).toLocaleDateString()
                 : "";
 
-            const stars = Array.from({ length: 5 }, (_, i) => {
-                return `<span style="color:${i < (review.rating || 0) ? "#f5a623" : "#ccc"};">★</span>`;
-            }).join("");
+            const stars = Array.from({ length: 5 }, (_, i) => 
+                `<span style="color:${i < (review.rating || 0) ? "var(--accent-color)" : "#ccc"};">★</span>`
+            ).join("");
 
-            const reviewImages = [review.revImg1, review.revImg2, review.revImg3]
-                .filter(Boolean)
-                .map((img) => `<img src="${img}" alt="리뷰 이미지" style="width:70px; height:70px; object-fit:cover; border-radius:8px; margin-right:8px;">`)
-                .join("");
-
-            return `
-                <div class="review-card" style="border:1px solid #e5e5e5; border-radius:12px; padding:16px; margin-bottom:16px; background:#fff;">
-                    <div style="display:flex; gap:14px; align-items:center; margin-bottom:12px;">
-                        <img src="${productImage}" alt="${productName}" style="width:90px; height:90px; object-fit:cover; border-radius:10px; background:#f5f5f5;">
-                        <div>
-                            <strong style="display:block; font-size:16px; margin-bottom:6px;">${productName}</strong>
-                            <div style="margin-bottom:6px;">${stars}</div>
-                            <small style="color:#888;">${dateText}</small>
-                        </div>
+            const div = document.createElement("div");
+            div.className = "review-card"; 
+            
+            div.innerHTML = `
+                <div style="display:flex; gap:14px; align-items:center;">
+                    <img src="${productImage}" style="width:70px; height:70px; object-fit:cover; border-radius:8px;">
+                    <div>
+                        <strong style="display:block; color:var(--text-color);">${productName}</strong>
+                        <div>${stars}</div>
+                        <p style="margin-top:8px; font-size:0.95rem; color:var(--text-color);">${review.revContent || ""}</p>
                     </div>
-
-                    <p style="margin:10px 0 12px; line-height:1.6;">${review.revContent || ""}</p>
-
-                    <div>${reviewImages}</div>
+                </div>
+                <div class="review-actions">
+                    <button class="btn btn-outline edit-rev-btn" data-idx="${review.revIdx}">수정</button>
+                    <button class="btn btn-outline delete-rev-btn" data-idx="${review.revIdx}" style="color:#ff4d4f; border-color:#ff4d4f;">삭제</button>
                 </div>
             `;
-        }).join("");
+            reviewsList.appendChild(div);
+
+            // 삭제 버튼 이벤트
+            div.querySelector(".delete-rev-btn").onclick = async () => {
+                if (!confirm("리뷰를 삭제하시겠습니까?")) return;
+                try {
+                    const res = await fetch(`${REVIEW_API}/delete/${review.revIdx}`, { method: "DELETE" });
+                    const result = await res.json();
+                    if (result.status === "success") {
+                        alert("삭제되었습니다.");
+                        renderMyReviews();
+                    }
+                } catch (err) { alert("삭제 실패"); }
+            };
+
+            // 수정 버튼 이벤트 (모달 열기)
+            div.querySelector(".edit-rev-btn").onclick = () => {
+                editingReviewIdx = review.revIdx;
+                editContent.value = review.revContent;
+                editProductName.textContent = productName;
+                editRating = review.rating;
+                updateStarUI(editRating);
+                editModal.classList.remove("hidden");
+                editModal.style.display = "flex"; // hidden 클래스가 없을 경우 대비
+            };
+        });
     } catch (err) {
-        console.error(err);
-        reviewsList.innerHTML = "<p>내 리뷰를 불러오지 못했습니다.</p>";
+        reviewsList.innerHTML = "<p>리뷰를 불러오지 못했습니다.</p>";
     }
 }
 
+// 별점 클릭 이벤트
+starEls.forEach(star => {
+    star.onclick = () => {
+        editRating = Number(star.dataset.value);
+        updateStarUI(editRating);
+    };
+});
+
+function updateStarUI(rating) {
+    starEls.forEach(s => s.classList.toggle("active", Number(s.dataset.value) <= rating));
+}
+
+// 리뷰 수정 저장
+saveEditBtn.onclick = async () => {
+    const newContent = editContent.value.trim();
+    if (!newContent) return alert("내용을 입력하세요.");
+
+    try {
+        const response = await fetch(`${REVIEW_API}/update/${editingReviewIdx}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                revContent: newContent,
+                rating: editRating
+            })
+        });
+        const result = await response.json();
+        if (result.status === "success") {
+            alert("수정 완료!");
+            editModal.style.display = "none";
+            renderMyReviews();
+        }
+    } catch (err) { alert("수정 중 오류 발생"); }
+};
+
+cancelEditBtn.onclick = () => editModal.style.display = "none";
+
+// 초기 실행
 renderMyReviews();
 
 // ===== 로그아웃 =====
 function logout() {
-    localStorage.removeItem("isLogin");
-    localStorage.removeItem("loginUser");
+    localStorage.clear();
     alert("로그아웃 되었습니다.");
     location.href = "index.html";
 }
