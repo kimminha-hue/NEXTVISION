@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let products = [];
     try {
         // 호성님의 스프링부트 DB 데이터 연동
-        const response = await fetch('/api/product/list');
+        const response = await fetch('http://223.130.161.162:8088/avw/api/product/list');
         if (!response.ok) throw new Error('백엔드 서버 응답 오류');
         
         const backendData = await response.json();
@@ -180,7 +180,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         async function fetchReviews() {
             try {
                 // p_idx에 현재 상품의 ID를 넣어서 호출합니다.
-                const reviewRes = await fetch(`/api/review/list?p_idx=${product.id}`);
+                const reviewRes = await fetch(`https://www.google.com/search?q=http://223.130.161.162:8088/avw/api/review/list%3Fp_idx%3D${product.id}`);
                 if (!reviewRes.ok) throw new Error("리뷰 데이터를 불러올 수 없습니다.");
                 
                 const reviews = await reviewRes.json();
@@ -383,7 +383,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('user_message', text); 
 
         try {
-            const response = await fetch('/api/chat/ask', {
+            const response = await fetch('http://223.130.161.162:8000/api/chat/ask', {
                 method: 'POST',
                 body: formData
             });
@@ -431,7 +431,7 @@ document.addEventListener('DOMContentLoaded', () => {
             addMessage('bot', '사진을 분석 중입니다...');
             try {
                 // 호성님의 로컬 파이썬 AI 서버 주소 사용
-                const res = await fetch('/api/chat/ask', { method: 'POST', body: formData });
+                const res = await fetch('http://223.130.161.162:8000/api/chat/ask', { method: 'POST', body: formData });
                 const data = await res.json();
                 addMessage('bot', data.result);
                 readAloud(data.result);
@@ -581,4 +581,55 @@ window.updateActiveNav = updateActiveNav;
 
 document.addEventListener("DOMContentLoaded", () => {
   updateActiveNav();
+});
+
+// ============================================================================
+// 🔥 [NextVision] 백그라운드 화면 자동 캡처 및 제미나이 분석 요청 함수
+// ============================================================================
+function autoCaptureAndAnalyze() {
+    console.log("화면 분석을 시작합니다...");
+
+    // 1. html2canvas로 현재 화면을 캡처
+    html2canvas(document.body, {
+        useCORS: true,      // 외부 이미지 허용
+        allowTaint: true,
+        logging: false
+    }).then(canvas => {
+        
+        // 2. 캔버스를 Base64 문자열로 변환
+        const imageData = canvas.toDataURL('image/png');
+
+        // 3. 로컬 FastAPI 서버로 데이터 전송 (주소 localhost 확인!)
+        fetch('http://223.130.161.162:8000/api/analyze-screen', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                image_data: imageData,
+                timestamp: new Date().toISOString() 
+            })
+        })
+        .then(response => response.json())
+        .then(result => {
+            console.log("분석 완료:", result.analysis);
+            
+            // 4. (보너스) 시각장애인 분들을 위해 분석 결과를 바로 음성으로 읽어주기
+            if (window.speechSynthesis) {
+                // 이전 음성이 있다면 취소
+                window.speechSynthesis.cancel(); 
+                const utterance = new SpeechSynthesisUtterance(result.analysis);
+                utterance.lang = 'ko-KR';
+                window.speechSynthesis.speak(utterance);
+            }
+        })
+        .catch(error => {
+            console.error("분석 요청 중 오류 발생:", error);
+        });
+    });
+}
+
+// 5. 페이지 로드가 완료되고 1.5초 뒤에 캡처 실행
+window.addEventListener('load', () => {
+    setTimeout(autoCaptureAndAnalyze, 1500);
 });

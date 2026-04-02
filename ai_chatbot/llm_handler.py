@@ -19,14 +19,15 @@ class VQAModelHandler:
             if image_file is not None:
                 # 케이스1: 사진이 함께 들어온 경우 (멀티모달 가능)
                 image_file.seek(0) # 파일 읽기 위치를 처음으로 초기화
-                img = PIL.Image(image_file) # 파이썬이 이해할 수 있는 이미지 형태로 변환
+                
+                # 🚨 중요 수정: PIL.Image() 가 아니라 PIL.Image.open() 이어야 이미지를 정상적으로 엽니다!
+                img = PIL.Image.open(image_file) 
 
                 # 이미지와 텍스트를 함께 묶어서 제미나이에게 분석 요청
                 response = await asyncio.to_thread(model.generate_content, [img, prompt])
             
             else:
                 # 케이스2: 사진 없이 텍스트(질문)만 들어온 경우
-                # 더 이상 없는 이미지에 대고 .seek()를 호출하지 않고, 텍스트만 던져서 대답을 받아옴
                 response = await asyncio.to_thread(model.generate_content, prompt)
             
             # 제미나이가 대답한 내용 중 텍스트 부분만 뽑아서 돌려보냄

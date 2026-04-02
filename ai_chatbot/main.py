@@ -1,3 +1,6 @@
+from pydantic import BaseModel
+import base64
+import io
 import os
 import requests 
 from fastapi import FastAPI, UploadFile, File, Form
@@ -12,6 +15,14 @@ from prompts import get_final_prompt
 load_dotenv()
 
 app = FastAPI(title="NextVision AI Server - 100% DB 연동")
+
+# -------------------------------------------------------------------
+# [2] 프론트엔드에서 보내는 JSON 데이터를 받기 위한 데이터 모델을 정의합니다.
+# (app = FastAPI(...) 선언부 아래 아무 곳에나 두시면 됩니다)
+# -------------------------------------------------------------------
+class ScreenCaptureRequest(BaseModel):
+    image_data: str         # 프론트엔드에서 보낸 Base64 이미지 문자열
+    timestamp: str = None   # 캡처된 시간 정보 (선택 사항)
 
 app.add_middleware(
     CORSMiddleware,
@@ -28,7 +39,7 @@ PERSONA_NORMAL = """당신은 스마트한 쇼핑 어시스턴트입니다.
 장황한 인사말이나 미사여구는 모두 생략하세요."""
 
 keys = {
-    "GEMINI": os.getenv("VQA_API_KEY")
+    "GEMINI": os.getenv("GEMINI_API_KEY") # 👈 이렇게 수정해주세요!
 }
 vqa_handler = VQAModelHandler(keys=keys)
 
@@ -166,5 +177,50 @@ async def chat_ask_api(
         return {"result": "제미나이 연결 중 문제가 발생했습니다. 에러 로그를 확인해주세요."}
 
 
+# -------------------------------------------------------------------
+# [3] 파일의 가장 맨 아래(if __name__ == "__main__": 바로 위)에 
+# 새로운 백그라운드 화면 분석 전용 API 라우터를 추가합니다.
+# -------------------------------------------------------------------
+@app.post("/api/analyze-screen")
+async def analyze_screen_api(request: ScreenCaptureRequest):
+    print("🔥 [DEBUG 4] 백그라운드 화면 캡처 분석 요청 도착!")
+    
+    try:
+        # 1. Base64 이미지 데이터 디코딩
+        # 프론트에서 넘어온 데이터는 "data:image/png;base64,iVBORw0KGgo..." 형태입니다.
+        # 실제 이미지 데이터인 콤마(,) 뒷부분만 분리해서 가져옵니다.
+        header, encoded_data = request.image_data.split(",", 1)
+        
+        # Base64 문자열을 컴퓨터가 이해할 수 있는 바이너리 바이트(bytes) 데이터로 변환합니다.
+        image_bytes = base64.b64decode(encoded_data)
+        
+        # 바이트 데이터를 마치 실제 파일(file)인 것처럼 다루기 위해 io.BytesIO로 감싸줍니다.
+        # (이렇게 해야 llm_handler.py의 image_file.seek(0)가 정상 작동합니다)
+        image_file = io.BytesIO(image_bytes)
+        
+        # 2. 분석을 위한 프롬프트 설정
+        # prompts.py의 시스템 페르소나를 가져옵니다. (카테고리를 알 수 없으므로 기본값 사용)
+        system_persona = get_final_prompt("기타") 
+        
+        # 화면의 전체적인 파악을 지시하는 구체적인 프롬프트를 작성합니다.
+        prompt = """
+        사용자가 현재 접속한 쇼핑몰 화면의 캡처본입니다. 사용자는 화면을 볼 수 없는 시각장애인입니다.
+        화면의 전체적인 레이아웃, 현재 보여지는 주요 카테고리나 상품들의 이름 등 
+        사용자가 '아, 내가 지금 어떤 화면에 들어와 있구나'를 직관적으로 이해할 수 있도록 
+        음성 안내용으로 3문장 이내로 아주 간결하게 설명해 주세요.
+        """
+        
+        # 3. 제미나이 모델 호출 (기존 llm_handler 재사용)
+        print("🔥 [DEBUG 5] 화면 캡처 이미지 제미나이 전송 중...")
+        gemini_answer = await vqa_handler.get_gemini_res(image_file, system_persona, prompt)
+        
+        # 프론트엔드의 response.json()과 매칭되도록 딕셔너리 형태로 반환합니다.
+        return {"analysis": gemini_answer}
+        
+    except Exception as e:
+        print(f"❌ 화면 분석 중 오류 발생: {e}")
+        return {"analysis": "화면을 분석하는 과정에서 일시적인 오류가 발생했습니다."}
+
+# ... (기존 if __name__ == "__main__": 블록 유지) ...
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
