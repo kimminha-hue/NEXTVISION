@@ -195,71 +195,104 @@ function requestPay() {
     });
 }
 
+// ✅ 카카오페이 데모 시작 (결제 대기 창)
 function kakaoPayDemo() {
-    // 1단계 — 음성 안내 및 로딩 시작
-    const speech = new SpeechSynthesisUtterance("카카오톡으로 이동합니다. 결제창을 확인해주세요.");
+    const totalPriceEl = document.getElementById("checkout-total-price");
+    const totalAmount = totalPriceEl ? totalPriceEl.innerText : "0";
+
+    // 1. 음성 및 진동
+    const speech = new SpeechSynthesisUtterance(`카카오페이 결제창이 열렸습니다. 결제 금액은 ${totalAmount}입니다.`);
     speech.lang = "ko-KR";
     window.speechSynthesis.speak(speech);
+    if ("vibrate" in navigator) navigator.vibrate([100, 50, 100]);
 
+    // 2. 오버레이 생성
     const overlay = document.createElement('div');
     overlay.id = "kakao-loading";
     overlay.style.cssText = `
-        position: fixed; top: 0; left: 0;
-        width: 100%; height: 100%;
-        background: rgba(0,0,0,0.85);
-        display: flex; align-items: center; justify-content: center;
-        z-index: 9999; font-family: 'Pretendard', sans-serif;
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.85); display: flex; align-items: center;
+        justify-content: center; z-index: 9999;
     `;
-    
-    // 초기 로딩 화면
+
+    // 3. UI 구성 (QR 코드가 들어갈 빈 div: qrcode-real 포함)
     overlay.innerHTML = `
-        <div id="kakao-step-container" style="text-align:center; color:white;">
-            <img src="../images/kakao.png" style="width:70px; height:70px; border-radius:16px; margin-bottom:20px;">
-            <p style="font-size:1.3rem; font-weight:600;">카카오페이 결제 요청 중...</p>
-            <div class="spinner" style="width:40px; height:40px; border:4px solid #FEE500; border-top-color:transparent; border-radius:50%; animation:spin 0.8s linear infinite; margin:20px auto;"></div>
+        <style>
+            @keyframes fadeIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+            .kakao-card { animation: fadeIn 0.3s ease; background:#fff; border-radius:20px; width:340px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.5); }
+            .pulse { animation: pulse 1.5s infinite; }
+            @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
+        </style>
+        <div class="kakao-card">
+            <div style="background:#FEE500; padding:16px 20px; display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-weight:700;">카카오페이</span>
+                <span style="font-size:0.8rem;">보안결제</span>
+            </div>
+            <div style="padding:24px 20px;">
+                <div style="background:#f8f8f8; border-radius:12px; padding:16px; text-align:center; margin-bottom:16px;">
+                    <p style="font-size:0.85rem; color:#888;">결제 금액</p>
+                    <p style="font-size:1.8rem; font-weight:800;">${totalAmount}</p>
+                </div>
+                
+                <div style="border:2px solid #FEE500; border-radius:12px; padding:20px; text-align:center; background:#fff; margin-bottom:16px;">
+                    <div id="qrcode-real" style="display:flex; justify-content:center; margin-bottom:10px;"></div>
+                    <p style="font-size:0.85rem; color:#555; font-weight:700;">카카오톡으로 QR코드를 스캔하세요</p>
+                    <p class="pulse" style="font-size:0.75rem; color:#ffb400; font-weight:bold;">결제 승인 대기 중...</p>
+                </div>
+
+                <button id="fake-confirm-btn" style="width:100%; padding:14px; background:#FEE500; border:none; border-radius:10px; font-weight:700; cursor:pointer; margin-bottom:10px;">✓ 결제 완료</button>
+                <button onclick="kakaoPayCancel()" style="width:100%; padding:10px; background:transparent; border:1px solid #ddd; border-radius:10px; color:#888; cursor:pointer;">취소</button>
+            </div>
         </div>
     `;
+
     document.body.appendChild(overlay);
 
-    // 2단계 — 1.5초 후 '가짜 결제 대기창' 표시 (이게 "결제 시늉"의 핵심입니다)
+    // 🚀 [중요] QR 코드 생성 로직 (반드시 appendChild 다음에 실행)
     setTimeout(() => {
-        const container = document.getElementById("kakao-step-container");
-        container.innerHTML = `
-            <div style="background:#fff; color:#000; padding:30px; border-radius:20px; width:320px; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.3);">
-                <div style="display:flex; justify-content:center; align-items:center; gap:8px; margin-bottom:20px;">
-                    <img src="../images/kakao_pay_logo.png" alt="kakaopay" style="height:20px;"> <span style="font-weight:bold; font-size:1.1rem;">결제하기</span>
-                </div>
-                <div style="background:#f9f9f9; padding:20px; border-radius:12px; margin-bottom:20px;">
-                    <p style="font-size:0.9rem; color:#666; margin-bottom:5px;">결제 금액</p>
-                    <p style="font-size:1.5rem; font-weight:800; color:#000;">${document.getElementById('total-price')?.innerText || '연습용'}원</p>
-                </div>
-                <div style="border:2px dashed #ddd; padding:20px; border-radius:10px; margin-bottom:20px;">
-                    <p style="font-size:0.85rem; color:#888;">스마트폰에서<br><b>결제 승인</b>을 완료해주세요.</p>
-                </div>
-                <button id="fake-confirm-btn" style="width:100%; padding:12px; background:#FEE500; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">결제 완료 테스트</button>
-                <p style="font-size:0.8rem; color:#aaa; margin-top:15px; cursor:pointer;" onclick="kakaoPayFinish()">취소하기</p>
-            </div>
-        `;
+        const qrContainer = document.getElementById("qrcode-real");
+        if (qrContainer) {
+            new QRCode(qrContainer, {
+                text: `https://www.kakaopay.com/payment/${Date.now()}`,
+                width: 150,
+                height: 150
+            });
+        }
+    }, 50);
 
-        // 가짜 결제 완료 버튼 클릭 시 최종 단계로 이동
-        document.getElementById("fake-confirm-btn").onclick = () => {
-            showFinalStep(overlay);
-        };
-    }, 1500);
+    document.getElementById("fake-confirm-btn").onclick = () => showFinalStep(overlay);
 }
 
+// ✅ 결제 완료 화면
 function showFinalStep(overlay) {
-    // 3단계 — 최종 완료 화면
-    overlay.innerHTML = `
-        <div style="background: #111; border: 2px solid #FEE500; border-radius: 20px; padding: 2.5rem 2rem; text-align: center; max-width: 340px; width: 90%; display: flex; flex-direction: column; align-items: center; gap: 16px;">
-            <div style="font-size:3.5rem;">✅</div>
-            <p style="font-size:1.4rem; font-weight:700; color:#FEE500;">결제가 완료되었습니다!</p>
-            <p style="font-size:0.95rem; color:#aaa;">정상적으로 주문이 접수되었습니다.</p>
-            <button onclick="kakaoPayFinish()" style="width: 100%; padding: 0.9rem; background: #FEE500; color: #000; border: none; border-radius: 10px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 8px;">확인</button>
-        </div>
-    `;
-
-    const doneSpeech = new SpeechSynthesisUtterance("결제가 정상적으로 완료되었습니다. 감사합니다.");
+    const totalAmount = document.getElementById("checkout-total-price")?.innerText || "0";
+    
+    // 음성 안내
+    const doneSpeech = new SpeechSynthesisUtterance("결제가 완료되었습니다.");
     doneSpeech.lang = "ko-KR";
     window.speechSynthesis.speak(doneSpeech);
+
+    overlay.innerHTML = `
+        <div class="kakao-card" style="text-align:center; padding:32px 24px; background:#fff; border-radius:20px; width:340px;">
+            <div style="width:70px; height:70px; background:#FEE500; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:2rem;">✓</div>
+            <p style="font-size:1.3rem; font-weight:800; margin-bottom:8px;">결제 완료!</p>
+            <div style="background:#f8f8f8; border-radius:12px; padding:16px; text-align:left; margin-bottom:20px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                    <span style="color:#888;">총 결제금액</span>
+                    <span style="font-weight:800;">${totalAmount}</span>
+                </div>
+            </div>
+            <button onclick="kakaoPayFinish()" style="width:100%; padding:14px; background:#FEE500; border:none; border-radius:10px; font-weight:700; cursor:pointer;">확인</button>
+        </div>
+    `;
+}
+
+function kakaoPayCancel() {
+    document.getElementById("kakao-loading")?.remove();
+    window.speechSynthesis.cancel();
+}
+
+function kakaoPayFinish() {
+    document.getElementById("kakao-loading")?.remove();
+    window.location.href = 'index.html';
 }

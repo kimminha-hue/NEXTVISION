@@ -322,7 +322,7 @@ function updateStarUI(rating) {
     });
 }
 
-starEls.forEach((별) => {
+starEls.forEach((star) => {
     star.onclick = () => {
         editRating = Number(star.dataset.value);
         updateStarUI(editRating);
