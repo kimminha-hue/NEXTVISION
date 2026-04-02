@@ -15,27 +15,27 @@ async function handleLogin() {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                loginId: username,
-                password: password
+                id: username,
+                pw: password
             })
         });
 
         const data = await response.json();
         console.log("로그인 응답:", data);
 
-        if (data.success) {
+        if (data.status === "success") {
             const loginUser = {
-                userIdx: data.userIdx,
-                id: data.loginId,
-                loginId: data.loginId,
-                name: data.name,
-                role: data.role
+                userIdx: data.user.userIdx,
+                id: data.user.id,
+                loginId: data.user.id,
+                name: data.user.name,
+                role: data.user.role
             };
 
             localStorage.setItem("isLogin", "true");
             localStorage.setItem("loginUser", JSON.stringify(loginUser));
 
-            alert(`${data.name}님 로그인 성공!`);
+            alert(`${data.user.name}님 로그인 성공!`);
             window.location.href = "index.html";
         } else {
             alert(data.message || "로그인 실패");
@@ -94,21 +94,21 @@ window.onload = async () => {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                loginId: email,
-                password: "google_" + email
+                id: email,
+                pw: "google_" + email
             })
         });
 
         const loginData = await loginRes.json();
         console.log("구글 로그인 응답:", loginData);
 
-        if (loginData.success) {
+        if (loginData.status === "success") {
             const loginUser = {
-                userIdx: loginData.userIdx,
-                id: loginData.loginId,
-                loginId: loginData.loginId,
-                name: loginData.name,
-                role: loginData.role
+                userIdx: loginData.user.userIdx,
+                id: loginData.user.id,
+                loginId: loginData.user.id,
+                name: loginData.user.name,
+                role: loginData.user.role
             };
 
             localStorage.setItem("isLogin", "true");
@@ -116,7 +116,7 @@ window.onload = async () => {
 
             history.replaceState(null, "", window.location.pathname);
 
-            alert(loginData.name + "님 로그인 성공!");
+            alert(loginData.user.name + "님 로그인 성공!");
             window.location.href = "index.html";
         } else {
             alert(loginData.message || "가입되지 않은 계정입니다. 회원가입을 먼저 해주세요.");
