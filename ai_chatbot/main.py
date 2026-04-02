@@ -140,12 +140,14 @@ async def chat_ask_api(
     
     if user_message:
         if "리뷰" in user_message or "후기" in user_message:
-            initial_prompt = f"{base_prompt} 사용자의 질문: '{user_message}'. 제공된 '실제 구매자들의 최신 리뷰'를 바탕으로 답변해줘."
+            # 수정: 반말 지시어를 존댓말과 구체적인 역할 지시로 변경
+            initial_prompt = f"{base_prompt} 사용자의 질문: '{user_message}'. 제공된 '실제 구매자들의 최신 리뷰'를 바탕으로, 시각장애인 사용자가 듣기 편한 자연스러운 대화체(구어체)로 답변해 주세요."
         else:
-            initial_prompt = f"{base_prompt} 사용자의 질문: '{user_message}'. 이 질문에 정확하게 답변해줘."
+            # 수정: 자연스러운 음성 안내 멘트를 명시적으로 요구
+            initial_prompt = f"{base_prompt} 사용자의 질문: '{user_message}'. 이 질문에 대해 실제 상담원이 육성으로 안내하듯 친절하고 자연스러운 구어체로 답변해 주세요."
     else:
-        initial_prompt = f"{base_prompt} 이 상품의 디자인, 색상, 특징을 눈앞에 있는 것처럼 자세히 설명해줘."
-
+        # 수정: 눈앞에 있는 것처럼 묘사할 때도 음성 안내 멘트임을 강조
+        initial_prompt = f"{base_prompt} 이 상품의 디자인, 색상, 특징을 눈앞에 있는 것처럼 자연스러운 음성 안내 멘트로 상세히 설명해 주세요."
 
     
     # =========================================================================
