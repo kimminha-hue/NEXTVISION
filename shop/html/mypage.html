@@ -105,13 +105,34 @@
                         <div class="orders-list"></div>
                     </div>
 
-                    <!-- 리뷰관리 -->
+                    <!-- 리뷰관리 --> 
                     <div id="reviews" class="tab-panel">
                         <h2>리뷰관리</h2>
                         <p style="color:#666; margin-bottom:16px;">내가 작성한 리뷰를 확인할 수 있습니다.</p>
                         <div class="reviews-list"></div>
                     </div>
-                </div>
+                    <div id="edit-modal" class="modal hidden">
+                    
+                        <div class="modal-content">
+                        <h3>리뷰 수정</h3>
+
+                        <p id="edit-product-name"></p>
+
+                        <div id="edit-stars" class="star-rating">
+                            <span data-value="1">★</span>
+                            <span data-value="2">★</span>
+                            <span data-value="3">★</span>
+                            <span data-value="4">★</span>
+                            <span data-value="5">★</span>
+                        </div>
+
+                        <textarea id="edit-content" placeholder="리뷰를 수정하세요"></textarea>
+
+                        <div class="modal-actions">
+                            <button id="save-edit" class="btn">저장</button>
+                            <button id="cancel-edit" class="btn btn-outline">취소</button>
+                        </div>
+                    </div>
             </div>
         </div>
     </main>
