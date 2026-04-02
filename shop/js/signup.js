@@ -1,66 +1,131 @@
 //////////////////////////////////////////////////////
 // 🔐 일반 회원가입 — DB 연동
 //////////////////////////////////////////////////////
-async function validateForm() {
-    const name = document.getElementById("name").value.trim();
-    const username = document.getElementById("username").value.trim();
-    const password = document.getElementById("password").value;
-    const confirmPassword = document.getElementById("confirm-password").value;
-    const role = document.getElementById("signup-role").value;
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("signup-form");
+    const passwordInput = document.getElementById("password");
+    const confirmPasswordInput = document.getElementById("confirm-password");
     const errorMessage = document.getElementById("error-message");
 
-    // 1. 빈값 체크
-    if (!name || !username || !password || !confirmPassword) {
-        alert("모든 항목을 입력해주세요.");
-        return false;
-    }
+    // 8자 이상 + 영문 + 숫자 포함
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
 
-    // 2. 아이디 길이 체크
-    if (username.length < 4) {
-        alert("아이디는 4자 이상 입력해주세요.");
-        return false;
-    }
-
-    // 3. 비밀번호 길이 체크
-    if (password.length < 6) {
-        alert("비밀번호는 6자 이상 입력해주세요.");
-        return false;
-    }
-
-    // 4. 비밀번호 확인
-    if (password !== confirmPassword) {
+    function showError(message) {
+        errorMessage.textContent = message;
         errorMessage.style.display = "block";
-        return false;
+        errorMessage.style.color = "red";
     }
-    errorMessage.style.display = "none";
 
-    try {
-        // ✅ localStorage 대신 DB API 호출
-        const response = await fetch("http://localhost:8088/avw/api/account/signup", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                id: username,
-                pw: password,
-                name: name,
-                role: role
-            })
-        });
-        const data = await response.json();
-        console.log("응답 데이터:", data);
+    function showSuccess(message) {
+        errorMessage.textContent = message;
+        errorMessage.style.display = "block";
+        errorMessage.style.color = "green";
+    }
 
-        if (data.status === "success") {
-            window.location.replace("login.html");
-        } else {
+    function hideMessage() {
+        errorMessage.textContent = "";
+        errorMessage.style.display = "none";
+    }
+
+    function validatePasswordUI() {
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+
+        if (!password && !confirmPassword) {
+            hideMessage();
+            return;
         }
 
-    } catch (err) {
-        console.error(err);
-        alert("서버 연결 오류가 발생했습니다.");
+        if (password && password.length < 8) {
+            showError("비밀번호는 8자 이상이어야 합니다.");
+            return;
+        }
+
+        if (password && !passwordRegex.test(password)) {
+            showError("비밀번호는 영문과 숫자를 모두 포함해야 합니다. (예: abc12345)");
+            return;
+        }
+
+        if (confirmPassword && password !== confirmPassword) {
+            showError("비밀번호가 일치하지 않습니다.");
+            return;
+        }
+
+        if (password && confirmPassword && password === confirmPassword) {
+            showSuccess("사용 가능한 비밀번호입니다.");
+            return;
+        }
+
+        hideMessage();
     }
 
-    return false;
-}
+    passwordInput.addEventListener("input", validatePasswordUI);
+    confirmPasswordInput.addEventListener("input", validatePasswordUI);
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const name = document.getElementById("name").value.trim();
+        const username = document.getElementById("username").value.trim();
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+        const role = document.getElementById("signup-role").value;
+
+        if (!name || !username || !password || !confirmPassword) {
+            alert("모든 항목을 입력해주세요.");
+            return;
+        }
+
+        if (username.length < 4) {
+            alert("아이디는 4자 이상 입력해주세요.");
+            return;
+        }
+
+        if (password.length < 8) {
+            showError("비밀번호는 8자 이상이어야 합니다.");
+            return;
+        }
+
+        if (!passwordRegex.test(password)) {
+            showError("비밀번호는 영문과 숫자를 모두 포함해야 합니다. (예: abc12345)");
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            showError("비밀번호가 일치하지 않습니다.");
+            return;
+        }
+
+        hideMessage();
+
+        try {
+            const response = await fetch("/api/account/signup", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    loginId: username,
+                    password: password,
+                    confirmPassword: confirmPassword,
+                    name: name,
+                    role: role
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.status === "success") {
+                alert("회원가입이 완료되었습니다.");
+                window.location.replace("login.html");
+            } else {
+                showError(data.message || "회원가입에 실패했습니다.");
+            }
+
+        } catch (err) {
+            console.error(err);
+            alert("서버 연결 오류가 발생했습니다.");
+        }
+    });
+});
 
 //////////////////////////////////////////////////////
 // 🔵 구글 회원가입
@@ -85,7 +150,7 @@ function googleLogin() {
 }
 
 //////////////////////////////////////////////////////
-// 🔥 구글 회원가입 콜백 처리 — DB 연동
+// 🔥 구글 회원가입 콜백 처리
 //////////////////////////////////////////////////////
 window.onload = async () => {
     const hash = window.location.hash;
@@ -101,37 +166,32 @@ window.onload = async () => {
 
         const email = data.email;
         const name = data.name;
-        const role = localStorage.getItem("tempRole") || "user";
+        const role = localStorage.getItem("tempRole") || "USER";
+        const googlePassword = "google_" + email;
 
-        // ✅ DB API로 회원가입 시도
-        const signupRes = await fetch("http://localhost:8088/avw/api/account/signup", {
+        // 회원가입
+        await fetch("/api/account/signup", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                id: email,
-                pw: "google_" + email,  // ✅ 구글 계정 비밀번호 고정
+                loginId: email,
+                password: googlePassword,
+                confirmPassword: googlePassword,
                 name: name,
                 role: role
             })
         });
-        const signupData = await signupRes.json();
 
-        if (signupData.status === "success") {
-            alert("회원가입 완료!");
-        } else {
-            // 이미 가입된 계정이면 로그인 처리
-            alert("이미 가입된 계정입니다. 로그인됩니다!");
-        }
-
-        // ✅ 바로 로그인 처리
-        const loginRes = await fetch("http://localhost:8088/avw/api/account/login", {
+        // 로그인
+        const loginRes = await fetch("/api/account/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                id: email,
-                pw: "google_" + email
+                loginId: email,
+                password: googlePassword
             })
         });
+
         const loginData = await loginRes.json();
 
         if (loginData.status === "success") {
@@ -139,7 +199,6 @@ window.onload = async () => {
             localStorage.setItem("loginUser", JSON.stringify(loginData.user));
             localStorage.removeItem("tempRole");
 
-            // ✅ URL 해시 제거 (보안)
             history.replaceState(null, "", window.location.pathname);
 
             alert(loginData.user.name + "님 환영합니다!");
