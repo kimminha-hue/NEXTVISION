@@ -6,6 +6,7 @@ async function validateForm() {
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value;
     const confirmPassword = document.getElementById("confirm-password").value;
+    const role = document.getElementById("signup-role").value;
     const errorMessage = document.getElementById("error-message");
 
     if (!name || !username || !password || !confirmPassword) {
@@ -37,7 +38,8 @@ async function validateForm() {
             body: JSON.stringify({
                 id: username,
                 pw: password,
-                name: name
+                name: name,
+                role: role
             })
         });
 
@@ -100,8 +102,8 @@ window.onload = async () => {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                id: email,
-                pw: "google_" + email,
+                loginId: email,
+                password: "google_" + email,
                 name: name
             })
         });
@@ -109,7 +111,7 @@ window.onload = async () => {
         const signupData = await signupRes.json();
         console.log("구글 회원가입 응답:", signupData);
 
-        if (signupData.status === "success") {
+        if (signupData.success) {
             alert("회원가입 완료!");
         } else {
             alert(signupData.message || "이미 가입된 계정입니다. 로그인됩니다!");
@@ -119,21 +121,21 @@ window.onload = async () => {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                id: email,
-                pw: "google_" + email
+                loginId: email,
+                password: "google_" + email
             })
         });
 
         const loginData = await loginRes.json();
         console.log("구글 로그인 응답:", loginData);
 
-        if (loginData.status === "success") {
+        if (loginData.success) {
             const loginUser = {
-                userIdx: loginData.user.userIdx,
-                id: loginData.user.id,
-                loginId: loginData.user.id,
-                name: loginData.user.name,
-                role: loginData.user.role
+                userIdx: loginData.userIdx,
+                id: loginData.loginId,
+                loginId: loginData.loginId,
+                name: loginData.name,
+                role: loginData.role
             };
 
             localStorage.setItem("isLogin", "true");
@@ -141,7 +143,7 @@ window.onload = async () => {
 
             history.replaceState(null, "", window.location.pathname);
 
-            alert(loginData.user.name + "님 환영합니다!");
+            alert(loginData.name + "님 환영합니다!");
             location.href = "index.html";
         } else {
             alert(loginData.message || "로그인 처리 중 오류가 발생했습니다.");
