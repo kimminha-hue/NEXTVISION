@@ -42,7 +42,7 @@
     border-top: 1px solid var(--border-color);
     color: var(--text-secondary);
     font-size: 0.95rem;
-    background: var(--surface-color);
+    background: #FFD400;
 }
 
 .main-content {
@@ -51,4 +51,22 @@
   align-items: center;
   justify-content: center;
   padding: 6rem 1rem;
+}
+.footer-top {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  padding: 15px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.2);
+}
+
+.footer-top a {
+  color: #000;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.footer-bottom {
+  padding: 12px 0;
+  font-size: 13px;
 }

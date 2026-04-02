@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let products = [];
     try {
         // 호성님의 스프링부트 DB 데이터 연동
-        const response = await fetch('http://localhost:8088/avw/api/product/list');
+        const response = await fetch('/api/product/list');
         if (!response.ok) throw new Error('백엔드 서버 응답 오류');
         
         const backendData = await response.json();
@@ -146,6 +146,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 <button type="button" class="qty-ctrl-btn" onclick="const input=document.getElementById('qty'); if(input.value<99) { input.value++; document.getElementById('total-price').innerText='₩'+(${product.price} * input.value).toLocaleString(); }">+</button>
                             </div>
                         </div>
+
+                        <div class="total-price-wrapper">
+                            <span>총 상품 금액</span>
+                            <span id="total-price" class="total-price-value">₩${product.price.toLocaleString()}</span>
+                        </div>
+
+                        <div class="btn-group">
+                            <button class="btn btn-outline" onclick="addToCart('${product.name}', ${product.price}, '${product.image}')">장바구니</button>
+                             <button class="btn btn-primary" id="buy-btn">구매하기</button>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -169,7 +180,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         async function fetchReviews() {
             try {
                 // p_idx에 현재 상품의 ID를 넣어서 호출합니다.
-                const reviewRes = await fetch(`http://localhost:8088/avw/api/review/list?p_idx=${product.id}`);
+                const reviewRes = await fetch(`/api/review/list?p_idx=${product.id}`);
                 if (!reviewRes.ok) throw new Error("리뷰 데이터를 불러올 수 없습니다.");
                 
                 const reviews = await reviewRes.json();
@@ -372,7 +383,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('user_message', text); 
 
         try {
-            const response = await fetch('http://localhost:8000/api/chat/ask', {
+            const response = await fetch('/api/chat/ask', {
                 method: 'POST',
                 body: formData
             });
@@ -420,7 +431,7 @@ document.addEventListener('DOMContentLoaded', () => {
             addMessage('bot', '사진을 분석 중입니다...');
             try {
                 // 호성님의 로컬 파이썬 AI 서버 주소 사용
-                const res = await fetch('http://localhost:8000/api/chat/ask', { method: 'POST', body: formData });
+                const res = await fetch('/api/chat/ask', { method: 'POST', body: formData });
                 const data = await res.json();
                 addMessage('bot', data.result);
                 readAloud(data.result);
@@ -528,3 +539,46 @@ function decreaseText(){
 function toggleContrast(){
   document.body.classList.toggle("high-contrast");
 }
+
+
+// ⭐ active + aria-current 동시 처리
+// - 로그인 후 `auth.js`가 메뉴를 동적으로 추가하기 때문에
+//   언제든 재호출할 수 있도록 전역 함수로 노출합니다.
+function updateActiveNav() {
+  const rawCurrentPage = window.location.pathname.split("/").pop() || "";
+  const currentPage = rawCurrentPage.split("?")[0].split("#")[0];
+
+  // 상세/결제/장바구니는 "쇼핑하기"로 묶어서 표시
+  const pageAliasMap = {
+    "product.html": "index.html",
+    "checkout.html": "index.html",
+  };
+  const effectivePage = pageAliasMap[currentPage] || currentPage;
+
+  const navLinks = document.querySelectorAll(".nav-links a");
+  navLinks.forEach((link) => {
+    const href = link.getAttribute("href") || "";
+    const linkPage = (() => {
+      try {
+        return new URL(href, window.location.href).pathname.split("/").pop() || "";
+      } catch {
+        return href.split("/").pop() || "";
+      }
+    })().split("?")[0].split("#")[0];
+
+    link.classList.remove("active");
+    link.removeAttribute("aria-current");
+
+    if (effectivePage && linkPage === effectivePage) {
+      link.classList.add("active");
+      link.setAttribute("aria-current", "page");
+    }
+  });
+}
+
+// 외부 스크립트(auth.js 등)에서 호출 가능하게 노출
+window.updateActiveNav = updateActiveNav;
+
+document.addEventListener("DOMContentLoaded", () => {
+  updateActiveNav();
+});

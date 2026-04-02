@@ -36,6 +36,8 @@ public class ReviewRestController {
             @RequestParam("p_idx") Integer pIdx,
             @RequestParam("rating") Integer rating,
             @RequestParam("rev_content") String revContent,
+            @RequestParam(value = "user_idx", required = false) Integer userIdx,  
+            @RequestParam(value = "user_name", required = false) String userName,  
             @RequestParam(value = "img1", required = false) MultipartFile img1,
             @RequestParam(value = "img2", required = false) MultipartFile img2,
             @RequestParam(value = "img3", required = false) MultipartFile img3
@@ -45,7 +47,8 @@ public class ReviewRestController {
         try {
             Review review = new Review();
             review.setPIdx(pIdx);
-            review.setUserIdx(1); // 우선 임시 구매자 번호(1)로 고정합니다.
+            review.setUserIdx(userIdx != null ? userIdx : 0);  
+            review.setUserName(userName != null ? userName : "알 수 없음");  
             review.setRating(rating);
             review.setRevContent(revContent);
             review.setCreatedAt(java.time.LocalDateTime.now());

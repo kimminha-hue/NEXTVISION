@@ -24,95 +24,101 @@
             <nav aria-label="메인 내비게이션">
                 <ul class="nav-links">
                     <li id="nav-intro"><a href="../../audiview/index.html">소개페이지</a></li>
-                    <li><a href="index.html" aria-current="page">쇼핑하기</a></li>
+                    <li><a href="index.html" >쇼핑하기</a></li>
                     <li><a href="login.html">로그인</a></li>
                     <li><a href="signup.html">회원가입</a></li>
                 </ul>
             </nav>
         </div>
     </header>
-<div class="mypage-container">
-    <aside class="mypage-sidebar">
-        <ul>
-            <li class="menu-item active" data-tab="profile">회원정보</li>
-            <li class="menu-item" data-tab="orders">주문내역</li>
-            <li class="menu-item" data-tab="reviews">리뷰관리</li>
-        </ul>
-    </aside>
 
-    <div class="mypage-content">
-        <!-- 회원정보 -->
-        <div id="profile" class="tab-panel active">
-            <h2>회원정보</h2>
-            <form id="profile-form">
-                <label>이름 <input type="text" id="name" value=""></label>
-                <label>연락처 <input type="tel" id="phone" value=""></label>
-                <label>주소 <input type="text" id="address" value=""></label>
-                <button type="submit" class="btn btn-primary">저장</button>
-            </form>
-            <div class="profile-actions">
-                <button class="btn btn-outline" id="change-password">비밀번호 변경</button>
-                <button class="btn btn-outline" id="delete-account">회원 탈퇴</button>
-                <button class="btn btn-outline" id="linked-accounts">연동 계정 관리</button>
-            </div>
-            <div id="password-modal" class="modal" style="display:none;">
-                <div class="modal-content">
-                    <span class="close">&times;</span>
-                    <h3>비밀번호 변경</h3>
-                    <input type="password" id="current-password" placeholder="현재 비밀번호">
-                    <input type="password" id="new-password" placeholder="새 비밀번호">
-                    <input type="password" id="confirm-password" placeholder="새 비밀번호 확인">
-                    <button class="btn btn-primary" id="save-password">변경 완료</button>
+    <main>
+        <div class="container">
+            <div class="mypage-container">
+                <aside class="mypage-sidebar">
+                    <ul>
+                        <li class="menu-item active" data-tab="profile">회원정보</li>
+                        <li class="menu-item" data-tab="orders">주문내역</li>
+                        <li class="menu-item" data-tab="reviews">리뷰관리</li>
+                    </ul>
+                </aside>
+
+                <div class="mypage-content">
+                    <!-- 회원정보 -->
+                    <div id="profile" class="tab-panel active">
+                        <h2>회원정보</h2>
+                        <form id="profile-form">
+                            <div class="form-group">
+                                <label>이름</label>
+                                <input type="text" id="name" class="input-field" placeholder="이름">
+                            </div>
+
+                            <div class="form-group">
+                                <label>연락처</label>
+                                <input type="text" id="phone" class="input-field" placeholder="010-0000-0000">
+                            </div>
+
+                            <div class="form-group">
+                                <label>주소</label>
+                                <div style="display:flex; gap:8px; margin-bottom:8px;">
+                                    <input type="text" id="postcode" class="input-field"
+                                           placeholder="우편번호" readonly style="width:40%;">
+                                    <button type="button" class="btn btn-outline"
+                                            onclick="execDaumPostcode()">주소 찾기</button>
+                                </div>
+                                <input type="text" id="address" class="input-field"
+                                       placeholder="기본주소" readonly style="margin-bottom:8px;">
+                                <input type="text" id="detail-address" class="input-field"
+                                       placeholder="상세주소 입력">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">저장하기</button>
+                        </form>
+
+                        <div class="profile-actions">
+                            <button class="btn btn-outline" id="change-password">비밀번호 변경</button>
+                            <button class="btn btn-outline" id="delete-account">회원 탈퇴</button>
+                            <button class="btn btn-outline" id="linked-accounts">연동 계정 관리</button>
+                        </div>
+
+                        <div id="password-modal" class="modal" style="display:none;">
+                            <div class="modal-content">
+                                <span class="close">&times;</span>
+                                <h3>비밀번호 변경</h3>
+                                <input type="password" id="current-password" placeholder="현재 비밀번호">
+                                <input type="password" id="new-password" placeholder="새 비밀번호">
+                                <input type="password" id="confirm-password" placeholder="새 비밀번호 확인">
+                                <button class="btn btn-primary" id="save-password">변경 완료</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 주문내역 -->
+                    <div id="orders" class="tab-panel">
+                        <h2>주문내역</h2>
+                        <div class="order-filters">
+                            <button data-status="all" class="filter-btn active">전체</button>
+                            <button data-status="shipping" class="filter-btn">배송중</button>
+                            <button data-status="delivered" class="filter-btn">배송완료</button>
+                            <button data-status="cancelled" class="filter-btn">취소/반품</button>
+                        </div>
+                        <div class="orders-list"></div>
+                    </div>
+
+                    <!-- 리뷰관리 -->
+                    <div id="reviews" class="tab-panel">
+                        <h2>리뷰관리</h2>
+                        <p style="color:#666; margin-bottom:16px;">내가 작성한 리뷰를 확인할 수 있습니다.</p>
+                        <div class="reviews-list"></div>
+                    </div>
                 </div>
             </div>
         </div>
+    </main>
 
-        <!-- 주문내역 -->
-        <div id="orders" class="tab-panel">
-            <h2>주문내역</h2>
-            <div class="order-filters">
-                <button data-status="all" class="filter-btn active">전체</button>
-                <button data-status="shipping" class="filter-btn">배송중</button>
-                <button data-status="delivered" class="filter-btn">배송완료</button>
-                <button data-status="cancelled" class="filter-btn">취소/반품</button>
-            </div>
-            <div class="orders-list"></div>
-        </div>
-
-        <!-- 리뷰관리 -->
-        <div id="reviews" class="tab-panel">
-            <h2>리뷰관리</h2>
-            <div class="reviews-list"></div>
-        </div>
-
-    </div>
-</div>
-
-<!-- 🔥 리뷰 수정 모달 -->
-<div id="edit-modal" class="modal hidden">
-  <div class="modal-content">
-    <h3>리뷰 수정</h3>
-
-    <p id="edit-product-name"></p>
-
-    <div id="edit-stars" class="star-rating">
-      <span data-value="1">★</span>
-      <span data-value="2">★</span>
-      <span data-value="3">★</span>
-      <span data-value="4">★</span>
-      <span data-value="5">★</span>
-    </div>
-
-    <textarea id="edit-content" placeholder="리뷰를 수정하세요"></textarea>
-
-    <div class="modal-actions">
-      <button id="save-edit" class="btn">저장</button>
-      <button id="cancel-edit" class="btn btn-outline">취소</button>
-    </div>
-  </div>
-</div>
-<script src="../js/script.js"></script>
-<script src="../js/mypage.js"></script>
-<script src="../../common/auth.js"></script>
+    <script src="../js/script.js"></script>
+    <script src="../js/mypage.js"></script>
+    <script src="../../common/auth.js"></script>
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </body>
 </html>

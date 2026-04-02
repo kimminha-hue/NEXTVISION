@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 데이터 가져오기 (data.json)
     let products = [];
     try {
-        const res = await fetch('http://localhost:8088/avw/api/product/list');
+        const res = await fetch('/api/product/list');
         if (!res.ok) throw new Error('API 호출 실패');
         const apiProducts = await res.json();
 
@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // =========================================================================
     async function getReviews() {
         try {
-            const res = await fetch(`http://localhost:8088/avw/api/review/list?p_idx=${productId}`);
+            const res = await fetch(`/api/review/list?p_idx=${productId}`);
             if (!res.ok) throw new Error("리뷰 API 호출 실패");
             const dbReviews = await res.json();
             
@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 productId: String(r.pIdx),
                 rating: r.rating || 5,
                 content: r.revContent,
-                user: "구매자", // 아직 DB에 유저 이름이 없으므로 통일
+                user: r.userName || "알 수 없음", 
                 date: r.createdAt ? new Date(r.createdAt).toLocaleDateString() : "최근",
                 images: [r.revImg1, r.revImg2, r.revImg3].filter(Boolean)
             }));
@@ -198,6 +198,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             formData.append('p_idx', productId);
             formData.append('rating', selectedRating);
             formData.append('rev_content', content);
+            formData.append('user_idx', loginUser.userIdx || "");  
+            formData.append('user_name', loginUser.name || "");    
 
             // 파일이 있다면 최대 3개까지 첨부
             const imageInput = document.getElementById("review-image");
@@ -210,7 +212,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             try {
                 // 스프링부트로 데이터 쏘기!
-                const res = await fetch('http://localhost:8088/avw/api/review/register', {
+                const res = await fetch('/api/review/register', {
                     method: 'POST',
                     body: formData 
                 });
