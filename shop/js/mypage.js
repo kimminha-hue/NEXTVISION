@@ -297,8 +297,7 @@ async function renderMyReviews() {
             fetch(`/api/product/list`)
         ]);
 
-        if (!reviewRes.ok) throw new Error("내 리뷰 조회 실패");
-        if (!productRes.ok) throw new Error("상품 목록 조회 실패");
+        if (!reviewRes.ok || !productRes.ok) throw new Error("데이터 호출 실패");
 
         const reviews = await reviewRes.json();
         const products = await productRes.json();
@@ -309,19 +308,19 @@ async function renderMyReviews() {
             productMap[key] = p;
         });
 
-        if (!reviews.length) {
+        if (!reviews || reviews.length === 0) {
             reviewsList.innerHTML = "<p>작성한 리뷰가 없습니다.</p>";
             return;
         }
 
-        reviewsList.innerHTML = reviews.map((review) => {
+        reviewsList.innerHTML = "";
+
+       reviews.forEach((review) => {
             const product = productMap[String(review.pIdx)] || {};
             const productName = product.name || product.productName || "상품명 없음";
             const productImage = product.img1 || product.image || "";
-            const dateText = review.createdAt
-                ? new Date(review.createdAt).toLocaleDateString()
-                : "";
-
+            
+            // 별점 HTML 생성
             const stars = Array.from({ length: 5 }, (_, i) => 
                 `<span style="color:${i < (review.rating || 0) ? "var(--accent-color)" : "#ccc"};">★</span>`
             ).join("");
@@ -353,24 +352,34 @@ async function renderMyReviews() {
                     const result = await res.json();
                     if (result.status === "success") {
                         alert("삭제되었습니다.");
-                        renderMyReviews();
+                        renderMyReviews(); // 목록 새로고침
+                    } else {
+                        alert(result.message || "삭제 실패");
                     }
-                } catch (err) { alert("삭제 실패"); }
+                } catch (err) { 
+                    console.error(err);
+                    alert("서버 오류로 삭제하지 못했습니다."); 
+                }
             };
 
             // 수정 버튼 이벤트 (모달 열기)
             div.querySelector(".edit-rev-btn").onclick = () => {
                 editingReviewIdx = review.revIdx;
-                editContent.value = review.revContent;
+                editContent.value = review.revContent || "";
                 editProductName.textContent = productName;
-                editRating = review.rating;
+                editRating = review.rating || 0;
                 updateStarUI(editRating);
-                editModal.classList.remove("hidden");
-                editModal.style.display = "flex"; // hidden 클래스가 없을 경우 대비
+                
+                // 모달 열기
+                if (editModal) {
+                    editModal.classList.remove("hidden");
+                    editModal.style.display = "flex";
+                }
             };
         });
     } catch (err) {
-        reviewsList.innerHTML = "<p>리뷰를 불러오지 못했습니다.</p>";
+        console.error(err);
+        reviewsList.innerHTML = "<p>내 리뷰를 불러오지 못했습니다.</p>";
     }
 }
 
