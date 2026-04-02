@@ -194,3 +194,98 @@ function requestPay() {
         }
     });
 }
+
+function kakaoPayDemo() {
+    // 1단계 — 음성 안내
+    const speech = new SpeechSynthesisUtterance("카카오톡으로 이동합니다.");
+    speech.lang = "ko-KR";
+    window.speechSynthesis.speak(speech);
+
+    // 2단계 — 로딩 오버레이 표시
+    const overlay = document.createElement('div');
+    overlay.id = "kakao-loading";
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0,0,0,0.85);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        color: white;
+        gap: 20px;
+    `;
+    overlay.innerHTML = `
+        <img src="../images/kakao.png" alt="카카오" 
+             style="width:70px; height:70px; border-radius:16px;">
+        <p style="font-size:1.3rem; font-weight:600;">카카오톡으로 이동 중...</p>
+        <div style="
+            width: 48px; height: 48px;
+            border: 4px solid #FEE500;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        "></div>
+    `;
+    document.body.appendChild(overlay);
+
+    // 3단계 — 2초 후 완료 화면
+    setTimeout(() => {
+        overlay.innerHTML = `
+            <div style="
+                background: #111;
+                border: 2px solid #FEE500;
+                border-radius: 20px;
+                padding: 2.5rem 2rem;
+                text-align: center;
+                max-width: 340px;
+                width: 90%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 16px;
+            ">
+                <div style="font-size:3.5rem;">✅</div>
+                <p style="font-size:1.4rem; font-weight:700; color:#FEE500;">
+                    결제가 완료되었습니다!
+                </p>
+                <p style="font-size:0.95rem; color:#aaa;">
+                    카카오페이로 결제되었습니다.
+                </p>
+                <button onclick="kakaoPayFinish()" style="
+                    width: 100%;
+                    padding: 0.9rem;
+                    background: #FEE500;
+                    color: #000;
+                    border: none;
+                    border-radius: 10px;
+                    font-size: 1rem;
+                    font-weight: 700;
+                    cursor: pointer;
+                    margin-top: 8px;
+                ">확인</button>
+            </div>
+        `;
+
+        // 4단계 — 완료 음성 안내
+        const doneSpeech = new SpeechSynthesisUtterance("결제가 완료되었습니다.");
+        doneSpeech.lang = "ko-KR";
+        window.speechSynthesis.speak(doneSpeech);
+
+    }, 2000);
+}
+
+// ✅ 8. 카카오페이 완료 후 처리
+function kakaoPayFinish() {
+    document.getElementById("kakao-loading")?.remove();
+
+    // 장바구니 비우기
+    const params = new URLSearchParams(window.location.search);
+    if (!params.get('name')) {
+        localStorage.removeItem(cartKey);
+    }
+
+    window.location.href = 'index.html';
+}
