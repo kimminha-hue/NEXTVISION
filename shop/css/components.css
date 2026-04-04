@@ -20,26 +20,14 @@
     position: relative;
 }
 
-.nav-links a::after {
-    content: '';
-    position: absolute;
-    width: 0%;
-    height: 2px;
-    bottom: -4px;
-    left: 0;
-    background-color: var(--accent-color);
-    transition: width var(--transition-speed);
-}
+
 
 .nav-links a:hover, 
 .nav-links a[aria-current="page"] {
     color: var(--text-primary);
 }
 
-.nav-links a:hover::after, 
-.nav-links a[aria-current="page"]::after {
-    width: 100%;
-}
+
 
 /* Category Navigation */
 .category-nav {

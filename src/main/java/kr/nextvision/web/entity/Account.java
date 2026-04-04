@@ -50,4 +50,10 @@ public class Account {
 
     @Column(name = "address")
     private String address;
+    
+    @Column(name = "postcode")
+    private String postcode;
+    
+    @Column(name = "detail_address")
+    private String detailAddress;
 }

@@ -132,3 +132,25 @@
   font-weight: 600;
   font-size: 1rem;
 }
+
+.btn-kakao {
+    width: 100%;
+    padding: 1rem;
+    background: #FEE500;
+    color: #000000;
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.2s;
+    margin-bottom: 0.8rem;
+}
+
+.btn-kakao:hover {
+    background: #f0d800;
+}

@@ -112,6 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             const data = await response.json();
+            console.log("회원가입 응답:", data);
 
             if (data.status === "success") {
                 alert("회원가입이 완료되었습니다.");
@@ -131,9 +132,6 @@ document.addEventListener("DOMContentLoaded", () => {
 // 🔵 구글 회원가입
 //////////////////////////////////////////////////////
 function googleLogin() {
-    const role = document.getElementById("signup-role").value;
-    localStorage.setItem("tempRole", role);
-
     const clientId = "622053074582-mul8bneofj0v5d7qsd8m4o3rullbp1sp.apps.googleusercontent.com";
     const redirectUri = "http://127.0.0.1:5500/shop/html/signup.html";
 
@@ -166,7 +164,6 @@ window.onload = async () => {
 
         const email = data.email;
         const name = data.name;
-        const role = localStorage.getItem("tempRole") || "USER";
         const googlePassword = "google_" + email;
 
         // 회원가입
@@ -178,7 +175,7 @@ window.onload = async () => {
                 password: googlePassword,
                 confirmPassword: googlePassword,
                 name: name,
-                role: role
+                role: "USER"
             })
         });
 
@@ -193,18 +190,18 @@ window.onload = async () => {
         });
 
         const loginData = await loginRes.json();
+        console.log("구글 로그인 응답:", loginData);
 
         if (loginData.status === "success") {
             localStorage.setItem("isLogin", "true");
             localStorage.setItem("loginUser", JSON.stringify(loginData.user));
-            localStorage.removeItem("tempRole");
 
             history.replaceState(null, "", window.location.pathname);
 
             alert(loginData.user.name + "님 환영합니다!");
             location.href = "index.html";
         } else {
-            alert("로그인 처리 중 오류가 발생했습니다.");
+            alert(loginData.message || "로그인 처리 중 오류가 발생했습니다.");
         }
 
     } catch (err) {

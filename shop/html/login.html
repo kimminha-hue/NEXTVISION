@@ -1,31 +1,33 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>로그인 - All-In-Shop</title>
-<link
-	href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap"
-	rel="stylesheet">
-<link rel="stylesheet" href="../css/base.css">
-<link rel="stylesheet" href="../css/components.css">
-<link rel="stylesheet" href="../css/layout.css">
-<link rel="stylesheet" href="../css/page.css">
-<link rel="stylesheet" href="../css/chatbot.css">
-<link rel="stylesheet" href="../css/pages/login.css">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>로그인 - All-In-Shop</title>
+
+	<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../css/base.css">
+	<link rel="stylesheet" href="../css/components.css">
+	<link rel="stylesheet" href="../css/layout.css">
+	<link rel="stylesheet" href="../css/page.css">
+	<link rel="stylesheet" href="../css/chatbot.css">
+	<link rel="stylesheet" href="../css/pages/login.css">
 </head>
+
 <body>
 	<header class="site-header">
 		<div class="container">
 			<h1 class="logo">
-				<a href="index.html"
-					style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
-					<img src="../images/audiview.png" alt="AudiMall 로고"
-					class="logo-img"> <span class="logo-text"> <span
-						class="logo-audi">AUDI</span><span class="logo-view">MALL</span>
-				</span>
+				<a href="index.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
+					<img src="../images/audiview.png" alt="AudiMall 로고" class="logo-img">
+					<span class="logo-text">
+						<span class="logo-audi">AUDI</span>
+						<span class="logo-view">MALL</span>
+					</span>
 				</a>
 			</h1>
+
 			<nav>
 				<ul class="nav-links">
 					<li><a href="index.html">쇼핑하기</a></li>
@@ -41,18 +43,18 @@
 			<h2 class="login-title">로그인</h2>
 
 			<form class="login-form" id="login-form" novalidate>
-				<input type="text" id="login-username" placeholder="아이디"
-					class="input-field" required> <input type="password"
-					id="login-password" placeholder="비밀번호" class="input-field" required>
-				<button type="submit" class="btn btn-primary"
-					onclick="handleLogin()">로그인</button>
+				<input type="text" id="login-username" placeholder="아이디" class="input-field" required>
+				<input type="password" id="login-password" placeholder="비밀번호" class="input-field" required>
+
+				<button type="submit" class="btn btn-primary" onclick="handleLogin()">
+					로그인
+				</button>
 			</form>
 
 			<div class="social-login">
 				<p class="divider">또는</p>
 
-				<button type="button" class="google-btn"
-					aria-label="Google 계정으로 로그인" onclick="googleLogin()">
+				<button type="button" class="google-btn" aria-label="Google 계정으로 로그인" onclick="googleLogin()">
 					<img src="../images/google.png" alt="구글로 로그인"> 구글로 로그인
 				</button>
 
@@ -73,6 +75,9 @@
 		</div>
 	</footer>
 
-	<script src="../js/login.js"></script>
+	<!-- JS 파일 연결 (캐시 방지 버전 유지) -->
+	<script src="../js/login.js?v=20260402"></script>
+
 </body>
+
 </html>

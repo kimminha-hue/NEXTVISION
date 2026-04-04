@@ -57,6 +57,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalPriceEl = document.getElementById("checkout-total-price");
     orderListEl.innerHTML = "";
 
+    if (loginUser.name) {
+        document.querySelector('input[placeholder="이름"]').value = loginUser.name;
+    }
+    if (loginUser.phone) {
+        document.querySelector('input[placeholder="연락처"]').value = loginUser.phone;
+    }
+    if (loginUser.postcode) {
+        document.getElementById("postcode").value = loginUser.postcode;
+    }
+    if (loginUser.address) {
+        document.getElementById("address").value = loginUser.address;
+    }
+    if (loginUser.detailAddress) {
+        document.getElementById("detailAddress").value = loginUser.detailAddress;
+    }
+
     // ✅ 사용자별 장바구니 키로 읽기
     const cart = JSON.parse(localStorage.getItem(cartKey)) || [];
     const params = new URLSearchParams(window.location.search);
@@ -151,9 +167,16 @@ function requestPay() {
         ? `${itemsToCheckout[0].name} 외 ${itemsToCheckout.length - 1}건` 
         : itemsToCheckout[0].name;
 
+    let pgName = "html5_inicis";
+    let payMethodAlias = currentPayMethod;
+    if (currentPayMethod === "kakaopay") {
+        pgName = "kakaopay.TC0ONETIME"; // 카카오페이 테스트용 연동 코드
+        payMethodAlias = "kakaopay";
+    }
+
     IMP.request_pay({
-        pg: "html5_inicis",
-        pay_method: currentPayMethod,
+        pg: pgName,
+        pay_method: payMethodAlias,
         merchant_uid: "order_" + new Date().getTime(),
         name: orderName,
         amount: finalTotalPrice, // 이제 단독 상품 가격이 정상 반영됩니다.

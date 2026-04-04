@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>결제하기 - All-In-Shop</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/components.css">
@@ -60,9 +61,15 @@
             <div class="checkout-box payment-box">
                 <h3 class="checkout-subtitle">결제 수단</h3>
                 <div id="pay-methods" class="pay-methods">
-                    <button type="button" class="btn btn-outline" onclick="selectPayMethod(this, 'card')">신용카드</button>
-                    <button type="button" class="btn btn-outline" onclick="selectPayMethod(this, 'vbank')">무통장 입금</button>
-                    <button type="button" class="btn btn-outline" onclick="selectPayMethod(this, 'phone')">휴대폰 결제</button>
+                    <!-- ✅ 카카오페이 버튼 추가 -->
+                    <button type="button" class="btn btn-kakao" onclick="selectPayMethod(this, 'kakaopay')">
+                        <img src="../images/kakao.png" alt="카카오" style="width:20px; height:20px; vertical-align:middle; margin-right:6px;">
+                        카카오페이 결제
+                    </button>
+                    <!-- ✅ 신용카드만 유지 -->
+                    <button type="button" class="btn btn-outline" onclick="selectPayMethod(this, 'card')">
+                        신용카드
+                    </button>
                 </div>
 
                 <div class="checkout-total" style="margin: 20px 0; border-top: 1px solid #eee; padding-top: 20px;">

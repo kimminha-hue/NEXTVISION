@@ -2,30 +2,26 @@
 <html lang="ko">
 
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>회원가입 - All-In-Shop</title>
-<link
-	href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap"
-	rel="stylesheet">
-<link rel="stylesheet" href="../css/base.css">
-<link rel="stylesheet" href="../css/components.css">
-<link rel="stylesheet" href="../css/layout.css">
-<link rel="stylesheet" href="../css/page.css">
-<link rel="stylesheet" href="../css/chatbot.css">
-<link rel="stylesheet" href="../css/pages/signup.css">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>회원가입 - All-In-Shop</title>
+	<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../css/base.css">
+	<link rel="stylesheet" href="../css/components.css">
+	<link rel="stylesheet" href="../css/layout.css">
+	<link rel="stylesheet" href="../css/page.css">
+	<link rel="stylesheet" href="../css/chatbot.css">
+	<link rel="stylesheet" href="../css/pages/signup.css">
 </head>
 
 <body>
 	<header class="site-header">
 		<div class="container">
 			<h1 class="logo">
-				<a href="index.html"
-					style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
-					<img src="../images/audiview.png" alt="AudiMall 로고"
-					class="logo-img"> <span class="logo-text"> <span
-						class="logo-audi">AUDI</span><span class="logo-view">MALL</span>
-				</span>
+				<a href="index.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
+					<img src="../images/audiview.png" alt="AudiMall 로고" class="logo-img"> <span class="logo-text"> <span
+							class="logo-audi">AUDI</span><span class="logo-view">MALL</span>
+					</span>
 				</a>
 			</h1>
 			<nav>
@@ -43,16 +39,15 @@
 			<h2 class="signup-title">회원가입</h2>
 
 			<form class="signup-form" id="signup-form" novalidate>
-				<input type="text" placeholder="이름" class="input-field" id="name"
-					required> <input type="text" placeholder="아이디"
-					class="input-field" id="username" required> <input
-					type="password" placeholder="비밀번호" class="input-field"
-					id="password" autocomplete="new-password" required> <input
-					type="password" placeholder="비밀번호 확인" class="input-field"
-					id="confirm-password" autocomplete="new-password" required>
+				<input type="text" placeholder="이름" class="input-field" id="name" required>
+				<input type="text" placeholder="아이디" class="input-field" id="username" required>
+				<input type="password" placeholder="비밀번호" class="input-field" id="password" autocomplete="new-password"
+					required>
+				<input type="password" placeholder="비밀번호 확인" class="input-field" id="confirm-password"
+					autocomplete="new-password" required>
 
-				<p id="error-message"
-					style="display: none; margin-top: 0.5rem; font-size: 1rem; font-weight: bold;"></p>
+				<p id="error-message" style="display: none; margin-top: 0.5rem; font-size: 1rem; font-weight: bold;">
+				</p>
 
 				<select id="signup-role" class="input-field">
 					<option value="USER">일반회원</option>
@@ -64,8 +59,7 @@
 				<div class="social-signup">
 					<p class="divider">간편 회원가입</p>
 
-					<button type="button" class="google-btn"
-						aria-label="Google 계정으로 회원가입" onclick="googleLogin()">
+					<button type="button" class="google-btn" aria-label="Google 계정으로 회원가입" onclick="googleLogin()">
 						<img src="../images/google.png" alt="구글로 회원가입"> 구글로 회원가입
 					</button>
 
@@ -83,7 +77,7 @@
 		</div>
 	</footer>
 
-	<script src="../js/signup.js"></script>
+	<script src="../js/signup.js?v=20260402"></script>
 </body>
 
 </html>

@@ -157,10 +157,13 @@ public class AccountRestController {
 			Map<String, Object> userInfo = new HashMap<>();
 			userInfo.put("userIdx", account.getUserIdx());
 			userInfo.put("id", account.getLoginId());
+			userInfo.put("loginId", account.getLoginId());
 			userInfo.put("name", account.getName());
 			userInfo.put("role", account.getRole());
 			userInfo.put("phone", account.getPhone());
 			userInfo.put("address", account.getAddress());
+			userInfo.put("postcode", account.getPostcode());
+			userInfo.put("detailAddress", account.getDetailAddress());
 
 			response.put("status", "success");
 			response.put("message", "로그인 성공!");
@@ -187,6 +190,8 @@ public class AccountRestController {
 			String name = body.get("name");
 			String phone = body.get("phone");
 			String address = body.get("address");
+			String postcode = body.get("postcode");
+			String detailAddress = body.get("detailAddress");
 
 			String currentPassword = body.get("currentPassword");
 			String newPassword = body.get("newPassword");
@@ -200,6 +205,12 @@ public class AccountRestController {
 			}
 			if (address != null) {
 				account.setAddress(address);
+			}
+			if (postcode != null) {
+				account.setPostcode(postcode);
+			}
+			if (detailAddress != null) {
+				account.setDetailAddress(detailAddress);
 			}
 
 			boolean wantsPasswordChange = !isBlank(currentPassword) || !isBlank(newPassword)

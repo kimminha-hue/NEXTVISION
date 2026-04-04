@@ -21,14 +21,16 @@ async function handleLogin() {
 		});
 
 		const data = await response.json();
+		console.log("로그인 응답:", data);
 
 		if (data.status === "success") {
 			localStorage.setItem("isLogin", "true");
 			localStorage.setItem("loginUser", JSON.stringify(data.user));
+
 			alert(data.user.name + "님 로그인 성공!");
 			window.location.href = "index.html";
 		} else {
-			alert(data.message);
+			alert(data.message || "로그인 실패");
 		}
 
 	} catch (err) {
@@ -87,6 +89,7 @@ function kakaoLogin() {
 					if (loginData.status === "success") {
 						localStorage.setItem("isLogin", "true");
 						localStorage.setItem("loginUser", JSON.stringify(loginData.user));
+
 						alert(loginData.user.name + "님 로그인 성공!");
 						window.location.href = "index.html";
 					} else {
@@ -132,6 +135,7 @@ window.onload = async () => {
 		});
 
 		const loginData = await loginRes.json();
+		console.log("구글 로그인 응답:", loginData);
 
 		if (loginData.status === "success") {
 			localStorage.setItem("isLogin", "true");
@@ -143,6 +147,7 @@ window.onload = async () => {
 			window.location.href = "index.html";
 		} else {
 			alert("가입되지 않은 계정입니다. 회원가입을 먼저 해주세요.");
+			history.replaceState(null, "", window.location.pathname);
 			window.location.href = "signup.html";
 		}
 
