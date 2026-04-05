@@ -4,7 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <title>마이페이지</title>
-
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/components.css">
     <link rel="stylesheet" href="../css/layout.css">
@@ -14,20 +13,17 @@
 </head>
 
 <body>
-
     <header class="site-header">
         <div class="container">
             <h1 class="logo" aria-label="AUDI MALL homepage">
                 <a href="index.html" style="display:flex; align-items:center; gap:10px; text-decoration:none;">
                     <img src="../images/audiview.png" alt="AudiMall 로고" class="logo-img">
                     <span class="logo-text">
-                        <span class="logo-audi">AUDI</span>
-                        <span class="logo-view">MALL</span>
+                        <span class="logo-audi">AUDI</span><span class="logo-view">MALL</span>
                     </span>
                 </a>
             </h1>
-
-            <nav>
+            <nav aria-label="메인 내비게이션">
                 <ul class="nav-links">
                     <li id="nav-intro"><a href="../../audiview/index.html">소개페이지</a></li>
                     <li><a href="index.html">쇼핑하기</a></li>
@@ -41,8 +37,6 @@
     <main>
         <div class="container">
             <div class="mypage-container">
-
-                <!-- 사이드바 -->
                 <aside class="mypage-sidebar">
                     <ul>
                         <li class="menu-item active" data-tab="profile">회원정보</li>
@@ -51,44 +45,37 @@
                     </ul>
                 </aside>
 
-                <!-- 본문 -->
                 <div class="mypage-content">
-
                     <!-- 회원정보 -->
                     <div id="profile" class="tab-panel active">
                         <h2>회원정보</h2>
-
                         <form id="profile-form">
-
                             <div class="form-group">
                                 <label>이름</label>
-                                <input type="text" id="name" class="input-field">
+                                <input type="text" id="name" class="input-field" placeholder="이름">
                             </div>
 
                             <div class="form-group">
                                 <label>연락처</label>
-                                <input type="text" id="phone" class="input-field">
+                                <input type="text" id="phone" class="input-field" placeholder="010-0000-0000">
                             </div>
 
                             <div class="form-group">
                                 <label>주소</label>
-
                                 <div style="display:flex; gap:8px; margin-bottom:8px;">
                                     <input type="text" id="postcode" class="input-field" placeholder="우편번호" readonly
                                         style="width:40%;">
                                     <button type="button" class="btn btn-outline" onclick="execDaumPostcode()">주소
                                         찾기</button>
                                 </div>
-
                                 <input type="text" id="address" class="input-field" placeholder="기본주소" readonly
                                     style="margin-bottom:8px;">
-                                <input type="text" id="detail-address" class="input-field" placeholder="상세주소">
+                                <input type="text" id="detail-address" class="input-field" placeholder="상세주소 입력">
                             </div>
 
-                            <!-- 🔥 네 기능 유지 (voice 선택) -->
-                            <div class="form-group">
-                                <label>기본 음성</label>
-                                <select id="voiceId" class="input-field">
+                            <div class="form-group" style="margin-top: 24px;">
+                                <label for="voiceId" style="display: block; margin-bottom: 8px;">기본 음성</label>
+                                <select id="voiceId" class="input-field" style="width: 100%;">
                                     <option value="voice_01">젊은 남성</option>
                                     <option value="voice_02">중년 남성</option>
                                     <option value="voice_03">젊은 여성</option>
@@ -107,7 +94,6 @@
                             <button class="btn btn-outline" id="linked-accounts">연동 계정 관리</button>
                         </div>
 
-                        <!-- 비밀번호 모달 -->
                         <div id="password-modal" class="modal" style="display:none;">
                             <div class="modal-content">
                                 <span class="close">&times;</span>
@@ -120,7 +106,7 @@
                         </div>
                     </div>
 
-                    <!-- 주문 -->
+                    <!-- 주문내역 -->
                     <div id="orders" class="tab-panel">
                         <h2>주문내역</h2>
                         <div class="order-filters">
@@ -132,14 +118,14 @@
                         <div class="orders-list"></div>
                     </div>
 
-                    <!-- 리뷰 -->
+                    <!-- 리뷰관리 -->
                     <div id="reviews" class="tab-panel">
                         <h2>리뷰관리</h2>
+                        <p style="color:#666; margin-bottom:16px;">내가 작성한 리뷰를 확인할 수 있습니다.</p>
                         <div class="reviews-list"></div>
                     </div>
-
-                    <!-- 리뷰 수정 모달 -->
                     <div id="edit-modal" class="modal hidden">
+
                         <div class="modal-content">
                             <h3>리뷰 수정</h3>
 
@@ -153,7 +139,7 @@
                                 <span data-value="5">★</span>
                             </div>
 
-                            <textarea id="edit-content"></textarea>
+                            <textarea id="edit-content" placeholder="리뷰를 수정하세요"></textarea>
 
                             <div class="modal-actions">
                                 <button id="save-edit" class="btn">저장</button>
@@ -161,17 +147,13 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
-            </div>
     </main>
 
-    <!-- JS -->
     <script src="../js/script.js"></script>
     <script src="../js/mypage.js"></script>
     <script src="../../common/auth.js"></script>
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-
 </body>
 
 </html>

@@ -1,15 +1,14 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const grid = document.getElementById('product-grid');
     const detailContainer = document.getElementById('product-detail-container');
-    
+
     let products = [];
     try {
-        // ✅ 파일2 API 경로 유지
         const response = await fetch('/avw/api/product/list');
         if (!response.ok) throw new Error('백엔드 서버 응답 오류');
-        
+
         const backendData = await response.json();
-        
+
         products = backendData.map(item => ({
             id: item.p_idx || item.id,
             name: item.p_name || item.name,
@@ -21,10 +20,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             detailImages: [item.img2, item.img3, item.img4].filter(Boolean)
         }));
 
-        // ✅ 파일2 — 전역 상품 리스트 저장
         window.globalProductsList = products;
         console.log("백엔드에서 가져온 진짜 데이터:", products);
-        
+
     } catch (error) {
         console.error("데이터 연동 실패:", error);
         const errMsg = `<p class="error-message">데이터를 불러오는 데 실패했습니다.</p>`;
@@ -33,19 +31,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    // --- [1] Index Page ---
     if (grid) {
         const renderProducts = (category) => {
             grid.innerHTML = '';
-            const filtered = category === 'all' 
-                ? products 
+            const filtered = category === 'all'
+                ? products
                 : products.filter(p => p.category === category);
-            
+
             if (filtered.length === 0) {
                 grid.innerHTML = `<p class="no-products-msg">해당 카테고리의 상품이 없습니다.</p>`;
                 return;
             }
-            
+
             filtered.forEach(product => {
                 const card = document.createElement('article');
                 card.classList.add('product-card');
@@ -76,7 +73,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // --- [2] Detail Page ---
     if (detailContainer) {
         const params = new URLSearchParams(window.location.search);
         const productId = params.get('id');
@@ -94,7 +90,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         document.title = `${product.name} | NextVision`;
-        
+
         const breadcrumbCategory = document.getElementById('breadcrumb-category');
         if (breadcrumbCategory) breadcrumbCategory.textContent = category;
         const breadcrumbCurrent = document.getElementById('breadcrumb-current');
@@ -169,13 +165,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
         `;
 
-        // ✅ 리뷰 불러오기 — 파일2 API 경로 유지
         async function fetchReviews() {
             try {
                 const reviewRes = await fetch(`/avw/api/review/list?p_idx=${product.id}`);
                 if (!reviewRes.ok) throw new Error("리뷰 데이터를 불러올 수 없습니다.");
                 const reviews = await reviewRes.json();
-                
+
                 const ratingContainer = document.querySelector('.product-rating');
                 const reviewContainer = document.querySelector('.highlight-review');
 
@@ -197,19 +192,38 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         fetchReviews();
 
-        // 음성 버튼
         const voiceBtn = document.getElementById('product-voice-btn');
         if (voiceBtn) {
-            voiceBtn.addEventListener('click', () => {
-                if (!window.speechSynthesis) return;
-                window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(product.description);
-                utterance.lang = 'ko-KR';
-                window.speechSynthesis.speak(utterance);
+            voiceBtn.addEventListener('click', async () => {
+                const loginUser = JSON.parse(localStorage.getItem("loginUser")) || {};
+                const voiceId = loginUser.voiceId || "voice_05";
+
+                try {
+                    const res = await fetch("/api/tts", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            text: product.description,
+                            voiceId: voiceId
+                        })
+                    });
+
+                    if (!res.ok) throw new Error("TTS 요청 실패");
+
+                    const audioBlob = await res.blob();
+                    const audioUrl = URL.createObjectURL(audioBlob);
+
+                    const audio = new Audio(audioUrl);
+                    await audio.play();
+                } catch (err) {
+                    console.error("상품 TTS 재생 실패:", err);
+                    alert("음성 재생 실패");
+                }
             });
         }
 
-        // 사이즈 선택
         if (product.category === "의류") {
             const sizeButtons = document.querySelectorAll(".size-btn");
             sizeButtons.forEach(btn => {
@@ -220,7 +234,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
 
-        // 구매 버튼
         const buyBtn = document.getElementById("buy-btn");
         if (buyBtn) {
             buyBtn.addEventListener("click", () => {
@@ -228,7 +241,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 let selectedSize = "";
                 if (product.category === "의류") {
                     const activeBtn = document.querySelector(".size-options .size-btn.active");
-                    if (!activeBtn) { alert("사이즈를 선택해주세요"); return; }
+                    if (!activeBtn) {
+                        alert("사이즈를 선택해주세요");
+                        return;
+                    }
                     selectedSize = activeBtn.textContent;
                 }
                 const totalPrice = product.price * qty;
@@ -242,7 +258,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-// ===== 챗봇 =====
 document.addEventListener('DOMContentLoaded', () => {
     const toggleBtn = document.getElementById("chatbot-toggle");
     const chatBox = document.getElementById("chatbot-box");
@@ -254,7 +269,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeBtn = document.querySelector(".chatbot-close-btn, #chat-close");
     const imageBtn = document.getElementById("image-btn");
 
-    // ✅ 챗봇 없는 페이지 오류 방지
     if (!toggleBtn || !chatBox || !messages) return;
 
     if (imageBtn && fileInput) {
@@ -269,12 +283,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const currentProductId = isDetailPage ? params.get('id') : 'main';
     const currentCategory = isDetailPage ? params.get('category') : '전체';
 
-    function readAloud(text) {
-        if (!window.speechSynthesis) return;
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'ko-KR';
-        window.speechSynthesis.speak(utterance);
+    async function speakWithUserVoice(text) {
+        const loginUser = JSON.parse(localStorage.getItem("loginUser")) || {};
+        const voiceId = loginUser.voiceId || "voice_05";
+
+        try {
+            const res = await fetch("/api/tts", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    text,
+                    voiceId
+                })
+            });
+
+            if (!res.ok) throw new Error("TTS 요청 실패");
+
+            const audioBlob = await res.blob();
+            const audioUrl = URL.createObjectURL(audioBlob);
+            const audio = new Audio(audioUrl);
+            await audio.play();
+        } catch (err) {
+            console.error("챗봇 TTS 실패:", err);
+        }
     }
 
     function addMessage(type, textOrImg) {
@@ -296,36 +329,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const modeNormalBtn = document.getElementById("mode-normal");
 
     if (modeBlindBtn && modeNormalBtn) {
-        modeBlindBtn.addEventListener("click", () => {
+        modeBlindBtn.addEventListener("click", async () => {
             userType = 'blind';
             modeBlindBtn.style.background = '#eee';
             modeNormalBtn.style.background = 'white';
             const msg = '시각장애인 모드로 전환되었습니다.';
             addMessage('bot', msg);
-            readAloud(msg);
+            await speakWithUserVoice(msg);
         });
+
         modeNormalBtn.addEventListener("click", () => {
             userType = 'normal';
             modeNormalBtn.style.background = '#eee';
             modeBlindBtn.style.background = 'white';
             addMessage('bot', '일반 사용자 모드로 전환되었습니다.');
-            if (window.speechSynthesis) window.speechSynthesis.cancel();
         });
     }
 
-    toggleBtn.addEventListener("click", () => {
+    toggleBtn.addEventListener("click", async () => {
         chatBox.classList.toggle("hidden");
         chatBox.style.zIndex = "9999";
+
         if (!chatBox.classList.contains("hidden") && messages.children.length === 0) {
             if (isDetailPage) {
                 const productName = document.querySelector('.detail-name')?.innerText || '이 상품';
                 const greeting = `현재 보고 계신 상품은 ${productName}입니다. 무엇이든 물어보시거나 사진을 올려주세요.`;
                 addMessage('bot', greeting);
-                readAloud(greeting);
+                await speakWithUserVoice(greeting);
             } else {
                 const welcomeMsg = "안녕하세요! NextVision 챗봇입니다.";
                 addMessage('bot', welcomeMsg);
-                readAloud(welcomeMsg);
+                await speakWithUserVoice(welcomeMsg);
             }
         }
     });
@@ -333,11 +367,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (closeBtn) {
         closeBtn.addEventListener("click", () => {
             chatBox.classList.add("hidden");
-            if (window.speechSynthesis) window.speechSynthesis.cancel();
         });
     }
 
-    // ✅ 텍스트 전송 — 파일2 JSON 방식 + AI 서버 주소 보호
     async function sendQuestionToServer() {
         const text = input.value.trim();
         if (!text) return;
@@ -359,13 +391,12 @@ document.addEventListener('DOMContentLoaded', () => {
             category: String(currentCategory || "전체"),
             question: String(text),
             product_name: String(targetProduct ? targetProduct.name : "메인페이지"),
-            image_urls: targetProduct 
-                ? [targetProduct.image, ...(targetProduct.detailImages || [])].filter(Boolean) 
+            image_urls: targetProduct
+                ? [targetProduct.image, ...(targetProduct.detailImages || [])].filter(Boolean)
                 : []
         };
 
         try {
-            // ✅ 파일2 AI 서버 주소 보호
             const response = await fetch('/api/analyze-screen', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -378,7 +409,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const data = await response.json();
             addMessage('bot', data.result);
-            readAloud(data.result);
+            await speakWithUserVoice(data.result);
         } catch (error) {
             console.error("질문 전송 에러:", error);
             addMessage('bot', '답변을 받아오는 데 실패했습니다.');
@@ -388,15 +419,18 @@ document.addEventListener('DOMContentLoaded', () => {
     if (sendBtn) sendBtn.addEventListener("click", sendQuestionToServer);
     if (input) {
         input.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") { e.preventDefault(); sendQuestionToServer(); }
+            if (e.key === "Enter") {
+                e.preventDefault();
+                sendQuestionToServer();
+            }
         });
     }
 
-    // ✅ 사진 업로드 — 파일2 주소 보호
     if (fileInput) {
         fileInput.addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
+
             const reader = new FileReader();
             reader.onload = (ev) => addMessage('user-img', ev.target.result);
             reader.readAsDataURL(file);
@@ -410,18 +444,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
             addMessage('bot', '사진을 분석 중입니다...');
             try {
-                // ✅ 파일2 업로드 주소 보호
-                const res = await fetch('/api/analyze-screen-upload', { method: 'POST', body: formData });
+                const res = await fetch('/api/analyze-screen-upload', {
+                    method: 'POST',
+                    body: formData
+                });
                 const data = await res.json();
                 addMessage('bot', data.result);
-                readAloud(data.result);
+                await speakWithUserVoice(data.result);
             } catch (err) {
                 addMessage('bot', '서버 연결 실패. 다시 시도해주세요.');
             }
         });
     }
 
-    // ✅ STT + 음성 결제 가로채기 — 파일2 로직 보호
     if (window.SpeechRecognition || window.webkitSpeechRecognition) {
         const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
         recognition.lang = "ko-KR";
@@ -438,7 +473,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const transcript = e.results[0][0].transcript;
                 input.value = transcript;
 
-                // ✅ 음성 결제 가로채기 — 파일2 보호
                 const buyKeywords = ["결제", "살래", "구매", "사고 싶어", "주문"];
                 const isBuyCommand = buyKeywords.some(k => transcript.includes(k));
 
@@ -446,7 +480,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     addMessage('user', transcript);
                     const buyMsg = "결제 화면으로 이동합니다.";
                     addMessage('bot', buyMsg);
-                    readAloud(buyMsg);
+                    speakWithUserVoice(buyMsg);
                     setTimeout(() => {
                         document.getElementById("buy-btn")?.click();
                     }, 1500);
@@ -467,7 +501,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// ===== 장바구니 =====
 function addToCart(name, price, image) {
     const loginUser = JSON.parse(localStorage.getItem("loginUser")) || {};
     const userId = loginUser.id || loginUser.username || "guest";
@@ -483,7 +516,6 @@ function addToCart(name, price, image) {
     alert("장바구니에 담겼습니다 🛒");
 }
 
-// ===== 접근성 기능 =====
 let zoomLevel = 1;
 let fontSize = 100;
 
@@ -492,27 +524,29 @@ function zoomIn() {
     if (zoomLevel > 1.5) zoomLevel = 1;
     document.body.style.zoom = zoomLevel;
 }
-// ✅ 파일2 오타 수정 (Out → zoomOut)
+
 function zoomOut() {
     zoomLevel -= 0.1;
     if (zoomLevel < 0.7) zoomLevel = 0.7;
     document.body.style.zoom = zoomLevel;
 }
+
 function increaseText() {
     fontSize += 10;
     if (fontSize > 150) fontSize = 150;
     document.documentElement.style.fontSize = fontSize + "%";
 }
+
 function decreaseText() {
     fontSize -= 10;
     if (fontSize < 70) fontSize = 70;
     document.documentElement.style.fontSize = fontSize + "%";
 }
+
 function toggleContrast() {
     document.body.classList.toggle("high-contrast");
 }
-
-// ===== 네비게이션 활성화 =====
+S
 function updateActiveNav() {
     const rawCurrentPage = window.location.pathname.split("/").pop() || "";
     const currentPage = rawCurrentPage.split("?")[0].split("#")[0];
