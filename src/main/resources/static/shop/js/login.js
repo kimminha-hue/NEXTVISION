@@ -1,5 +1,5 @@
 function showLoginError(message) {
-    const errorBox = document.getElementById("login-error");
+    const errorBox = document.getElementById("error-message");
     if (!errorBox) {
         alert(message);
         return;
@@ -9,7 +9,7 @@ function showLoginError(message) {
 }
 
 function hideLoginError() {
-    const errorBox = document.getElementById("login-error");
+    const errorBox = document.getElementById("error-message");
     if (errorBox) {
         errorBox.textContent = "";
         errorBox.style.display = "none";
@@ -20,8 +20,16 @@ function hideLoginError() {
 // 🔐 일반 로그인
 //////////////////////////////////////////////////////
 async function handleLogin() {
-    const username = document.getElementById("login-username").value.trim();
-    const password = document.getElementById("login-password").value.trim();
+    const usernameInput = document.getElementById("login-username");
+    const passwordInput = document.getElementById("login-password");
+
+    if (!usernameInput || !passwordInput) {
+        alert("로그인 입력창을 찾을 수 없습니다.");
+        return;
+    }
+
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value.trim();
 
     hideLoginError();
 
@@ -41,6 +49,7 @@ async function handleLogin() {
         });
 
         const data = await response.json();
+        console.log("login response:", data);
 
         if (data.status === "success") {
             localStorage.setItem("isLogin", "true");
@@ -50,9 +59,8 @@ async function handleLogin() {
         } else {
             showLoginError(data.message || "로그인에 실패했습니다.");
         }
-
     } catch (err) {
-        console.error(err);
+        console.error("login error:", err);
         showLoginError("서버 연결 오류가 발생했습니다.");
     }
 }
@@ -63,44 +71,48 @@ async function handleLogin() {
 function kakaoLogin() {
     hideLoginError();
 
-    window.Kakao.Auth.login({
-        success: function(authObj) {
+    if (!window.Kakao) {
+        showLoginError("카카오 SDK가 로드되지 않았습니다.");
+        return;
+    }
 
+    window.Kakao.Auth.login({
+        success: function (authObj) {
             fetch("http://localhost:8081/kakao/auth", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ access_token: authObj.access_token })
             })
-            .then(res => res.json())
-            .then(async data => {
-                const email = data.email;
+                .then(res => res.json())
+                .then(async data => {
+                    const email = data.email;
 
-                const loginRes = await fetch("/api/account/login", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        loginId: email,
-                        password: "kakao_" + email
-                    })
+                    const loginRes = await fetch("/api/account/login", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            loginId: email,
+                            password: "kakao_" + email
+                        })
+                    });
+
+                    const loginData = await loginRes.json();
+
+                    if (loginData.status === "success") {
+                        localStorage.setItem("isLogin", "true");
+                        localStorage.setItem("loginUser", JSON.stringify(loginData.user));
+                        alert(loginData.user.name + "님 로그인 성공!");
+                        window.location.href = "index.html";
+                    } else {
+                        showLoginError(loginData.message || "가입되지 않은 계정입니다.");
+                    }
+                })
+                .catch((err) => {
+                    console.error(err);
+                    showLoginError("카카오 로그인 실패");
                 });
-
-                const loginData = await loginRes.json();
-
-                if (loginData.status === "success") {
-                    localStorage.setItem("isLogin", "true");
-                    localStorage.setItem("loginUser", JSON.stringify(loginData.user));
-                    alert(loginData.user.name + "님 로그인 성공!");
-                    window.location.href = "../index.html";
-                } else {
-                    showLoginError(loginData.message || "가입되지 않은 계정입니다.");
-                }
-            })
-            .catch((err) => {
-                console.error(err);
-                showLoginError("카카오 로그인 실패");
-            });
         },
-        fail: function(err) {
+        fail: function (err) {
             console.error(err);
             showLoginError("카카오 로그인 실패");
         }
@@ -108,7 +120,15 @@ function kakaoLogin() {
 }
 
 //////////////////////////////////////////////////////
-// 🔵 구글 로그인 처리
+// 🔵 구글 로그인 버튼 클릭용
+//////////////////////////////////////////////////////
+function googleLogin() {
+    hideLoginError();
+    showLoginError("구글 로그인 기능 연결 상태를 확인해주세요.");
+}
+
+//////////////////////////////////////////////////////
+// 🔵 구글 access_token 처리
 //////////////////////////////////////////////////////
 window.onload = async () => {
     hideLoginError();
@@ -151,7 +171,6 @@ window.onload = async () => {
                 window.location.href = "signup.html";
             }, 1500);
         }
-
     } catch (err) {
         console.error(err);
         showLoginError("구글 로그인 오류");
